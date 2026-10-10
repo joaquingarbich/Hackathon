@@ -8,10 +8,11 @@ import { fechaLegible, type Advertencia } from "@/lib/dictamen";
 type Fuente = { id: string; nombre: string; url: string | null; fecha_corte: string };
 
 export function VistaDictamen({
-  estado, advertencias = [], fuentes, consejos = [], muestra = false, children,
+  estado, advertencias = [], anuncio = [], fuentes, consejos = [], muestra = false, children,
 }: {
   estado: Estado;
   advertencias?: Advertencia[];
+  anuncio?: string[]; // observaciones de la imagen consultada: aparte, no cambian el estado oficial
   fuentes: Fuente[];
   consejos?: readonly string[];
   muestra?: boolean;
@@ -47,6 +48,21 @@ export function VistaDictamen({
         </Tarjeta>
       )}
 
+      {anuncio.length > 0 && (
+        <Tarjeta aria-labelledby="t-anuncio" className="border-observaciones-borde">
+          <h2 id="t-anuncio" className="mb-1 font-semibold">Sobre el anuncio que consultaste</h2>
+          <p className="mb-2 text-sm text-texto-suave">Esto se refiere a la imagen que subiste, no al registro oficial.</p>
+          <ul className="flex flex-col gap-2">
+            {anuncio.map((t) => (
+              <li key={t} className="flex gap-2 text-observaciones">
+                <TriangleAlert aria-label="Observación" className="mt-1 size-5 shrink-0" />
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </Tarjeta>
+      )}
+
       {children}
 
       <Plegable titulo="Fuentes consultadas">
@@ -74,10 +90,11 @@ export function Datos({ titulo, filas }: { titulo: string; filas: [string, React
   return (
     <Tarjeta>
       <h2 className="mb-2 font-semibold">{titulo}</h2>
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+      {/* Móvil: etiqueta sobre el valor (las etiquetas largas no aprietan el dato). sm+: dos columnas. */}
+      <dl className="grid grid-cols-1 gap-y-0.5 sm:grid-cols-[auto_1fr] sm:gap-x-4 sm:gap-y-1">
         {visibles.map(([k, v]) => (
           <div key={k} className="contents">
-            <dt className="text-texto-suave">{k}</dt>
+            <dt className="mt-2 text-sm text-texto-suave first:mt-0 sm:mt-0 sm:text-base">{k}</dt>
             <dd className="break-words">{v}</dd>
           </div>
         ))}

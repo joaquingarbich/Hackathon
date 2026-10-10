@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { dictamenPrestador, dictamenVehiculo, coincidenciaClara, conObservaciones } from "./dictamen";
+import { dictamenPrestador, dictamenVehiculo, coincidenciaClara } from "./dictamen";
 
 const HOY = "2026-10-10";
 const OK = { estado: "ACTIVO", condicion: "HABIDO" };
@@ -41,8 +41,3 @@ test("coincidenciaClara", () => {
   assert.equal(coincidenciaClara([]), false);
 });
 
-test("conObservaciones", () => {
-  assert.equal(conObservaciones({ estado: "verificado", advertencias: [] }, ["x"]).estado, "observaciones");
-  assert.equal(conObservaciones({ estado: "alerta", advertencias: [] }, ["x"]).estado, "alerta");
-  assert.equal(conObservaciones({ estado: "verificado", advertencias: [] }, []).estado, "verificado");
-});

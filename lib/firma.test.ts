@@ -4,11 +4,11 @@ import { firmar, firmaValida } from "./firma";
 
 process.env.SUPABASE_SERVICE_ROLE_KEY ??= "clave-de-prueba"; // la clave se lee al firmar, no al importar
 
-test("firma", () => {
-  const f = firmar("prestador:abc:sin_ruc");
-  assert.equal(firmaValida("prestador:abc:sin_ruc", f), true);
-  assert.equal(firmaValida("prestador:abc:sin_ruc,datos_distintos", f), false); // no se puede añadir obs
-  assert.equal(firmaValida("prestador:otro:sin_ruc", f), false); // ni moverla a otro prestador
-  assert.equal(firmaValida("prestador:abc:sin_ruc", undefined), false);
-  assert.equal(firmaValida("prestador:abc:sin_ruc", "x"), false);
+test("firma canónica", () => {
+  const f = firmar({ d: "consulta:a:1", o: [], nf: false });
+  assert.equal(firmaValida({ d: "consulta:a:1", o: [], nf: false }, f), true);
+  assert.equal(firmaValida({ d: "consulta:a", o: [], nf: true }, f), false); // los ':' del texto no permiten reinterpretar
+  assert.equal(firmaValida({ d: "consulta:a:1", o: ["sin_ruc"], nf: false }, f), false);
+  assert.equal(firmaValida({ d: "consulta:a:1", o: [], nf: false }, "x"), false);
+  assert.equal(firmaValida({ d: "consulta:a:1", o: [], nf: false }, undefined), false);
 });

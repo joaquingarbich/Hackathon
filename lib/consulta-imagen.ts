@@ -1,35 +1,31 @@
-// Consulta por imagen: campos leídos → a quién corresponde → URL del dictamen con observaciones del anuncio.
+// Consulta por imagen: campos leídos → a quién corresponde → URL limpia del dictamen + observaciones del anuncio
+// (las observaciones se guardan aparte en lib/anuncio.ts, nunca en la URL).
 // Prioridad de identificación (§5): RUC > placa > cuenta de redes / teléfono > nombre.
 import { supabasePublico } from "@/lib/supabase/publico";
 import { resolver, registrarConsulta, type Resolucion } from "@/lib/consultas";
 import type { CamposConsulta } from "@/lib/vision";
 import type { CodigoObs } from "@/config/textos";
-import { firmar } from "@/lib/firma";
 
 const db = supabasePublico;
-// Los parámetros que alteran el dictamen van firmados (ver lib/firma.ts y las páginas que los leen).
-const aPrestadorUrl = (id: string, obs: CodigoObs[]) =>
-  obs.length ? `/prestador/${id}?obs=${obs.join(",")}&f=${firmar(`prestador:${id}:${obs.join(",")}`)}` : `/prestador/${id}`;
-const aConsultaUrl = (q: string, obs: CodigoObs[], noEncontrado: boolean) => {
-  const nf = noEncontrado ? "1" : "";
-  if (!obs.length && !nf) return `/consulta?q=${encodeURIComponent(q)}`;
-  return `/consulta?q=${encodeURIComponent(q)}${nf && "&nf=1"}${obs.length ? `&obs=${obs.join(",")}` : ""}&f=${firmar(`consulta:${q}:${nf}:${obs.join(",")}`)}`;
-};
+export type Destino = { url: string; destino: string; obs: CodigoObs[]; noEncontrado: boolean };
+const destinoPrestador = (id: string, obs: CodigoObs[]): Destino => ({ url: `/prestador/${id}`, destino: `prestador:${id}`, obs, noEncontrado: false });
+const aConsulta = (q: string, obs: CodigoObs[], noEncontrado: boolean): Destino =>
+  ({ url: `/consulta?q=${encodeURIComponent(q)}`, destino: `consulta:${q}`, obs, noEncontrado });
 
 /** ¿El anuncio contradice lo registrado? (posible suplantación de un prestador formal) */
 async function datosDistintos(id: string, c: CamposConsulta) {
   const { data: p } = await db().from("providers").select("ruc, telefono, redes").eq("id", id).maybeSingle();
   if (!p) return false;
   const tel = p.telefono?.replace(/\D/g, "").slice(-9);
-  const redes = JSON.stringify(p.redes ?? {}).toLowerCase();
+  const redes = Object.values((p.redes ?? {}) as Record<string, string>).map((v) => String(v).toLowerCase().replace(/^@/, ""));
   return (
     (!!c.ruc && !!p.ruc && c.ruc !== p.ruc) ||
     (!!tel && c.telefonos.length > 0 && !c.telefonos.some((t) => t.slice(-9) === tel)) ||
-    (!!c.usuario_red && redes !== "{}" && !redes.includes(c.usuario_red))
+    (!!c.usuario_red && redes.length > 0 && !redes.includes(c.usuario_red))
   );
 }
 
-export async function urlParaImagen(c: CamposConsulta): Promise<string | null> {
+export async function destinoParaImagen(c: CamposConsulta): Promise<Destino | null> {
   const obs: CodigoObs[] = c.tipo_imagen === "red_social" && !c.muestra_ruc_o_constancia ? ["sin_ruc"] : [];
   const tipoEntrada = c.tipo_imagen === "red_social" ? "red_social" : "logo";
   const registrar = (r: Resolucion, valor: string) =>
@@ -38,17 +34,17 @@ export async function urlParaImagen(c: CamposConsulta): Promise<string | null> {
   const aPrestador = async (id: string, valor: string) => {
     if (await datosDistintos(id, c)) obs.push("datos_distintos");
     await registrar({ tipo: "prestador", id }, valor);
-    return aPrestadorUrl(id, obs);
+    return destinoPrestador(id, obs);
   };
 
   if (c.ruc) {
     const r = await resolver({ tipo: "ruc", valor: c.ruc });
     if (r.tipo === "prestador") return aPrestador(r.id, c.ruc);
-    if (r.tipo === "candidatos") return aConsultaUrl(c.ruc, obs, false);
+    if (r.tipo === "candidatos") return aConsulta(c.ruc, obs, false);
   }
   if (c.placa) {
     const r = await resolver({ tipo: "placa", valor: c.placa });
-    if (r.tipo === "vehiculo") { await registrar(r, c.placa); return `/vehiculo/${r.placa}`; }
+    if (r.tipo === "vehiculo") { await registrar(r, c.placa); return { url: `/vehiculo/${r.placa}`, destino: `vehiculo:${r.placa}`, obs: [], noEncontrado: false }; }
   }
   if (c.usuario_red || c.telefonos.length) {
     const { data } = await db().rpc("buscar_por_contacto", { usuario: c.usuario_red ?? "", telefono: c.telefonos[0] ?? "" });
@@ -58,8 +54,8 @@ export async function urlParaImagen(c: CamposConsulta): Promise<string | null> {
     const r = await resolver({ tipo: "nombre", valor: c.nombre_comercial });
     if (r.tipo === "prestador") return aPrestador(r.id, c.nombre_comercial);
     await registrar(r, c.nombre_comercial);
-    return aConsultaUrl(c.nombre_comercial, obs, r.tipo !== "candidatos");
+    return aConsulta(c.nombre_comercial, obs, r.tipo !== "candidatos");
   }
   const algo = c.ruc ?? c.placa ?? c.usuario_red ?? c.telefonos[0];
-  return algo ? aConsultaUrl(algo, obs, true) : null;
+  return algo ? aConsulta(algo, obs, true) : null;
 }

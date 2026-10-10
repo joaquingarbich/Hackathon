@@ -4,33 +4,31 @@ import { connection } from "next/server";
 import { Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { NOMBRE_AUTORIZACION, NOMBRE_TIPO } from "@/config/textos";
 import { cargarPrestador, fuentes, hoyLima } from "@/lib/consultas";
-import { firmaValida } from "@/lib/firma";
-import { conObservaciones, dictamenPrestador, fechaLegible, observacionesDe } from "@/lib/dictamen";
+import { leerAnuncio } from "@/lib/anuncio";
+import { dictamenPrestador, fechaLegible } from "@/lib/dictamen";
 
-export default function Prestador({ params, searchParams }: PageProps<"/prestador/[id]">) {
+export default function Prestador({ params }: PageProps<"/prestador/[id]">) {
   return (
     <Suspense fallback={<Cargando />}>
-      <Contenido params={params} searchParams={searchParams} />
+      <Contenido params={params} />
     </Suspense>
   );
 }
 
-async function Contenido({ params, searchParams }: Pick<PageProps<"/prestador/[id]">, "params" | "searchParams">) {
+async function Contenido({ params }: Pick<PageProps<"/prestador/[id]">, "params">) {
   const { id } = await params;
-  const sp = await searchParams;
-  // Observaciones del anuncio solo si las firmó el servidor: un enlace armado a mano no puede añadir advertencias.
-  const obs = firmaValida(`prestador:${id}:${String(sp.obs ?? "")}`, sp.f) ? observacionesDe(sp.obs) : [];
+  const anuncio = await leerAnuncio(`prestador:${id}`); // cookie del navegador que subió la imagen; nunca de la URL
   await connection();
   const [datos, lista] = await Promise.all([cargarPrestador(id), fuentes()]);
   if (!datos) notFound();
   const { prestador: p, autorizaciones, ruc } = datos;
-  const { estado, advertencias } = conObservaciones(dictamenPrestador(p, autorizaciones, ruc, hoyLima()), obs);
+  const { estado, advertencias } = dictamenPrestador(p, autorizaciones, ruc, hoyLima());
   const redes = Object.values((p.redes ?? {}) as Record<string, string>).join(" · ");
 
   return (
     <>
       <h1 className="text-2xl font-semibold">{p.nombre_comercial ?? p.razon_social}</h1>
-      <VistaDictamen estado={estado} advertencias={advertencias} fuentes={lista} muestra={p.es_muestra}>
+      <VistaDictamen estado={estado} advertencias={advertencias} anuncio={anuncio.textos} fuentes={lista} muestra={p.es_muestra}>
         <Datos
           titulo="Datos del prestador"
           filas={[

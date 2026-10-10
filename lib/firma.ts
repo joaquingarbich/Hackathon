@@ -1,14 +1,14 @@
-// Firma HMAC de los parámetros que cambian un dictamen (obs, nf). Sin firma válida se ignoran:
-// así nadie puede compartir un enlace que muestre a un prestador formal con advertencias falsas.
+// Firma HMAC para datos que el servidor guarda en el navegador (cookie del anuncio consultado).
+// Se firma un JSON: forma canónica, sin ambigüedad entre campos.
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 // ponytail: clave derivada de la service role (siempre presente en el servidor); usar un secreto propio si se rota esa key.
-const clave = () => createHmac("sha256", process.env.SUPABASE_SERVICE_ROLE_KEY!).update("checktur:obs").digest();
+const clave = () => createHmac("sha256", process.env.SUPABASE_SERVICE_ROLE_KEY!).update("checktur:anuncio").digest();
 
-export const firmar = (contenido: string) => createHmac("sha256", clave()).update(contenido).digest("base64url").slice(0, 22);
+export const firmar = (datos: unknown) => createHmac("sha256", clave()).update(JSON.stringify(datos)).digest("base64url");
 
-export function firmaValida(contenido: string, firma: unknown): boolean {
+export function firmaValida(datos: unknown, firma: unknown): boolean {
   if (typeof firma !== "string") return false;
-  const a = Buffer.from(firmar(contenido)), b = Buffer.from(firma);
+  const a = Buffer.from(firmar(datos)), b = Buffer.from(firma);
   return a.length === b.length && timingSafeEqual(a, b);
 }
