@@ -4,7 +4,7 @@ import { ESTADOS } from "@/config/textos";
 // Vitrina del design system: para revisar los tokens después de cambiarlos.
 export default function Estilos() {
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-8">
+    <>
       <h1 className="text-2xl font-semibold">Design system</h1>
       <Tarjeta className="flex flex-col gap-3">
         <h2 className="font-semibold">Estados del dictamen</h2>
@@ -19,6 +19,6 @@ export default function Estilos() {
         <Boton disabled>Deshabilitado</Boton>
       </Tarjeta>
       <Plegable titulo="Plegable">Contenido del bloque.</Plegable>
-    </main>
+    </>
   );
 }
