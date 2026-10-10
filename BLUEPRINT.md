@@ -88,7 +88,6 @@ Construir con `/ui-ux-pro-max`. Móvil primero, sobrio, tipo "servicio público 
 
 - [x] Repo: https://github.com/joaquingarbich/Hackathon
 - [x] Proyecto Supabase `checktur-piura` (ref `hrycpqowvaixewbjdsbf`, sa-east-1) con migración y seed aplicados. Falta: `SUPABASE_SERVICE_ROLE_KEY` en `.env.local`
-- [ ] Aplicar `supabase/migrations/*.sql` y luego `supabase/seed.sql` (SQL editor o `npx supabase link` + `npx supabase db push --include-seed`)
 - [ ] Conectar Vercel al repo y cargar las env vars
 - [ ] Key de Gemini → `GEMINI_API_KEY` (necesaria recién en la Fase 2)
 - [ ] Export del Directorio MINCETUR (Piura) → `data/raw/` (su loader se escribe al ver el formato real)
