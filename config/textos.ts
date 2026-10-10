@@ -139,3 +139,15 @@ export const TEXTO_RESENA = {
   comprobanteUsado: "Este comprobante ya se usó para una opinión.",
   error: "No pudimos procesar tu opinión. Intenta de nuevo.",
 } as const;
+
+// Explorar por servicio: categoría → filtro sobre providers (tipo y/o actividades).
+export const CATEGORIAS = [
+  { id: "tours", nombre: "Tours y agencias", tipo: "agencia" },
+  { id: "aventura", nombre: "Aventura", actividad: "aventura" },
+  { id: "playa", nombre: "Playa", actividad: "playa" },
+  { id: "city_tour", nombre: "City tour", actividad: "city_tour" },
+  { id: "transporte", nombre: "Transporte turístico", tipo: "transporte_terrestre" },
+  { id: "estadia", nombre: "Estadía / hospedaje", tipo: "hospedaje" },
+  { id: "gastronomia", nombre: "Restaurantes", tipo: "restaurante" },
+  { id: "guias", nombre: "Guías de turismo", tipo: "guia" },
+] as const;

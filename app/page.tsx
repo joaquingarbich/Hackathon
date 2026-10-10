@@ -12,6 +12,9 @@ export default function Inicio() {
         <Boton type="submit">{TEXTO_APP.botonBuscar}</Boton>
       </form>
       <ConsultaFoto />
+      <Link href="/explorar" className="inline-flex min-h-11 items-center self-start font-semibold underline">
+        Explorar por servicio: tours, aventura, transporte, estadía…
+      </Link>
       <p className="text-sm text-texto-suave">
         {TEXTO_OPERADOR.invitacion}{" "}
         <Link href="/operador" className="underline">{TEXTO_OPERADOR.enlaceInvitacion}</Link>

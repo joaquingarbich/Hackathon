@@ -5,7 +5,8 @@ Producción: https://checktur-piura.vercel.app · Supabase `hrycpqowvaixewbjdsbf
 ## Visión aclarada por el equipo: 3 interfaces, todo gira en torno a las agencias
 
 1. **Cliente final (turista)** — HECHO: búsqueda por nombre/RUC/placa/foto → dictamen; opiniones con comprobante.
-   **FALTA: explorar por servicio.** Página `/explorar` con filtros por categoría (tours, actividades/aventura, transporte, estadía/hospedaje, gastronomía…) y zona, que liste agencias/prestadores que lo ofrecen, cada uno con su estado de formalidad. Requiere un catálogo de servicios por agencia (ver 3). Sin reservas ni pagos (fuera de alcance).
+   **HECHO (v1): `/explorar`** filtra por categoría usando `providers.tipo`/`actividades` (config `CATEGORIAS` en `config/textos.ts`).
+   **FALTA: versión con catálogo real.** `/explorar` con filtros por categoría (tours, actividades/aventura, transporte, estadía/hospedaje, gastronomía…) y zona, que liste agencias/prestadores que lo ofrecen, cada uno con su estado de formalidad. Requiere un catálogo de servicios por agencia (ver 3). Sin reservas ni pagos (fuera de alcance).
 2. **Administración** — HECHO: `/admin` cola de documentos (8 capas) y de opiniones; aprobar/rechazar con motivo.
    FALTA: aprobar/editar perfiles y servicios de agencias (ver 3), gestionar usuarios/roles desde UI, métricas básicas (consultas en `lookups`).
 3. **Agencias** — HECHO a medias: `/operador` sube constancia o TUC y ve el estado.
@@ -14,11 +15,11 @@ Producción: https://checktur-piura.vercel.app · Supabase `hrycpqowvaixewbjdsbf
 Propuesta de modelo: tabla `services` (id, provider_id, categoria, nombre, descripcion, precio_ref, fotos, estado pendiente|publicado|rechazado) + `providers.owner_user_id` y perfil editable con cambios en estado pendiente. Reusar `lib/checks`, `/admin` y el design system.
 
 ## Bugs / ajustes detectados en la verificación manual (playwright-cli, producción)
-- `/ingresar`: errores de Supabase Auth salen crudos y en inglés ("Email address … is invalid"). Mapear a español en `app/ingresar/acciones.ts`.
+- HECHO: errores de Supabase Auth en `/ingresar` traducidos a español.
 - El registro público valida el dominio del correo: probar el alta de operador con un correo real.
 - Verificado OK en producción: búsqueda por texto (10 casos), foto (2), operador→admin→azul. **Opiniones: quedó a medias** (interrumpido); el e2e local `scripts/e2e-resenas.mjs` sí pasó 14/14.
 
-## Limpieza pendiente en la base (datos de la verificación manual)
+## Limpieza de la base — HECHA 10/10 (Máncora vuelve a gris, usuarios de prueba borrados)
 - Usuarios `operador.manual@checktur.test` y `admin.manual@checktur.test`.
 - Prestador publicado "Tours Ejemplo Máncora" (source `checktur_validacion`, RUC 20999999931), su autorización y la solicitud aprobada + archivo en Storage. Devolverlo a gris para la demo en vivo.
 - Posibles opiniones "(verificación manual)" en Colán Aventura.
