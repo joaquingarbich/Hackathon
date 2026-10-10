@@ -1,6 +1,7 @@
 import { Camera } from "lucide-react";
 import { Boton, Campo } from "@/components/ui";
-import { TEXTO_APP } from "@/config/textos";
+import Link from "next/link";
+import { TEXTO_APP, TEXTO_OPERADOR } from "@/config/textos";
 
 export default function Inicio() {
   return (
@@ -15,6 +16,10 @@ export default function Inicio() {
           {TEXTO_APP.botonFoto}
         </Boton>
       </form>
+      <p className="text-sm text-texto-suave">
+        {TEXTO_OPERADOR.invitacion}{" "}
+        <Link href="/operador" className="underline">{TEXTO_OPERADOR.enlaceInvitacion}</Link>
+      </p>
     </>
   );
 }

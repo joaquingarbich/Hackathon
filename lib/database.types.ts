@@ -126,6 +126,7 @@ export type Database = {
           source_id: string
           telefono: string | null
           tipo: string
+          validacion_vence: string | null
           web: string | null
         }
         Insert: {
@@ -147,6 +148,7 @@ export type Database = {
           source_id: string
           telefono?: string | null
           tipo: string
+          validacion_vence?: string | null
           web?: string | null
         }
         Update: {
@@ -168,6 +170,7 @@ export type Database = {
           source_id?: string
           telefono?: string | null
           tipo?: string
+          validacion_vence?: string | null
           web?: string | null
         }
         Relationships: [
@@ -289,6 +292,7 @@ export type Database = {
           campos_extraidos: Json | null
           confianza: string | null
           created_at: string
+          datos_declarados: Json
           estado: string
           hash: string | null
           id: string
@@ -306,6 +310,7 @@ export type Database = {
           campos_extraidos?: Json | null
           confianza?: string | null
           created_at?: string
+          datos_declarados?: Json
           estado?: string
           hash?: string | null
           id?: string
@@ -323,6 +328,7 @@ export type Database = {
           campos_extraidos?: Json | null
           confianza?: string | null
           created_at?: string
+          datos_declarados?: Json
           estado?: string
           hash?: string | null
           id?: string

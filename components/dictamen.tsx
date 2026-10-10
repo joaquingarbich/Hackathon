@@ -17,7 +17,7 @@ export function VistaDictamen({
   muestra?: boolean;
   children?: ReactNode;
 }) {
-  const corte = fuentes[0]?.fecha_corte;
+  const corte = fuentes.find((f) => f.id !== "checktur_validacion")?.fecha_corte; // corte de padrones oficiales
   const resumen = TEXTO_ESTADO[estado].resumen.replace("{fecha}", corte ? fechaLegible(corte) : "la última actualización");
   return (
     <article className="flex flex-col gap-4">

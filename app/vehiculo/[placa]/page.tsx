@@ -23,7 +23,7 @@ async function Contenido({ params }: Pick<PageProps<"/vehiculo/[placa]">, "param
   const [datos, lista] = await Promise.all([cargarVehiculo(placa.toUpperCase()), fuentes()]);
   if (!datos) notFound();
   const { vehiculo: v, prestador: p, ruc } = datos;
-  const { estado, advertencias } = dictamenVehiculo(v, p.ruc, ruc, hoyLima());
+  const { estado, advertencias } = dictamenVehiculo(v, p.ruc, ruc, hoyLima(), p.validacion_vence);
   const placaLegible = `${v.placa.slice(0, 3)}-${v.placa.slice(3)}`;
 
   return (

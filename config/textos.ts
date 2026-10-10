@@ -84,3 +84,20 @@ export const CONSEJO = {
   vehiculo: "Confirma que la empresa que contrataste sea la que figura aquí como titular de la unidad.",
   ambulatorio: "La venta de tours en la calle, playas o terminales está prohibida: contrata en un local o canal oficial.",
 } as const;
+
+export const TEXTO_OPERADOR = {
+  invitacion: "¿Eres un operador recién acreditado y aún no apareces?",
+  enlaceInvitacion: "Sube tu constancia",
+  tituloIngreso: "Acceso para operadores",
+  ayudaIngreso: "Crea una cuenta con tu correo para subir tu constancia o TUC. Un revisor la validará.",
+  tituloPanel: "Actualización anticipada de tu registro",
+  ayudaPanel:
+    "Sube tu constancia de inscripción (DIRCETUR) o la TUC de tu unidad. Un revisor la validará y, si es correcta, los turistas te verán como «En proceso de actualización» hasta que aparezcas en el padrón oficial.",
+  estadoSolicitud: { pendiente: "En revisión", aprobado: "Aprobada", rechazado: "Rechazada" } as Record<string, string>,
+  privacidad: "Tu documento es privado: solo lo ven tú y el revisor.",
+} as const;
+
+export const TIPO_DOCUMENTO: Record<string, string> = {
+  constancia_agencia: "Constancia de inscripción de agencia (DIRCETUR)",
+  tuc: "Tarjeta Única de Circulación (TUC) de una unidad",
+};

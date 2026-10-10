@@ -4,7 +4,7 @@ import { dictamenPrestador, dictamenVehiculo, coincidenciaClara } from "./dictam
 
 const HOY = "2026-10-10";
 const OK = { estado: "ACTIVO", condicion: "HABIDO" };
-const agencia = { tipo: "agencia", ruc: "20999999922", clases: ["minorista"], actividades: [] as string[], estado_inscripcion: "vigente" };
+const agencia = { tipo: "agencia", ruc: "20999999922", clases: ["minorista"], actividades: [] as string[], estado_inscripcion: "vigente", validacion_vence: null as string | null };
 const vehiculo = { estado: "habilitado", modalidad: "turistico", habilitacion_vencimiento: "2034-02-01", citv_vencimiento: "2027-03-15", soat_vencimiento: "2027-01-10" };
 
 test("prestador", () => {
@@ -18,6 +18,12 @@ test("prestador", () => {
   assert.equal(dictamenPrestador(aventura, [{ tipo: "certificado_aventura", fecha_vencimiento: null }], OK, HOY).estado, "verificado");
   assert.equal(dictamenPrestador(agencia, [{ tipo: "autorizacion_transporte", fecha_vencimiento: "2026-01-01" }], OK, HOY).estado, "alerta");
   assert.equal(dictamenPrestador(agencia, [{ tipo: "autorizacion_transporte", fecha_vencimiento: "2026-10-30" }], OK, HOY).estado, "observaciones");
+});
+
+test("validación anticipada (azul) y su caducidad", () => {
+  assert.equal(dictamenPrestador({ ...agencia, validacion_vence: "2026-12-09" }, [], OK, HOY).estado, "actualizacion");
+  assert.equal(dictamenPrestador({ ...agencia, validacion_vence: "2026-10-01" }, [], OK, HOY).estado, "no_encontrado");
+  assert.equal(dictamenPrestador({ ...agencia, validacion_vence: "2026-12-09" }, [], { estado: "BAJA DE OFICIO", condicion: "HABIDO" }, HOY).estado, "alerta");
 });
 
 test("vehículo (casos del seed)", () => {

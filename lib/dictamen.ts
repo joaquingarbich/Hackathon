@@ -6,7 +6,7 @@ import type { Tables } from "@/lib/database.types";
 export type Advertencia = { nivel: "alerta" | "observacion"; texto: string };
 export type Dictamen = { estado: Estado; advertencias: Advertencia[] };
 
-type Prestador = Pick<Tables<"providers">, "tipo" | "ruc" | "clases" | "actividades" | "estado_inscripcion">;
+type Prestador = Pick<Tables<"providers">, "tipo" | "ruc" | "clases" | "actividades" | "estado_inscripcion" | "validacion_vence">;
 type Autorizacion = Pick<Tables<"authorizations">, "tipo" | "fecha_vencimiento">;
 type Ruc = Pick<Tables<"ruc_status">, "estado" | "condicion"> | null;
 type Vehiculo = Pick<
@@ -28,8 +28,10 @@ function advertenciasRuc(rucNumero: string | null, ruc: Ruc): Advertencia[] {
   return a;
 }
 
-function estadoDe(advertencias: Advertencia[]): Estado {
+/** validacionVence: solo para prestadores publicados por validación del admin (no por padrón oficial). */
+function estadoDe(advertencias: Advertencia[], validacionVence: string | null, hoy: string): Estado {
   if (advertencias.some((a) => a.nivel === "alerta")) return "alerta";
+  if (validacionVence) return validacionVence >= hoy ? "actualizacion" : "no_encontrado"; // caducada: vuelve a revisión
   return advertencias.length ? "observaciones" : "verificado";
 }
 
@@ -51,10 +53,10 @@ export function dictamenPrestador(p: Prestador, autorizaciones: Autorizacion[], 
     else if (dias <= REGLAS.diasAvisoVencimiento)
       a.push({ nivel: "observacion", texto: ADVERTENCIA.autorizacionPorVencer(nombre, fechaLegible(aut.fecha_vencimiento)) });
   }
-  return { estado: estadoDe(a), advertencias: a };
+  return { estado: estadoDe(a, p.validacion_vence, hoy), advertencias: a };
 }
 
-export function dictamenVehiculo(v: Vehiculo, rucNumero: string | null, ruc: Ruc, hoy: string): Dictamen {
+export function dictamenVehiculo(v: Vehiculo, rucNumero: string | null, ruc: Ruc, hoy: string, validacionVence: string | null = null): Dictamen {
   const a = advertenciasRuc(rucNumero, ruc);
   if (v.estado === "cancelado") a.push({ nivel: "alerta", texto: ADVERTENCIA.vehiculoCancelado });
   if (v.habilitacion_vencimiento) {
@@ -68,7 +70,7 @@ export function dictamenVehiculo(v: Vehiculo, rucNumero: string | null, ruc: Ruc
     a.push({ nivel: "observacion", texto: ADVERTENCIA.citvVencido(fechaLegible(v.citv_vencimiento)) });
   if (v.soat_vencimiento && diasHasta(v.soat_vencimiento, hoy) < 0)
     a.push({ nivel: "observacion", texto: ADVERTENCIA.soatVencido(fechaLegible(v.soat_vencimiento)) });
-  return { estado: estadoDe(a), advertencias: a };
+  return { estado: estadoDe(a, validacionVence, hoy), advertencias: a };
 }
 
 /** ¿El mejor candidato es claramente "el" buscado? Si no, el usuario elige (nunca en silencio). */

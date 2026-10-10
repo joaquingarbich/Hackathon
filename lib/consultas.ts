@@ -37,7 +37,7 @@ export async function cargarVehiculo(placa: string) {
   const vehiculo = uno(await db().from("vehicles").select("*").eq("placa", placa).maybeSingle());
   if (!vehiculo) return null;
   const prestador = uno(
-    await db().from("providers").select("id, tipo, ruc, razon_social, nombre_comercial, telefono").eq("id", vehiculo.provider_id).maybeSingle(),
+    await db().from("providers").select("id, tipo, ruc, razon_social, nombre_comercial, telefono, validacion_vence").eq("id", vehiculo.provider_id).maybeSingle(),
   );
   if (!prestador) return null;
   return { vehiculo, prestador, ruc: await rucStatus(prestador.ruc) };
