@@ -8,7 +8,7 @@ function errorEnEspanol(m: string) {
   if (/already registered|already exists/i.test(m)) return "Ya existe una cuenta con ese correo. Usa «Ingresar».";
   if (/password/i.test(m)) return "La contraseña no cumple los requisitos (mínimo 8 caracteres).";
   if (/rate limit|too many/i.test(m)) return "Demasiados intentos. Espera unos minutos.";
-  return "No pudimos crear la cuenta. Intenta de nuevo.";
+  return "La cuenta no se pudo crear. Intenta de nuevo.";
 }
 
 const credenciales = (f: FormData) => ({

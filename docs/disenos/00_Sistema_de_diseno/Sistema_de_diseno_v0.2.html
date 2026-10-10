@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CheckTur · Sistema de diseño v0.2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=Atkinson+Hyperlegible:wght@400;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F6F5}
+a{color:#0E1B24}a:hover{color:#3B4955}
+</style>
+<style>html{background:#D5DADD}body{display:flex;justify-content:center;padding:24px 0}</style>
+</head>
+<body>
+<a href="../index.html" style="position:fixed;right:12px;top:12px;z-index:9;font:700 14px system-ui,sans-serif;background:#0E1B24;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none">Índice</a><script>if(self!==top)document.currentScript.previousElementSibling.remove()</script>
+<div style="width:1440px;box-shadow:0 2px 12px rgba(0,0,0,.12)">
+<div style="width: 1440px; height: 3000px; box-sizing: border-box; padding: 72px 80px; background: #F4F6F5; color: #0E1B24; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; display: flex; flex-direction: column; gap: 56px">
+
+  <!-- Header -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; border-bottom: 2px solid #0E1B24; padding-bottom: 32px">
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: #0E1B24; display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+        <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 30px">CheckTur <span style="font-weight: 500; color: #46535E">Piura</span></span>
+      </div>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 72px; line-height: 1; letter-spacing: -0.03em">Sistema “Sello” v0.2</h1>
+      <p style="margin: 0; font-size: 20px; color: #46535E; max-width: 820px; line-height: 1.45">Tinta para la interfaz, color solo para el estado del dictamen, y un único elemento con personalidad: el sello. Ajustado tras la auditoría con las guías de Apple (HIG).</p>
+    </div>
+    <div style="font-size: 15px; color: #46535E; text-align: right; line-height: 1.6">v0.2 · 10 oct 2026<br>Equipo Trifuerza · Reto 16</div>
+  </div>
+
+  <!-- Principles (no numbering: not a sequence) -->
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 26px">Informa, no acusa</div>
+      <div style="font-size: 17px; line-height: 1.5; color: #3B4955">Nunca “informal”, “ilegal”, “estafa” ni “fraude”. Se dice lo que consta y qué hacer.</div>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 26px">Fuente y fecha, siempre</div>
+      <div style="font-size: 17px; line-height: 1.5; color: #3B4955">Viven dentro del sello. “No encontrado” no es una conclusión negativa.</div>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 26px">Formalidad ≠ reputación</div>
+      <div style="font-size: 17px; line-height: 1.5; color: #3B4955">Las opiniones van aparte, en neutro, y nunca cambian el estado.</div>
+    </div>
+  </div>
+
+  <!-- Signature: El sello -->
+  <div style="display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 36px; font-weight: 700">El sello del dictamen</h2>
+      <span style="font-size: 17px; color: #46535E">El elemento firma. Toda la audacia se gasta aquí; lo demás queda en silencio.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+      <!-- Light seal -->
+      <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 12px">
+        <span style="font-size: 15px; color: #46535E">Claro</span>
+        <div style="background: #E2F3E7; border: 2px solid #137A43; border-radius: 20px; padding: 6px">
+          <div style="border: 1.5px dashed #137A43; border-radius: 15px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div style="width: 48px; height: 48px; flex: none; border-radius: 999px; background: #137A43; display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5l4 4 8-9"></path></svg></div>
+              <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 32px; letter-spacing: -0.02em; color: #0D6634">Verificado</span>
+            </div>
+            <span style="font-size: 17px; line-height: 1.45">Figura en el Directorio de MINCETUR y su RUC está activo y habido.</span>
+            <div style="border-top: 1.5px dashed #137A43; padding-top: 10px; display: flex; justify-content: space-between; font-size: 15px; color: #0D6634"><span>MINCETUR · SUNAT</span><span>Corte <span style="font-family: 'JetBrains Mono', monospace">05/10/2026</span></span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Dark seal -->
+      <div style="background: #0B141B; border: 1px solid #26323C; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 12px; color: #E8ECEE">
+        <span style="font-size: 15px; color: #A9B3BA">Oscuro</span>
+        <div style="background: #123224; border: 2px solid #3FB97A; border-radius: 20px; padding: 6px">
+          <div style="border: 1.5px dashed #3FB97A; border-radius: 15px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div style="width: 48px; height: 48px; flex: none; border-radius: 999px; background: #3FB97A; display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0B141B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5l4 4 8-9"></path></svg></div>
+              <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 32px; letter-spacing: -0.02em; color: #7BD9A3">Verificado</span>
+            </div>
+            <span style="font-size: 17px; line-height: 1.45">Figura en el Directorio de MINCETUR y su RUC está activo y habido.</span>
+            <div style="border-top: 1.5px dashed #3FB97A; padding-top: 10px; display: flex; justify-content: space-between; font-size: 15px; color: #7BD9A3"><span>MINCETUR · SUNAT</span><span>Corte <span style="font-family: 'JetBrains Mono', monospace">05/10/2026</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status tokens table -->
+  <div style="display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 36px; font-weight: 700">Estados: claro y oscuro</h2>
+    <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; overflow: hidden">
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr 1fr; font-size: 15px">
+        <span style="padding: 12px 20px; color: #46535E; border-bottom: 1px solid #DCE1E4">Estado e ícono</span><span style="padding: 12px 20px; color: #46535E; border-bottom: 1px solid #DCE1E4">Borde claro</span><span style="padding: 12px 20px; color: #46535E; border-bottom: 1px solid #DCE1E4">Texto claro</span><span style="padding: 12px 20px; color: #46535E; border-bottom: 1px solid #DCE1E4">Fondo claro</span><span style="padding: 12px 20px; color: #46535E; border-bottom: 1px solid #DCE1E4">Borde oscuro</span><span style="padding: 12px 20px; color: #46535E; border-bottom: 1px solid #DCE1E4">Texto oscuro</span><span style="padding: 12px 20px; color: #46535E; border-bottom: 1px solid #DCE1E4">Fondo oscuro</span>
+
+        <span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-weight: 700; color: #0D6634">✓ Verificado</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#137A43</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#0D6634 · 6,1</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#E2F3E7</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#3FB97A</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#7BD9A3 · 8,2</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#123224</span>
+
+        <span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-weight: 700; color: #82500A">▲ Con observaciones</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#A86200</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#82500A · 6,0</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#FDF0D5</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#D99A2B</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#F2C46B · 8,5</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#3A2A0C</span>
+
+        <span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-weight: 700; color: #1C4C99">◷ En proceso</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#2559B8</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#1C4C99 · 6,9</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#E3ECFA</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#6C93E0</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#9DBBF5 · 7,6</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#15284A</span>
+
+        <span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-weight: 700; color: #47515A">? No encontrado</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#5A646E</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#47515A · 7,0</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#ECEEF0</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#8E9BA5</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#C3CBD1 · 8,0</span><span style="padding: 14px 20px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#26323C</span>
+
+        <span style="padding: 14px 20px; font-weight: 700; color: #A3221B">⬣ Alerta</span><span style="padding: 14px 20px; font-family: 'JetBrains Mono', monospace">#B92D25</span><span style="padding: 14px 20px; font-family: 'JetBrains Mono', monospace">#A3221B · 6,2</span><span style="padding: 14px 20px; font-family: 'JetBrains Mono', monospace">#FBE5E2</span><span style="padding: 14px 20px; font-family: 'JetBrains Mono', monospace">#E0645A</span><span style="padding: 14px 20px; font-family: 'JetBrains Mono', monospace">#F4A39B · 7,9</span><span style="padding: 14px 20px; font-family: 'JetBrains Mono', monospace">#3D1714</span>
+      </div>
+    </div>
+    <span style="font-size: 15px; color: #46535E">Contraste del texto sobre su fondo (WCAG). El estado siempre lleva ícono y palabra: ámbar y azul son difíciles de separar para algunas personas.</span>
+  </div>
+
+  <!-- Neutrals + type -->
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 36px; font-weight: 700">Neutros por rol</h2>
+      <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; overflow: hidden; font-size: 15px">
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr 1fr">
+          <span style="padding: 12px 18px; color: #46535E; border-bottom: 1px solid #DCE1E4">Rol</span><span style="padding: 12px 18px; color: #46535E; border-bottom: 1px solid #DCE1E4">Claro</span><span style="padding: 12px 18px; color: #46535E; border-bottom: 1px solid #DCE1E4">Oscuro</span>
+          <span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0">Fondo</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#F4F6F5</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#0B141B</span>
+          <span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0">Superficie</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#FFFFFF</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#15212B</span>
+          <span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0">Texto</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#0E1B24 · 17,5</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#E8ECEE · 13,8</span>
+          <span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0">Texto secundario</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#46535E · 7,9</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace">#A9B3BA · 7,7</span>
+          <span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-weight: 700">Borde de control</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace; font-weight: 700">#6B7782 · 4,6</span><span style="padding: 12px 18px; border-bottom: 1px solid #ECEEF0; font-family: 'JetBrains Mono', monospace; font-weight: 700">#7A8792 · 4,4</span>
+          <span style="padding: 12px 18px">Separador (decorativo)</span><span style="padding: 12px 18px; font-family: 'JetBrains Mono', monospace">#DCE1E4</span><span style="padding: 12px 18px; font-family: 'JetBrains Mono', monospace">#26323C</span>
+        </div>
+      </div>
+      <span style="font-size: 15px; color: #46535E; line-height: 1.5">El borde de campos y zonas de carga pasa de #A9B3BA (2,1:1) a #6B7782 (4,6:1). Sin interruptor de apariencia propio: sigue la del sistema.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 36px; font-weight: 700">Escala tipográfica (móvil)</h2>
+      <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 34px; letter-spacing: -0.02em; line-height: 1.05">Título grande</span><span style="font-size: 15px; color: #46535E">Bricolage 800 · 34</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px">Encabezado de sección</span><span style="font-size: 15px; color: #46535E">Bricolage 700 · 22</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><span style="font-size: 17px; line-height: 1.5">Cuerpo: lo que el turista lee.</span><span style="font-size: 15px; color: #46535E">Atkinson 400 · 17</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><span style="font-size: 15px; color: #46535E">Secundario: explicaciones y metadatos</span><span style="font-size: 15px; color: #46535E">Atkinson · 15</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><span style="font-size: 13px; color: #46535E">Nota mínima (nunca menos)</span><span style="font-size: 15px; color: #46535E">Atkinson · 13</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 17px">20600000001 · Z9X-482</span><span style="font-size: 15px; color: #46535E">Mono solo para RUC, placas, n.° y fechas</span></div>
+        <span style="font-size: 15px; color: #46535E; line-height: 1.5; border-top: 1px solid #DCE1E4; padding-top: 14px">Escritorio: cuerpo 15, mínimo 13. Todo en rem para que crezca con el tamaño de texto del sistema (hasta 200 %).</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Components -->
+  <div style="display: flex; flex-direction: column; gap: 20px">
+    <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 36px; font-weight: 700">Componentes</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start">
+
+      <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <span style="font-weight: 700; font-size: 17px">Campo de texto · estados</span>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label for="ds-a" style="font-size: 15px; font-weight: 700">Normal</label><input id="ds-a" type="text" placeholder="Ej. 20600000001" style="height: 52px; border: 1.5px solid #6B7782; border-radius: 10px; padding: 0 14px; font: inherit; font-size: 17px; color: #0E1B24; background: #FFFFFF"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label for="ds-b" style="font-size: 15px; font-weight: 700">Con foco</label><input id="ds-b" type="text" value="2060000" style="height: 52px; border: 2px solid #0E1B24; border-radius: 10px; padding: 0 14px; font-family: 'JetBrains Mono', monospace; font-size: 17px; color: #0E1B24; background: #FFFFFF; outline: 3px solid #0E1B24; outline-offset: 2px"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label for="ds-c" style="font-size: 15px; font-weight: 700">Error</label><input id="ds-c" type="text" value="2060000" aria-describedby="ds-c-e" style="height: 52px; border: 2px solid #B92D25; border-radius: 10px; padding: 0 14px; font-family: 'JetBrains Mono', monospace; font-size: 17px; color: #0E1B24; background: #FFFFFF"><span id="ds-c-e" style="font-size: 15px; color: #A3221B">Escribe los 11 dígitos del RUC (faltan 4).</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><label for="ds-d" style="font-size: 15px; font-weight: 700">Válido</label><div style="position: relative"><input id="ds-d" type="text" value="20600000001" style="width: 100%; box-sizing: border-box; height: 52px; border: 1.5px solid #6B7782; border-radius: 10px; padding: 0 44px 0 14px; font-family: 'JetBrains Mono', monospace; font-size: 17px; color: #0E1B24; background: #FFFFFF"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0D6634" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; right: 14px; top: 15px" role="img" aria-label="Formato válido"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.5l2.5 2.5L16 9.5"></path></svg></div></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 24px">
+        <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <span style="font-weight: 700; font-size: 17px">Botones · 52 alto, foco visible</span>
+          <button type="button" style="height: 52px; border-radius: 14px; border: 0; background: #0E1B24; color: #FFFFFF; font: inherit; font-weight: 700; font-size: 17px">Verificar</button>
+          <button type="button" style="height: 52px; border-radius: 14px; border: 2px solid #0E1B24; background: #FFFFFF; color: #0E1B24; font: inherit; font-weight: 700; font-size: 17px; outline: 3px solid #0E1B24; outline-offset: 3px">Contactar (con foco)</button>
+          <button type="button" disabled="" style="height: 52px; border-radius: 14px; border: 0; background: #DCE1E4; color: #46535E; font: inherit; font-weight: 700; font-size: 17px">Continuar (falta un dato)</button>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <span style="font-weight: 700; font-size: 17px">Chips de proceso (no son estados públicos)</span>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #6B7782; font-size: 15px; font-weight: 700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E1B24" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l2.5 1.5"></path></svg>En revisión</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #6B7782; font-size: 15px; font-weight: 700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E1B24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Aprobado</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #6B7782; font-size: 15px; font-weight: 700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E1B24" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"></path></svg>Por corregir</span>
+          </div>
+          <span style="font-size: 15px; color: #46535E; line-height: 1.45">Contorno + ícono, nunca relleno de tinta: el relleno de tinta queda solo para botones.</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 24px">
+        <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <span style="font-weight: 700; font-size: 17px">Barra de pestañas (proveedor)</span>
+          <nav aria-label="Ejemplo de pestañas" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #DCE1E4; border-radius: 16px; background: #FFFFFF; padding: 6px">
+            <a href="#i" style="height: 56px; border-radius: 12px; background: #ECEEF0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 13px; font-weight: 700; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0E1B24" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg>Inicio</a>
+            <a href="#d" style="height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 13px; color: #46535E; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#46535E" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"></path><path d="M14 3v4h4"></path></svg>Documentos</a>
+            <a href="#u" style="height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 13px; color: #46535E; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#46535E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15l2-6h14l2 6v3H3z"></path><circle cx="7.5" cy="18" r="1.5"></circle><circle cx="16.5" cy="18" r="1.5"></circle></svg>Unidades</a>
+            <a href="#p" style="height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 13px; color: #46535E; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#46535E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Perfil</a>
+          </nav>
+          <span style="font-size: 15px; color: #46535E; line-height: 1.45">Visible en todas las secciones; seleccionado con ícono relleno + fondo, no solo color.</span>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <span style="font-weight: 700; font-size: 17px">Barra de acción inferior (dictamen)</span>
+          <div style="border: 1px solid #DCE1E4; border-radius: 16px; padding: 10px; display: grid; grid-template-columns: 1fr 52px; gap: 8px; background: #FFFFFF">
+            <button type="button" style="height: 52px; border-radius: 14px; border: 0; background: #0E1B24; color: #FFFFFF; font: inherit; font-weight: 700; font-size: 17px">Contactar por canal oficial</button>
+            <button type="button" aria-label="Compartir dictamen" style="height: 52px; border-radius: 14px; border: 1.5px solid #6B7782; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E1B24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"></path><path d="M7 8l5-5 5 5"></path><path d="M5 13v7h14v-7"></path></svg></button>
+          </div>
+          <span style="font-size: 15px; color: #46535E; line-height: 1.45">La acción principal al alcance del pulgar, no a mitad de un scroll de 1 700 px.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Voice & glossary -->
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+    <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px">Glosario único</span>
+      <div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 10px 16px; font-size: 17px">
+        <b>proveedor</b><span style="color: #3B4955">Reemplaza “prestador” y “operador” en toda la interfaz.</span>
+        <b>dictamen</b><span style="color: #3B4955">El resultado de una consulta.</span>
+        <b>corte</b><span style="color: #3B4955">Fecha de los datos de cada fuente.</span>
+        <b>Documentos</b><span style="color: #3B4955">Une “Solicitudes” y “Requisitos”: un solo lugar.</span>
+      </div>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #DCE1E4; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px">Voz</span>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 17px; line-height: 1.45">
+        <span><b style="color: #0D6634">Sí:</b> “Sin coincidencias en los registros oficiales con corte al 05/10/2026.”</span>
+        <span><b style="color: #A3221B">No:</b> <span style="text-decoration: line-through; color: #46535E">“No pudimos verificar…”</span> (evita “nosotros”)</span>
+        <span><b style="color: #0D6634">Sí:</b> “Solicitudes”, “Unidades”. <b style="color: #A3221B">No:</b> <span style="text-decoration: line-through; color: #46535E">“Mis solicitudes”, “Tus unidades”</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</body>
+</html>

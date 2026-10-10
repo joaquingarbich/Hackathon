@@ -327,6 +327,94 @@ export type Database = {
           },
         ]
       }
+      // AÑADIDO A MANO desde supabase/migrations/20261011000000_catalogo_servicios.sql (aún no aplicada).
+      // Regenerar este archivo con el MCP después de aplicar la migración.
+      services: {
+        Row: {
+          categoria: string
+          condiciones: string | null
+          created_at: string
+          descripcion: string | null
+          destino: string
+          duracion: string | null
+          es_muestra: boolean
+          estado: string
+          fotos: string[]
+          grupo_max: number | null
+          id: string
+          idiomas: string[]
+          ilustracion: string | null
+          incluye: string[]
+          itinerario: Json
+          no_incluye: string[]
+          nombre: string
+          precio_ref: number | null
+          provider_id: string
+          punto_encuentro: string | null
+          salidas: string | null
+          temporada: string | null
+          unidad_precio: string
+        }
+        Insert: {
+          categoria: string
+          condiciones?: string | null
+          created_at?: string
+          descripcion?: string | null
+          destino: string
+          duracion?: string | null
+          es_muestra?: boolean
+          estado?: string
+          fotos?: string[]
+          grupo_max?: number | null
+          id?: string
+          idiomas?: string[]
+          ilustracion?: string | null
+          incluye?: string[]
+          itinerario?: Json
+          no_incluye?: string[]
+          nombre: string
+          precio_ref?: number | null
+          provider_id: string
+          punto_encuentro?: string | null
+          salidas?: string | null
+          temporada?: string | null
+          unidad_precio?: string
+        }
+        Update: {
+          categoria?: string
+          condiciones?: string | null
+          created_at?: string
+          descripcion?: string | null
+          destino?: string
+          duracion?: string | null
+          es_muestra?: boolean
+          estado?: string
+          fotos?: string[]
+          grupo_max?: number | null
+          id?: string
+          idiomas?: string[]
+          ilustracion?: string | null
+          incluye?: string[]
+          itinerario?: Json
+          no_incluye?: string[]
+          nombre?: string
+          precio_ref?: number | null
+          provider_id?: string
+          punto_encuentro?: string | null
+          salidas?: string | null
+          temporada?: string | null
+          unidad_precio?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sources: {
         Row: {
           fecha_corte: string

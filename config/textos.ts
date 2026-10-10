@@ -7,7 +7,7 @@ export type Estado = (typeof ESTADOS)[number];
 export const TEXTO_ESTADO: Record<Estado, { titulo: string; resumen: string }> = {
   verificado: {
     titulo: "Verificado",
-    resumen: "Figura en el registro oficial y su RUC está activo.",
+    resumen: "Figura en un registro oficial vigente y su RUC está activo y habido.",
   },
   observaciones: {
     titulo: "Verificado con observaciones",
@@ -15,11 +15,11 @@ export const TEXTO_ESTADO: Record<Estado, { titulo: string; resumen: string }> =
   },
   actualizacion: {
     titulo: "En proceso de actualización",
-    resumen: "Presentó su constancia y fue validada; está pendiente de publicación en el padrón oficial.",
+    resumen: "Presentó su constancia oficial y CheckTur la validó; aún no aparece en el padrón, que se publica con retraso.",
   },
   no_encontrado: {
     titulo: "No encontrado",
-    resumen: "No pudimos verificar a este prestador en los registros oficiales con corte al {fecha}.",
+    resumen: "Sin coincidencias en los registros oficiales con corte al {fecha}. No es una conclusión negativa: los padrones se publican con retraso.",
   },
   alerta: {
     titulo: "Alerta",
@@ -29,18 +29,18 @@ export const TEXTO_ESTADO: Record<Estado, { titulo: string; resumen: string }> =
 
 export const TEXTO_APP = {
   nombre: "CheckTur Piura",
-  lema: "Verifica agencias, transporte y servicios turísticos antes de contratar.",
+  lema: "Experiencias, hospedajes y restaurantes de Piura con registro oficial verificado.",
   campoBusqueda: "Nombre, RUC o placa",
-  ejemploBusqueda: "Ej.: Vaca Loca Tours, 20123456789 o ABC-123",
+  ejemploBusqueda: "Ej.: Colán Aventura, 20123456789 o ABC-123",
   botonBuscar: "Verificar",
-  botonFoto: "Usar foto o captura",
+  botonFoto: "Tomar foto o elegir captura",
 } as const;
 
 // Advertencias: hechos comprobables de fuente oficial, redactados sin acusar.
 export const ADVERTENCIA = {
   rucNoActivo: (estado: string) => `Según SUNAT, el RUC figura con estado "${estado}".`,
   rucNoHabido: (condicion: string) => `Según SUNAT, la condición de domicilio del RUC es "${condicion}".`,
-  rucSinDato: "No pudimos contrastar el RUC con el padrón de SUNAT a la fecha de corte.",
+  rucSinDato: "El RUC no se pudo contrastar con el padrón de SUNAT a la fecha de corte.",
   sinRuc: "El registro no consigna un RUC para contrastar con SUNAT.",
   inscripcionSuspendida: "Su inscripción en el Directorio figura como suspendida.",
   mayorista:
@@ -79,16 +79,16 @@ export const CONSEJO = {
   noEncontrado: [
     "Pídele su RUC o su constancia de inscripción y vuelve a consultar.",
     "Consulta en iPerú (www.iperu.org) o en la DIRCETUR Piura.",
-    "Un prestador recién acreditado puede tardar en aparecer en el padrón oficial.",
+    "Un proveedor recién acreditado puede tardar en aparecer en el padrón oficial.",
   ],
   vehiculo: "Confirma que la empresa que contrataste sea la que figura aquí como titular de la unidad.",
   ambulatorio: "La venta de tours en la calle, playas o terminales está prohibida: contrata en un local o canal oficial.",
 } as const;
 
 export const TEXTO_OPERADOR = {
-  invitacion: "¿Eres un operador recién acreditado y aún no apareces?",
+  invitacion: "¿Eres un proveedor recién acreditado y aún no apareces?",
   enlaceInvitacion: "Sube tu constancia",
-  tituloIngreso: "Acceso para operadores",
+  tituloIngreso: "Acceso para proveedores",
   ayudaIngreso: "Crea una cuenta con tu correo para subir tu constancia o TUC. Un revisor la validará.",
   tituloPanel: "Actualización anticipada de tu registro",
   ayudaPanel:
@@ -107,14 +107,14 @@ export const OBS_IMAGEN = {
   sin_ruc:
     "El anuncio o perfil no muestra RUC ni n.° de constancia. Las agencias deben mostrarlos en sus canales digitales (art. 22, D.S. 005-2020-MINCETUR).",
   datos_distintos:
-    "Los datos del anuncio (teléfono, cuenta o RUC) no coinciden con los registrados para este prestador. Contáctalo solo por el canal oficial que figura aquí.",
+    "Los datos del anuncio (teléfono, cuenta o RUC) no coinciden con los registrados para este proveedor. Contáctalo solo por el canal oficial que figura aquí.",
 } as const;
 export type CodigoObs = keyof typeof OBS_IMAGEN;
 
 export const TEXTO_FOTO = {
   leyendo: "Leyendo la imagen…",
-  ilegible: "No pudimos identificar datos en la imagen. Prueba con una foto más nítida o escribe el nombre, RUC o placa.",
-  error: "No pudimos procesar la imagen. Intenta de nuevo o escribe el nombre, RUC o placa.",
+  ilegible: "No se identificaron datos en la imagen. Prueba con una foto más nítida o escribe el nombre, RUC o placa.",
+  error: "La imagen no se pudo procesar. Intenta de nuevo o escribe el nombre, RUC o placa.",
   ayuda: "Foto de un letrero, logo o unidad, o captura de un anuncio en redes.",
 } as const;
 
@@ -129,25 +129,91 @@ export const TEXTO_RESENA = {
   dejar: "Dejar una opinión",
   reportar: "Reportar",
   reportada: "Gracias: un revisor la evaluará.",
-  sinRuc: "Este prestador no tiene RUC registrado, así que no podemos verificar comprobantes para opinar sobre él.",
+  sinRuc: "Este proveedor no tiene RUC registrado: no se pueden verificar comprobantes para opinar sobre él.",
   tituloFormulario: "Tu opinión",
   ayudaFormulario:
-    "Para evitar opiniones falsas, solo publicamos opiniones con un comprobante de pago (boleta, factura o ticket) emitido por este prestador. Un revisor la valida antes de publicarla.",
+    "Para evitar opiniones falsas, solo se publican opiniones con un comprobante de pago (boleta, factura o ticket) emitido por este proveedor. Un revisor la valida antes de publicarla.",
   consentimiento:
     "Acepto que CheckTur trate mis datos de contacto solo para verificar esta opinión (Ley N.° 29733). No se publican: solo se muestra el alias.",
-  enviado: "¡Gracias! Recibimos tu opinión y tu comprobante. Un revisor la validará antes de publicarla.",
+  enviado: "¡Gracias! Tu opinión y tu comprobante llegaron. Un revisor la validará antes de publicarla.",
   comprobanteUsado: "Este comprobante ya se usó para una opinión.",
-  error: "No pudimos procesar tu opinión. Intenta de nuevo.",
+  error: "La opinión no se pudo procesar. Intenta de nuevo.",
 } as const;
 
-// Explorar por servicio: categoría → filtro sobre providers (tipo y/o actividades).
+// Catálogo (web cliente). Categoría de `services.categoria` → tipos de proveedor (respaldo sin tabla services).
 export const CATEGORIAS = [
-  { id: "tours", nombre: "Tours y agencias", tipo: "agencia" },
-  { id: "aventura", nombre: "Aventura", actividad: "aventura" },
-  { id: "playa", nombre: "Playa", actividad: "playa" },
-  { id: "city_tour", nombre: "City tour", actividad: "city_tour" },
-  { id: "transporte", nombre: "Transporte turístico", tipo: "transporte_terrestre" },
-  { id: "estadia", nombre: "Estadía / hospedaje", tipo: "hospedaje" },
-  { id: "gastronomia", nombre: "Restaurantes", tipo: "restaurante" },
-  { id: "guias", nombre: "Guías de turismo", tipo: "guia" },
+  { id: "experiencia", nombre: "Experiencias", singular: "experiencia", tipos: ["agencia", "guia"] },
+  { id: "hospedaje", nombre: "Hospedajes", singular: "hospedaje", tipos: ["hospedaje"] },
+  { id: "restaurante", nombre: "Restaurantes", singular: "restaurante", tipos: ["restaurante"] },
+  { id: "transporte", nombre: "Transporte", singular: "traslado", tipos: ["transporte_terrestre"] },
 ] as const;
+export type Categoria = (typeof CATEGORIAS)[number]["id"];
+
+// Destinos de Piura: `services.destino` guarda el id. `ilustracion` elige la escena de components/ilustracion.tsx.
+export const DESTINOS = [
+  { id: "mancora", nombre: "Máncora" },
+  { id: "los_organos", nombre: "Los Órganos y El Ñuro" },
+  { id: "colan_paita", nombre: "Colán y Paita" },
+  { id: "catacaos", nombre: "Catacaos" },
+  { id: "chulucanas", nombre: "Chulucanas" },
+  { id: "piura", nombre: "Piura ciudad" },
+] as const;
+
+export const TEXTO_CATALOGO = {
+  titular: "Ballenas, tallanes y playas del norte",
+  bajada: "Experiencias, hospedajes y restaurantes de Piura, con opiniones de viajeros y contacto directo con cada proveedor.",
+  destino: "Destino",
+  todoPiura: "Toda la región Piura",
+  queHacer: "¿Qué quieres hacer?",
+  queHacerEjemplo: "Ballenas, artesanía, surf…",
+  buscar: "Buscar",
+  garantia: "Cada proveedor publicado tiene registro oficial verificado o documentos validados.",
+  comoSeRevisa: "Cómo se revisa",
+  comoSeRevisaTexto:
+    "Se contrasta su RUC con SUNAT y su inscripción con MINCETUR o el MTC. Si ya presentó su constancia y aún no aparece en el padrón oficial, lo verás con la etiqueta “Registro en actualización”.",
+  destinos: "Destinos de Piura",
+  mejorValoradas: "Mejor valoradas",
+  verTodas: "Ver todo el catálogo",
+  verificarTitulo: "¿Te ofrecieron un tour fuera de CheckTur?",
+  verificarTexto: "En la calle, en la playa o por redes: verifica su registro con el nombre, RUC, placa o una foto antes de pagar.",
+  verificarBoton: "Verificar un proveedor",
+  precioNota: "Precios referenciales; la reserva y el pago se coordinan directamente con cada proveedor.",
+  porPersona: "por persona",
+  sinResultados: "Sin resultados con esos filtros. Prueba con otro destino o categoría.",
+  ofrecidoPor: "Ofrecido por",
+  verDictamen: "Ver dictamen",
+  queEs: "¿Qué es?",
+  incluye: "Incluye",
+  noIncluye: "No incluye",
+  itinerario: "Itinerario",
+  puntoEncuentro: "Punto de encuentro",
+  abrirMapa: "Abrir en el mapa",
+  condiciones: "Condiciones del proveedor",
+  tuConsulta: "Tu consulta",
+  mensajeSeEnviara: "Mensaje que se enviará",
+  whatsapp: "Consultar por WhatsApp",
+  llamar: "Llamar al proveedor",
+  notaContacto: "Número registrado por el proveedor. La reserva y el pago se coordinan directamente con él.",
+  sinTelefono: "Este proveedor no registró un teléfono. Revisa su dictamen para ver sus canales oficiales.",
+  mensaje: (servicio: string, personas: string, fecha: string) =>
+    `Hola, quiero consultar por ${servicio} para ${personas}${fecha ? ` el ${fecha}` : ""}. Lo vi en CheckTur.`,
+  experienciasDelProveedor: "Servicios publicados",
+  respaldoAviso: "El catálogo de servicios se está cargando. Mientras tanto, estos son los proveedores registrados.",
+  verProveedor: "Ver proveedor",
+  publica: "Publica tus servicios",
+} as const;
+
+// Etiqueta en tarjetas del catálogo: solo cuando el estado no es "Verificado" (la publicación ya implica formalidad).
+export const ETIQUETA_CATALOGO: Partial<Record<Estado, string>> = {
+  actualizacion: "Registro en actualización",
+  observaciones: "Con observaciones",
+};
+
+export const TEXTO_GUARDADOS = {
+  titulo: "Guardados",
+  ayuda: "Se guardan solo en este dispositivo, sin cuenta.",
+  vacio: "Aún no guardaste nada. Toca el corazón en una experiencia o proveedor para tenerlo a mano.",
+  guardar: "Guardar",
+  guardado: "Guardado",
+  quitar: "Quitar",
+} as const;

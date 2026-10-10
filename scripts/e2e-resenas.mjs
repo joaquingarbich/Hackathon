@@ -36,7 +36,7 @@ try {
   const ajeno = await enviar(page, "boleta-otro.png");
   ok(ajeno.includes("20999999922") && ajeno.includes("no es el de este prestador"), `RUC ajeno rechazado: «${ajeno}»`);
   const bueno = await enviar(page, "boleta-colan.png");
-  ok(bueno.includes("Recibimos tu opinión"), `comprobante correcto aceptado: «${bueno.slice(0, 60)}…»`);
+  ok(bueno.includes("Tu opinión y tu comprobante llegaron"), `comprobante correcto aceptado: «${bueno.slice(0, 60)}…»`);
   const repetido = await enviar(page, "boleta-colan.png");
   ok(repetido.includes("ya se usó"), `mismo comprobante rechazado: «${repetido}»`);
 
@@ -54,7 +54,7 @@ try {
   await ap.fill("#email", "admin.prueba@checktur.test"); await ap.fill("#password", pass);
   await ap.getByRole("button", { name: "Ingresar" }).click(); await ap.waitForURL(/operador/);
   await ap.goto(`${B}/admin`);
-  await ap.getByText("Opiniones por revisar").waitFor();
+  await ap.getByText("Opiniones · por revisar").waitFor();
   await ap.click(`a[href="/admin/resena/${rs[0].id}"]`);
   await ap.getByText("Contacto (privado)").waitFor();
   const det = await ap.textContent("main");

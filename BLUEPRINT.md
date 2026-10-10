@@ -29,7 +29,7 @@
 | Hospedaje, restaurante | Dictamen genérico: figura en padrón + RUC activo/habido |
 | Transporte acuático | **Fuera** |
 
-**Actividades:** campo `providers.actividades text[]` (city tour, aventura, vivencial, gastronómico…) tomado de "modalidades y tipo de turismo" del Directorio. Nueva advertencia: *ofrece aventura y no consta certificado de aventura* (art. 17.4 D.S. 005-2020). No hay catálogo de tours ni reservas.
+**Actividades:** campo `providers.actividades text[]` (city tour, aventura, vivencial, gastronómico…) tomado de "modalidades y tipo de turismo" del Directorio. Nueva advertencia: *ofrece aventura y no consta certificado de aventura* (art. 17.4 D.S. 005-2020). No hay reservas ni pagos. **Actualizado 10/10 (equipo):** la web del turista es un catálogo de servicios por proveedor (tabla `services`, `docs/CATALOGO.md`); estar publicado ya implica formalidad y el verificador queda como pestaña secundaria.
 
 ## 4. Costuras (lo que se puede cambiar sin tocar el resto)
 
@@ -41,8 +41,9 @@ lib/vision/           extract(file, tipo) → JSON con certeza por campo. Hoy: g
 lib/checks/           una función por capa de verificación (2–8). Devuelven {capa, ok, detalle}
 lib/dictamen.ts       entidad + ruc_status + vehículos + submissions → {estado, advertencias, fuentes}
 scripts/load-*.ts     un loader por fuente → tablas normalizadas
-app/globals.css       design tokens (@theme). Componentes solo usan tokens semánticos
-components/ui.tsx     Boton, Tarjeta, InsigniaEstado, Campo, Plegable (vitrina en /estilos)
+app/globals.css       design tokens "Sello" v0.2 (@theme, claro/oscuro). Componentes solo usan tokens semánticos
+components/ui.tsx     Sello, InsigniaEstado, ChipProceso, Boton, Campo, Tarjeta, Plegable, BarraAccion (vitrina en /estilos)
+lib/catalogo.ts       lecturas del catálogo + respaldo si falta la tabla services (docs/CATALOGO.md)
 supabase/migrations/  único lugar donde cambia el esquema
 ```
 
@@ -66,10 +67,10 @@ supabase/migrations/  único lugar donde cambia el esquema
 
 ## 7. Diseño
 
-Construir con `/ui-ux-pro-max`. Móvil primero, sobrio, tipo "servicio público confiable".
-- Pantalla de consulta: un campo + botón grande de cámara.
-- Dictamen: tarjeta de estado arriba con **color + ícono + palabra**; debajo, plegables: datos, autorizaciones, advertencias, fuentes y fecha de corte; "Opiniones de usuarios" separado.
-- Sin logos del Estado ni distintivo MINCETUR. Wordmark "CheckTur Piura" + escudo con check.
+**Sistema "Sello" v0.2** (mockups de Claude Design en `docs/disenos/`, detalle en `docs/DISENO.md`). Móvil primero; tinta para la interfaz, color solo para el estado.
+- Portada = catálogo (destinos, mejor valorados, buscador). Verificar = pestaña aparte con campo + foto o captura.
+- Dictamen: **sello** arriba (color + ícono + palabra + fuente + corte); debajo datos, autorizaciones, advertencias y fuentes; "Opiniones de usuarios" separado y en neutro.
+- Sin logos del Estado ni distintivo MINCETUR. Wordmark "CheckTur Piura" con check en cuadro de tinta.
 
 ## 8. Fases (cada una demostrable)
 

@@ -2,17 +2,39 @@
 
 Producción: https://checktur-piura.vercel.app · Supabase `hrycpqowvaixewbjdsbf` · deploy automático por push a `main`.
 
+## ⚠️ PRIORIDAD 1 — Base de datos del catálogo (hacer desde la PC con acceso a Supabase)
+
+El catálogo nuevo (`/`, `/explorar`, `/experiencia/[id]`) necesita la tabla `services`, y **todavía no está aplicada**. Mientras falte, producción muestra la lista de proveedores registrados como respaldo y `/experiencia/*` responde 404 (`docs/CATALOGO.md`).
+
+1. Aplicar `supabase/migrations/20261011000000_catalogo_servicios.sql` con el MCP de Supabase (`apply_migration`, nombre `catalogo_servicios`).
+2. Renombrar el archivo local a la versión que reporte `list_migrations` (regla de `CLAUDE.md`).
+3. Correr `supabase/seed_catalogo.sql` (`execute_sql`). Crea 3 proveedores "(muestra)" y 6 servicios publicados. Se corre una sola vez.
+4. Regenerar `lib/database.types.ts` (`generate_typescript_types`). El bloque `services` se añadió a mano y debe quedar igual.
+5. Revisar con `get_advisors` (security) que `services` no tenga avisos de RLS.
+6. Verificar en producción: `/` muestra "Mejor valoradas", `/explorar?c=hospedaje` filtra, la ficha de ballenas abre el panel de WhatsApp y `/prestador/…0011` lista "Servicios publicados".
+
 ## Visión aclarada por el equipo: 3 interfaces, todo gira en torno a las agencias
 
-1. **Cliente final (turista)** — HECHO: búsqueda por nombre/RUC/placa/foto → dictamen; opiniones con comprobante.
-   **HECHO (v1): `/explorar`** filtra por categoría usando `providers.tipo`/`actividades` (config `CATEGORIAS` en `config/textos.ts`).
-   **FALTA: versión con catálogo real.** `/explorar` con filtros por categoría (tours, actividades/aventura, transporte, estadía/hospedaje, gastronomía…) y zona, que liste agencias/prestadores que lo ofrecen, cada uno con su estado de formalidad. Requiere un catálogo de servicios por agencia (ver 3). Sin reservas ni pagos (fuera de alcance).
-2. **Administración** — HECHO: `/admin` cola de documentos (8 capas) y de opiniones; aprobar/rechazar con motivo.
-   FALTA: aprobar/editar perfiles y servicios de agencias (ver 3), gestionar usuarios/roles desde UI, métricas básicas (consultas en `lookups`).
-3. **Agencias** — HECHO a medias: `/operador` sube constancia o TUC y ve el estado.
-   **FALTA: registro completo de la agencia**: vincular cuenta ↔ agencia (RUC), perfil (nombre comercial, descripción, dirección, contacto, redes, fotos), **servicios/tours ofrecidos** (nombre, categoría, descripción, precio referencial, fotos), editar todo, y que los cambios pasen por validación del admin antes de publicarse.
+1. **Cliente final (turista)**:
+   - **HECHO (10/10, rediseño Sello v0.2):** web tipo catálogo con portada, resultados por categoría/destino/texto, ficha de experiencia con consulta por WhatsApp o llamada, Guardados (localStorage) y verificador en `/verificar`. Ver `docs/CATALOGO.md` y `docs/DISENO.md`. Solo falta aplicar la BD (prioridad 1).
+   - FALTA: fotos reales por servicio (bucket público + `services.fotos`), opiniones por servicio (hoy son por proveedor), mapa en resultados y filtro por fecha o disponibilidad. Sin reservas ni pagos (fuera de alcance).
+2. **Administración**:
+   - HECHO: `/admin` cola de documentos (8 capas) y de opiniones; aprobar o pedir corrección con motivo. Rediseñado con A02/A03.
+   - FALTA: alta, edición y publicación de servicios (`services.estado`) desde la UI; aprobar/editar perfiles de agencias; gestionar usuarios y roles; métricas básicas (consultas en `lookups`); sección "Padrones" del mockup.
+3. **Agencias (proveedor)**:
+   - HECHO a medias: `/operador` sube constancia o TUC, ve "Lo que ve hoy un turista" y el estado de sus documentos (rediseño P05/P07).
+   - **FALTA: registro completo de la agencia**:
+     - vincular cuenta ↔ agencia (`providers.owner_user_id`);
+     - perfil (nombre comercial, descripción, dirección, contacto, redes, fotos);
+     - **formulario de servicios** que escriba en `services` con `estado = 'pendiente'` y que el admin publique (necesita grants o server action con service role).
 
-Propuesta de modelo: tabla `services` (id, provider_id, categoria, nombre, descripcion, precio_ref, fotos, estado pendiente|publicado|rechazado) + `providers.owner_user_id` y perfil editable con cambios en estado pendiente. Reusar `lib/checks`, `/admin` y el design system.
+### No implementado de los mockups (docs/disenos)
+- Botón **English** (i18n).
+- Registro del proveedor: paso del RUC con validación contra SUNAT (P02) y **código de verificación por SMS** (P04).
+- Pestañas del proveedor **Unidades** y **Perfil** (barra de pestañas P05); matrícula de embarcaciones y permiso de transporte acuático (P07).
+- **Licencia de funcionamiento** municipal en el dictamen (C03).
+- Galería "Ver las N fotos", "Compartir dictamen", "Reportar un problema con este dictamen".
+- C01b "Leyendo captura" con pasos y certeza por campo (hoy solo "Leyendo la imagen…").
 
 ## Bugs / ajustes detectados en la verificación manual (playwright-cli, producción)
 - HECHO: errores de Supabase Auth en `/ingresar` traducidos a español.

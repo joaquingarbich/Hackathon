@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Cargando } from "@/components/dictamen";
-import { Tarjeta } from "@/components/ui";
+import { ChipProceso, Mono, Pagina } from "@/components/ui";
 import { TIPO_DOCUMENTO } from "@/config/textos";
 import { exigirAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -32,45 +32,49 @@ async function Cola() {
     .order("created_at");
 
   return (
-    <>
-      <h1 className="text-2xl font-semibold">Solicitudes por revisar</h1>
-      {!pendientes?.length && <p className="text-texto-suave">No hay solicitudes pendientes.</p>}
-      <ul className="flex flex-col gap-2">
+    <Pagina>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-[2.125rem] leading-[1.05] font-extrabold">Panel de validación</h1>
+        <p className="text-texto-suave">Documentos de proveedores y opiniones con comprobante.</p>
+      </div>
+      <h2 className="text-[1.375rem] font-bold">Documentos · pendientes {pendientes?.length ?? 0}</h2>
+      {!pendientes?.length && <p className="text-texto-suave">No hay documentos pendientes.</p>}
+      <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
         {pendientes?.map((s) => (
-          <li key={s.id}>
-            <Link href={`/admin/${s.id}`} className="block">
-              <Tarjeta className="flex items-center justify-between gap-3 transition-colors duration-200 hover:bg-fondo">
-                <span className="flex flex-col gap-1">
-                  <span className="font-semibold">
-                    {(s.datos_declarados as { nombre_comercial?: string }).nombre_comercial ?? "Sin nombre"} · RUC {s.ruc}
-                  </span>
-                  <span className="text-sm text-texto-suave">{TIPO_DOCUMENTO[s.tipo_documento]} · {fechaLegible(s.created_at.slice(0, 10))}</span>
-                  <InsigniaConfianza confianza={s.confianza} />
+          <li key={s.id} className="border-b border-separador last:border-0">
+            <Link href={`/admin/${s.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-relleno">
+              <span className="flex flex-col gap-1">
+                <b className="text-lg">{(s.datos_declarados as { nombre_comercial?: string }).nombre_comercial ?? "Sin nombre"}</b>
+                <span className="text-[0.9375rem] text-texto-suave">{TIPO_DOCUMENTO[s.tipo_documento]} · RUC <Mono>{s.ruc}</Mono></span>
+                <span className="flex flex-wrap items-center gap-2 text-[0.9375rem] text-texto-suave">
+                  <InsigniaConfianza confianza={s.confianza} /> <Mono>{fechaLegible(s.created_at.slice(0, 10))}</Mono>
                 </span>
-                <ChevronRight aria-hidden className="size-5 shrink-0" />
-              </Tarjeta>
+              </span>
+              <ChevronRight aria-hidden className="size-5 shrink-0" />
             </Link>
           </li>
         ))}
       </ul>
-      <h2 className="mt-4 text-xl font-semibold">Opiniones por revisar</h2>
+      <h2 className="mt-2 text-[1.375rem] font-bold">Opiniones · por revisar {resenas?.length ?? 0}</h2>
       {!resenas?.length && <p className="text-texto-suave">No hay opiniones pendientes ni reportadas.</p>}
-      <ul className="flex flex-col gap-2">
+      <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
         {resenas?.map((r) => (
-          <li key={r.id}>
-            <Link href={`/admin/resena/${r.id}`} className="block">
-              <Tarjeta className="flex items-center justify-between gap-3 transition-colors duration-200 hover:bg-fondo">
-                <span className="flex flex-col gap-1">
-                  <span className="font-semibold">{r.estrellas}★ · {r.estado === "reportada" ? "Reportada" : "Pendiente"}</span>
-                  <span className="text-sm text-texto-suave">{r.comentario?.slice(0, 80) ?? "Sin comentario"} · {fechaLegible(r.created_at.slice(0, 10))}</span>
+          <li key={r.id} className="border-b border-separador last:border-0">
+            <Link href={`/admin/resena/${r.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-relleno">
+              <span className="flex flex-col gap-1">
+                <span className="flex flex-wrap items-center gap-2">
+                  <b>{r.estrellas} de 5</b>
+                  <ChipProceso tipo={r.estado === "reportada" ? "corregir" : "revision"} texto={r.estado === "reportada" ? "Reportada" : "Pendiente"} />
                 </span>
-                <ChevronRight aria-hidden className="size-5 shrink-0" />
-              </Tarjeta>
+                <span className="text-[0.9375rem] text-texto-suave">{r.comentario?.slice(0, 80) ?? "Sin comentario"} · <Mono>{fechaLegible(r.created_at.slice(0, 10))}</Mono></span>
+              </span>
+              <ChevronRight aria-hidden className="size-5 shrink-0" />
             </Link>
           </li>
         ))}
       </ul>
-      <Link href="/operador" className="min-h-11 self-start underline">Volver</Link>
-    </>
+      <p className="text-[0.875rem] text-texto-suave">Datos de muestra · empresas ficticias.</p>
+      <Link href="/operador" className="flex min-h-11 items-center self-start font-bold">← Volver</Link>
+    </Pagina>
   );
 }

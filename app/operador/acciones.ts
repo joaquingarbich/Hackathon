@@ -32,7 +32,7 @@ export async function enviarSolicitud(entrada: {
     .insert({ user_id: u.id, ruc, tipo_documento: entrada.tipo, archivo_path: entrada.ruta, datos_declarados: declarados })
     .select("id")
     .single();
-  if (error) return { ok: false, error: "No pudimos registrar tu solicitud. Intenta de nuevo." };
+  if (error) return { ok: false, error: "La solicitud no se pudo registrar. Intenta de nuevo." };
 
   try {
     await procesarSolicitud(data.id);

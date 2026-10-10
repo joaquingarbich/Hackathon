@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload } from "lucide-react";
-import { Boton, Campo } from "@/components/ui";
+import { Boton, Campo, claseControl } from "@/components/ui";
 import { TIPO_DOCUMENTO } from "@/config/textos";
 import { supabaseNavegador } from "@/lib/supabase/client";
 import { enviarSolicitud } from "./acciones";
@@ -26,7 +26,7 @@ export function FormularioSolicitud({ usuarioId }: { usuarioId: string }) {
     setEstado({ cargando: true });
     const ruta = `${usuarioId}/${crypto.randomUUID()}.${EXT[archivo.type]}`;
     const subida = await supabaseNavegador().storage.from("documentos").upload(ruta, archivo, { contentType: archivo.type });
-    if (subida.error) return setEstado({ cargando: false, error: "No pudimos subir el archivo. Intenta de nuevo." });
+    if (subida.error) return setEstado({ cargando: false, error: "El archivo no se pudo subir. Intenta de nuevo." });
 
     const r = await enviarSolicitud({
       ruc: String(f.get("ruc")), tipo, ruta,
@@ -42,9 +42,9 @@ export function FormularioSolicitud({ usuarioId }: { usuarioId: string }) {
 
   return (
     <form onSubmit={enviar} className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="tipo" className="font-semibold">Documento</label>
-        <select id="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)} className="min-h-12 rounded-control border border-borde bg-superficie px-3">
+      <div className="flex flex-col gap-1">
+        <label htmlFor="tipo" className="text-[0.9375rem] font-bold">Documento</label>
+        <select id="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)} className={claseControl}>
           {Object.entries(TIPO_DOCUMENTO).map(([v, t]) => <option key={v} value={v}>{t}</option>)}
         </select>
       </div>
@@ -54,7 +54,7 @@ export function FormularioSolicitud({ usuarioId }: { usuarioId: string }) {
       <Campo id="telefono" name="telefono" type="tel" etiqueta="Teléfono de contacto" maxLength={20} />
       <Campo id="archivo" name="archivo" type="file" etiqueta="Archivo (PDF o foto, máx. 10 MB)" accept="application/pdf,image/jpeg,image/png,image/webp" required />
       {estado.error && <p role="alert" className="text-alerta">{estado.error}</p>}
-      {estado.ok && <p role="status" className="text-verificado">Recibimos tu documento. Un revisor lo validará.</p>}
+      {estado.ok && <p role="status" className="text-verificado">Documento enviado. Un revisor lo validará y verás el resultado aquí.</p>}
       <Boton type="submit" disabled={estado.cargando}>
         <Upload aria-hidden className="size-5" />
         {estado.cargando ? "Enviando…" : "Enviar para validación"}

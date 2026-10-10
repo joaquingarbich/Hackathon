@@ -1,6 +1,7 @@
 # CheckTur Piura — Contexto para Claude Code
 
 > Documento de arranque. Léelo completo antes de escribir código.
+> Glosario de interfaz (docs/DISENO.md): en el texto visible se dice **proveedor** (no "prestador" ni "operador"); este documento conserva los términos legales.
 > Fecha de investigación: 10 de octubre de 2026. Las normas y URLs se verificaron ese día; lo marcado con **[VERIFICAR]** no se pudo confirmar y debe validarse con la mentora o con los archivos de muestra.
 
 ---
@@ -28,7 +29,7 @@
 
 ### Fuera de alcance
 
-- Reservas, pagos o contratación. El alcance termina en el dictamen (a lo sumo un enlace de contacto al operador verificado).
+- Reservas, pagos o contratación. El alcance termina en el dictamen o la ficha del servicio, con a lo sumo un enlace de contacto (WhatsApp o llamada) al proveedor verificado. **Actualizado 10/10:** la web del turista es un catálogo de servicios de proveedores registrados (`docs/CATALOGO.md`).
 - Cualquier automatización que evada captchas de portales del Estado.
 
 ---
@@ -222,7 +223,7 @@ La extracción multimodal debe devolver JSON estricto y un nivel de certeza por 
 | **Verificado** | Verde | Figura en un padrón oficial vigente y el RUC está activo y habido. En vehículos: placa habilitada para transporte turístico y habilitación no vencida. |
 | **Verificado con observaciones** | Ámbar | Figura, pero hay un hecho objetivo que el turista debe saber (ver advertencias). |
 | **En proceso de actualización** | Azul | No figura aún en el padrón oficial, pero presentó constancia y un administrador la validó (sección 4). |
-| **No encontrado** | Gris | No se halló coincidencia. Texto sugerido: "No pudimos verificar a este prestador en los registros oficiales con corte al [fecha]". Incluir qué hacer: pedirle su RUC o constancia, consultar a iPerú. |
+| **No encontrado** | Gris | No se halló coincidencia. Texto (voz del sistema "Sello" v0.2, sin "nosotros"): "Sin coincidencias en los registros oficiales con corte al [fecha]. No es una conclusión negativa". Incluir qué hacer: pedirle su RUC o constancia, consultar a iPerú. |
 | **Alerta** | Rojo | Solo ante hechos objetivos de fuente oficial: RUC de baja, inscripción suspendida, habilitación vehicular vencida o cancelada. |
 
 ### Reglas de redacción (importantes)

@@ -1,74 +1,137 @@
 @import "tailwindcss";
 
 /*
- * DESIGN SYSTEM — CheckTur Piura
+ * DESIGN SYSTEM — CheckTur Piura · Sistema "Sello" v0.2 (docs/DISENO.md)
  * Único lugar donde se definen colores, tipografías y radios.
- * Los componentes usan SOLO estos tokens (bg-superficie, text-estado-alerta…), nunca colores crudos.
- * Base: estilo "Accessible & Ethical" (ui-ux-pro-max): alto contraste, texto ≥16px, foco visible.
+ * Tinta para la interfaz, color solo para el estado del dictamen, y un único elemento con personalidad: el sello.
+ * Los componentes usan SOLO estos tokens (bg-superficie, text-verificado…), nunca colores crudos.
+ * Claro y oscuro: sigue la apariencia del sistema (sin interruptor propio).
  */
 @theme {
-  /* Marca */
-  --color-primario: #0f172a;
-  --color-primario-hover: #1e293b;
+  /* Tinta: botones primarios y texto fuerte */
+  --color-primario: #0e1b24;
+  --color-primario-hover: #3b4955;
   --color-sobre-primario: #ffffff;
-  --color-acento: #0369a1;
 
-  /* Superficies y texto */
-  --color-fondo: #f8fafc;
+  /* Neutros por rol */
+  --color-fondo: #f4f6f5;
   --color-superficie: #ffffff;
-  --color-borde: #e2e8f0;
-  --color-texto: #020617;
-  --color-texto-suave: #475569;
-  --color-foco: #0369a1;
+  --color-relleno: #eceef0; /* chips, nota de valoración, bloque de opiniones */
+  --color-texto: #0e1b24; /* 17,5:1 */
+  --color-texto-suave: #46535e; /* 7,9:1 */
+  --color-borde: #6b7782; /* borde de control: 4,6:1 */
+  --color-separador: #dce1e4; /* decorativo */
+  --color-foco: #0e1b24;
 
-  /* Estados del dictamen: texto / fondo / borde (texto ≥ 4.5:1 sobre su fondo) */
-  --color-verificado: #166534;
-  --color-verificado-fondo: #f0fdf4;
-  --color-verificado-borde: #86efac;
-  --color-observaciones: #92400e;
-  --color-observaciones-fondo: #fffbeb;
-  --color-observaciones-borde: #fcd34d;
-  --color-actualizacion: #1e40af;
-  --color-actualizacion-fondo: #eff6ff;
-  --color-actualizacion-borde: #93c5fd;
-  --color-no-encontrado: #334155;
-  --color-no-encontrado-fondo: #f1f5f9;
-  --color-no-encontrado-borde: #cbd5e1;
-  --color-alerta: #991b1b;
-  --color-alerta-fondo: #fef2f2;
-  --color-alerta-borde: #fca5a5;
+  /* Portada (hero): banda de tinta en ambos modos */
+  --color-portada: #0e1b24;
+  --color-sobre-portada: #ffffff;
+  --color-sobre-portada-suave: #c3cbd1;
+
+  /* Estados del dictamen: texto / fondo / borde (el borde también es el color sólido del ícono del sello) */
+  --color-verificado: #0d6634;
+  --color-verificado-fondo: #e2f3e7;
+  --color-verificado-borde: #137a43;
+  --color-observaciones: #82500a;
+  --color-observaciones-fondo: #fdf0d5;
+  --color-observaciones-borde: #a86200;
+  --color-actualizacion: #1c4c99;
+  --color-actualizacion-fondo: #e3ecfa;
+  --color-actualizacion-borde: #2559b8;
+  --color-no-encontrado: #47515a;
+  --color-no-encontrado-fondo: #eceef0;
+  --color-no-encontrado-borde: #5a646e;
+  --color-alerta: #a3221b;
+  --color-alerta-fondo: #fbe5e2;
+  --color-alerta-borde: #b92d25;
+  --color-estrella: #a86200;
 
   /* Forma */
-  --radius-control: 0.75rem;
-  --radius-tarjeta: 1rem;
+  --radius-chip: 0.625rem; /* 10 */
+  --radius-control: 0.75rem; /* 12 */
+  --radius-tarjeta: 1rem; /* 16 */
+  --radius-sello: 1.25rem; /* 20 */
+}
+
+/* Oscuro: solo se redefinen los valores; los nombres no cambian. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primario: #e8ecee;
+    --color-primario-hover: #c3cbd1;
+    --color-sobre-primario: #0b141b;
+    --color-fondo: #0b141b;
+    --color-superficie: #15212b;
+    --color-relleno: #26323c;
+    --color-texto: #e8ecee; /* 13,8:1 */
+    --color-texto-suave: #a9b3ba; /* 7,7:1 */
+    --color-borde: #7a8792;
+    --color-separador: #26323c;
+    --color-foco: #e8ecee;
+    --color-portada: #15212b;
+    --color-verificado: #7bd9a3;
+    --color-verificado-fondo: #123224;
+    --color-verificado-borde: #3fb97a;
+    --color-observaciones: #f2c46b;
+    --color-observaciones-fondo: #3a2a0c;
+    --color-observaciones-borde: #d99a2b;
+    --color-actualizacion: #9dbbf5;
+    --color-actualizacion-fondo: #15284a;
+    --color-actualizacion-borde: #6c93e0;
+    --color-no-encontrado: #c3cbd1;
+    --color-no-encontrado-fondo: #26323c;
+    --color-no-encontrado-borde: #8e9ba5;
+    --color-alerta: #f4a39b;
+    --color-alerta-fondo: #3d1714;
+    --color-alerta-borde: #e0645a;
+    --color-estrella: #f2c46b;
+  }
 }
 
 /* Tipografías: vienen de next/font en app/layout.tsx */
 @theme inline {
   --font-titulo: var(--fuente-titulo);
   --font-base: var(--fuente-base);
+  --font-mono: var(--fuente-mono);
 }
 
 html {
-  color-scheme: light; /* ponytail: sin modo oscuro; añadir tokens oscuros aquí si se pide */
+  color-scheme: light dark;
 }
 
 body {
   background: var(--color-fondo);
   color: var(--color-texto);
   font-family: var(--font-base), system-ui, sans-serif;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 1.0625rem; /* 17 en móvil */
+  line-height: 1.5;
+}
+
+@media (min-width: 64rem) {
+  body {
+    font-size: 1rem; /* escritorio: nunca menos de 0,8125rem (13) en notas */
+  }
 }
 
 h1, h2, h3 {
   font-family: var(--font-titulo), system-ui, sans-serif;
-  line-height: 1.25;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
 }
 
 :focus-visible {
   outline: 3px solid var(--color-foco);
   outline-offset: 2px;
+}
+
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
