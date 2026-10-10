@@ -187,6 +187,11 @@ alter table public.submissions    enable row level security;
 alter table public.lookups        enable row level security;
 alter table public.reviews        enable row level security;
 
+-- Supabase da ALL a anon/authenticated sobre tablas nuevas de public por defecto:
+-- se revoca todo y se concede solo lo de abajo (si no, los grants por columna no restringen nada).
+revoke all on public.sources, public.providers, public.authorizations, public.vehicles, public.ruc_status,
+              public.submissions, public.lookups, public.reviews from anon, authenticated;
+
 -- Padrones: lectura pública. Escritura solo vía service role (loaders).
 grant select on public.sources, public.providers, public.authorizations, public.vehicles, public.ruc_status to anon, authenticated;
 create policy "lectura publica" on public.sources        for select to anon, authenticated using (true);
