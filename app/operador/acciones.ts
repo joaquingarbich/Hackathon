@@ -2,6 +2,7 @@
 import { exigirUsuario } from "@/lib/sesion";
 import { rucValido, normalizarPlaca } from "@/lib/normalizacion";
 import { procesarSolicitud, type Declarados } from "@/lib/validacion";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const RUTA = /^[0-9a-f-]{36}\/[A-Za-z0-9_-]+\.(pdf|jpe?g|png|webp)$/;
 const corto = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim().slice(0, 120) : undefined);
@@ -25,10 +26,10 @@ export async function enviarSolicitud(entrada: {
     telefono: corto(entrada.telefono),
     ...(placa ? { placa } : {}),
   };
-  // Inserta con la sesión del operador: RLS + grants por columna limitan lo que puede escribir.
-  const { data, error } = await u.supabase
+  // Solo el servidor crea solicitudes (el operador no tiene INSERT por la API): así nadie se salta esta validación.
+  const { data, error } = await supabaseAdmin()
     .from("submissions")
-    .insert({ ruc, tipo_documento: entrada.tipo, archivo_path: entrada.ruta, datos_declarados: declarados })
+    .insert({ user_id: u.id, ruc, tipo_documento: entrada.tipo, archivo_path: entrada.ruta, datos_declarados: declarados })
     .select("id")
     .single();
   if (error) return { ok: false, error: "No pudimos registrar tu solicitud. Intenta de nuevo." };

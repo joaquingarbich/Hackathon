@@ -57,6 +57,7 @@ export async function publicarValidacion(id: string) {
   const db = supabaseAdmin();
   const { data: s, error } = await db.from("submissions").select("*").eq("id", id).single();
   if (error) throw error;
+  if (s.estado !== "aprobado") throw new Error(`Solicitud ${id} no está aprobada`);
   const vence = sumarDias(hoy(), REGLAS.diasValidacionAnticipada);
   const d = s.datos_declarados as Declarados;
   const ext = (s.campos_extraidos ?? null) as { campos?: Record<string, string | null> } | null;
@@ -75,9 +76,10 @@ export async function publicarValidacion(id: string) {
       .insert({
         tipo: s.tipo_documento === "tuc" ? "transporte_terrestre" : "agencia",
         ruc: s.ruc,
-        razon_social: ext?.campos?.razon_social ?? sunat?.razon_social ?? null,
-        nombre_comercial: d.nombre_comercial ?? ext?.campos?.nombre_comercial ?? null,
-        telefono: d.telefono ?? null,
+        // Solo datos con respaldo (SUNAT o leídos del documento). Lo declarado por el operador (nombre, teléfono)
+        // no se publica: permitiría suplantar a una agencia conocida. El admin lo ve solo como referencia.
+        razon_social: sunat?.razon_social ?? ext?.campos?.razon_social ?? null,
+        nombre_comercial: ext?.campos?.nombre_comercial ?? null,
         clases: ext?.campos?.clase ? [ext.campos.clase.toLowerCase().replace("operador de turismo", "operador")] : [],
         source_id: "checktur_validacion",
         validacion_vence: vence,
@@ -99,7 +101,7 @@ export async function publicarValidacion(id: string) {
       source_id: "checktur_validacion",
     });
   } else {
-    const placa = normalizarPlaca(d.placa ?? ext?.campos?.placa ?? "");
+    const placa = normalizarPlaca(d.placa ?? ext?.campos?.placa ?? ""); // la placa declarada ya se cruzó con el documento (capa 3)
     if (placa)
       await db.from("vehicles").upsert(
         {

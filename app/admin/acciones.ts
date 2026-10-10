@@ -15,7 +15,7 @@ export async function resolver(f: FormData) {
   if (decision === "rechazado" && !motivo) redirect(`/admin/${id}?error=motivo`);
 
   const vence = new Date(Date.now() + REGLAS.diasValidacionAnticipada * 86_400_000).toISOString().slice(0, 10);
-  const { error } = await admin.supabase
+  const { data, error } = await admin.supabase
     .from("submissions")
     .update({
       estado: decision,
@@ -25,8 +25,10 @@ export async function resolver(f: FormData) {
       vence_el: decision === "aprobado" ? vence : null,
     })
     .eq("id", id)
-    .eq("estado", "pendiente");
+    .eq("estado", "pendiente")
+    .select("id");
   if (error) throw error;
+  if (!data?.length) redirect(`/admin/${id}`); // ya estaba resuelta: no se publica nada
   if (decision === "aprobado") await publicarValidacion(id);
   console.info(`[auditoria] ${hoy()} ${admin.email} ${decision} ${id}`);
   redirect("/admin");
