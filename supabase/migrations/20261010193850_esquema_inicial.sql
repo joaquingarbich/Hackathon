@@ -114,7 +114,8 @@ create table public.submissions (
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
   ruc char(11) not null,
   tipo_documento text not null check (tipo_documento in ('constancia_agencia', 'tuc')),
-  archivo_path text not null,          -- ruta en el bucket 'documentos': <user_id>/<archivo>
+  -- ruta en el bucket 'documentos': exactamente <user_id>/<nombre>.<ext>, sin '..' ni subcarpetas
+  archivo_path text not null check (archivo_path ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[A-Za-z0-9_-]+\.(pdf|jpe?g|png|webp)$'),
   hash text,                           -- lo calcula el servidor (no el cliente) junto con las capas
   campos_extraidos jsonb,
   resultado_capas jsonb,
