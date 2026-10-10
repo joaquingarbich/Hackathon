@@ -8,6 +8,7 @@ import { CONSEJO, NOMBRE_TIPO } from "@/config/textos";
 import { clasificarEntrada } from "@/lib/normalizacion";
 import { fuentes, registrarConsulta, resolver, type Resolucion } from "@/lib/consultas";
 import { observacionesDe } from "@/lib/dictamen";
+import { firmaValida } from "@/lib/firma";
 
 export default function Consulta({ searchParams }: PageProps<"/consulta">) {
   return (
@@ -21,11 +22,13 @@ async function Resultado({ searchParams }: Pick<PageProps<"/consulta">, "searchP
   const sp = await searchParams;
   const q = String(sp.q ?? "").trim();
   if (!q) redirect("/");
-  const obs = observacionesDe(sp.obs);
+  // obs y nf solo valen si los firmó el servidor (consulta por imagen); si no, se ignoran.
+  const firmado = firmaValida(`consulta:${q}:${sp.nf === "1" ? "1" : ""}:${String(sp.obs ?? "")}`, sp.f);
+  const obs = firmado ? observacionesDe(sp.obs) : [];
+  const noEncontrado = firmado && sp.nf === "1"; // la imagen ya resolvió que no hay coincidencia
   const entrada = clasificarEntrada(q);
-  // nf=1: la consulta por imagen ya resolvió que no hay coincidencia (no volver a buscar parecidos).
-  const r: Resolucion = sp.nf === "1" ? { tipo: "no_encontrado", ruc: null } : await resolver(entrada);
-  if (sp.nf !== "1") await registrarConsulta(entrada, r);
+  const r: Resolucion = noEncontrado ? { tipo: "no_encontrado", ruc: null } : await resolver(entrada);
+  if (!noEncontrado) await registrarConsulta(entrada, r);
 
   if (r.tipo === "prestador") redirect(`/prestador/${r.id}`);
   if (r.tipo === "vehiculo") redirect(`/vehiculo/${r.placa}`);

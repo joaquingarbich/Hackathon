@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { NOMBRE_AUTORIZACION, NOMBRE_TIPO } from "@/config/textos";
 import { cargarPrestador, fuentes, hoyLima } from "@/lib/consultas";
+import { firmaValida } from "@/lib/firma";
 import { conObservaciones, dictamenPrestador, fechaLegible, observacionesDe } from "@/lib/dictamen";
 
 export default function Prestador({ params, searchParams }: PageProps<"/prestador/[id]">) {
@@ -16,7 +17,9 @@ export default function Prestador({ params, searchParams }: PageProps<"/prestado
 
 async function Contenido({ params, searchParams }: Pick<PageProps<"/prestador/[id]">, "params" | "searchParams">) {
   const { id } = await params;
-  const obs = observacionesDe((await searchParams).obs);
+  const sp = await searchParams;
+  // Observaciones del anuncio solo si las firmó el servidor: un enlace armado a mano no puede añadir advertencias.
+  const obs = firmaValida(`prestador:${id}:${String(sp.obs ?? "")}`, sp.f) ? observacionesDe(sp.obs) : [];
   await connection();
   const [datos, lista] = await Promise.all([cargarPrestador(id), fuentes()]);
   if (!datos) notFound();

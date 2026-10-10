@@ -4,10 +4,17 @@ import { supabasePublico } from "@/lib/supabase/publico";
 import { resolver, registrarConsulta, type Resolucion } from "@/lib/consultas";
 import type { CamposConsulta } from "@/lib/vision";
 import type { CodigoObs } from "@/config/textos";
+import { firmar } from "@/lib/firma";
 
 const db = supabasePublico;
-const conObs = (url: string, obs: CodigoObs[]) =>
-  obs.length ? `${url}${url.includes("?") ? "&" : "?"}obs=${obs.join(",")}` : url;
+// Los parámetros que alteran el dictamen van firmados (ver lib/firma.ts y las páginas que los leen).
+const aPrestadorUrl = (id: string, obs: CodigoObs[]) =>
+  obs.length ? `/prestador/${id}?obs=${obs.join(",")}&f=${firmar(`prestador:${id}:${obs.join(",")}`)}` : `/prestador/${id}`;
+const aConsultaUrl = (q: string, obs: CodigoObs[], noEncontrado: boolean) => {
+  const nf = noEncontrado ? "1" : "";
+  if (!obs.length && !nf) return `/consulta?q=${encodeURIComponent(q)}`;
+  return `/consulta?q=${encodeURIComponent(q)}${nf && "&nf=1"}${obs.length ? `&obs=${obs.join(",")}` : ""}&f=${firmar(`consulta:${q}:${nf}:${obs.join(",")}`)}`;
+};
 
 /** ¿El anuncio contradice lo registrado? (posible suplantación de un prestador formal) */
 async function datosDistintos(id: string, c: CamposConsulta) {
@@ -31,13 +38,13 @@ export async function urlParaImagen(c: CamposConsulta): Promise<string | null> {
   const aPrestador = async (id: string, valor: string) => {
     if (await datosDistintos(id, c)) obs.push("datos_distintos");
     await registrar({ tipo: "prestador", id }, valor);
-    return conObs(`/prestador/${id}`, obs);
+    return aPrestadorUrl(id, obs);
   };
 
   if (c.ruc) {
     const r = await resolver({ tipo: "ruc", valor: c.ruc });
     if (r.tipo === "prestador") return aPrestador(r.id, c.ruc);
-    if (r.tipo === "candidatos") return conObs(`/consulta?q=${c.ruc}`, obs);
+    if (r.tipo === "candidatos") return aConsultaUrl(c.ruc, obs, false);
   }
   if (c.placa) {
     const r = await resolver({ tipo: "placa", valor: c.placa });
@@ -51,9 +58,8 @@ export async function urlParaImagen(c: CamposConsulta): Promise<string | null> {
     const r = await resolver({ tipo: "nombre", valor: c.nombre_comercial });
     if (r.tipo === "prestador") return aPrestador(r.id, c.nombre_comercial);
     await registrar(r, c.nombre_comercial);
-    const q = encodeURIComponent(c.nombre_comercial);
-    return conObs(r.tipo === "candidatos" ? `/consulta?q=${q}` : `/consulta?q=${q}&nf=1`, obs);
+    return aConsultaUrl(c.nombre_comercial, obs, r.tipo !== "candidatos");
   }
   const algo = c.ruc ?? c.placa ?? c.usuario_red ?? c.telefonos[0];
-  return algo ? conObs(`/consulta?q=${encodeURIComponent(algo)}&nf=1`, obs) : null;
+  return algo ? aConsultaUrl(algo, obs, true) : null;
 }
