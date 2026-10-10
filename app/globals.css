@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/*
+ * DESIGN SYSTEM — CheckTur Piura
+ * Único lugar donde se definen colores, tipografías y radios.
+ * Los componentes usan SOLO estos tokens (bg-superficie, text-estado-alerta…), nunca colores crudos.
+ * Base: estilo "Accessible & Ethical" (ui-ux-pro-max): alto contraste, texto ≥16px, foco visible.
+ */
+@theme {
+  /* Marca */
+  --color-primario: #0f172a;
+  --color-primario-hover: #1e293b;
+  --color-sobre-primario: #ffffff;
+  --color-acento: #0369a1;
+
+  /* Superficies y texto */
+  --color-fondo: #f8fafc;
+  --color-superficie: #ffffff;
+  --color-borde: #e2e8f0;
+  --color-texto: #020617;
+  --color-texto-suave: #475569;
+  --color-foco: #0369a1;
+
+  /* Estados del dictamen: texto / fondo / borde (texto ≥ 4.5:1 sobre su fondo) */
+  --color-verificado: #166534;
+  --color-verificado-fondo: #f0fdf4;
+  --color-verificado-borde: #86efac;
+  --color-observaciones: #92400e;
+  --color-observaciones-fondo: #fffbeb;
+  --color-observaciones-borde: #fcd34d;
+  --color-actualizacion: #1e40af;
+  --color-actualizacion-fondo: #eff6ff;
+  --color-actualizacion-borde: #93c5fd;
+  --color-no-encontrado: #334155;
+  --color-no-encontrado-fondo: #f1f5f9;
+  --color-no-encontrado-borde: #cbd5e1;
+  --color-alerta: #991b1b;
+  --color-alerta-fondo: #fef2f2;
+  --color-alerta-borde: #fca5a5;
+
+  /* Forma */
+  --radius-control: 0.75rem;
+  --radius-tarjeta: 1rem;
+}
+
+/* Tipografías: vienen de next/font en app/layout.tsx */
+@theme inline {
+  --font-titulo: var(--fuente-titulo);
+  --font-base: var(--fuente-base);
+}
+
+html {
+  color-scheme: light; /* ponytail: sin modo oscuro; añadir tokens oscuros aquí si se pide */
+}
+
+body {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--font-base), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-titulo), system-ui, sans-serif;
+  line-height: 1.25;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
