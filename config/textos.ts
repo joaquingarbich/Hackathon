@@ -117,3 +117,25 @@ export const TEXTO_FOTO = {
   error: "No pudimos procesar la imagen. Intenta de nuevo o escribe el nombre, RUC o placa.",
   ayuda: "Foto de un letrero, logo o unidad, o captura de un anuncio en redes.",
 } as const;
+
+export const SERVICIOS = ["City tour", "Tour de playa", "Aventura (sandboarding, kayak, surf…)", "Avistamiento de ballenas", "Gastronómico", "Traslado / transporte", "Hospedaje", "Restaurante", "Guiado", "Otro"] as const;
+
+export const TEXTO_RESENA = {
+  tituloBloque: "Opiniones de usuarios",
+  aclaracion: "Opiniones de personas que contrataron el servicio. No son un dato oficial y no cambian el dictamen.",
+  sello: "Compra verificada con comprobante",
+  sinResenas: "Aún no hay opiniones verificadas.",
+  pocasParaPromedio: (n: number, min: number) => `${n} ${n === 1 ? "opinión" : "opiniones"} (el promedio se muestra desde ${min}).`,
+  dejar: "Dejar una opinión",
+  reportar: "Reportar",
+  reportada: "Gracias: un revisor la evaluará.",
+  sinRuc: "Este prestador no tiene RUC registrado, así que no podemos verificar comprobantes para opinar sobre él.",
+  tituloFormulario: "Tu opinión",
+  ayudaFormulario:
+    "Para evitar opiniones falsas, solo publicamos opiniones con un comprobante de pago (boleta, factura o ticket) emitido por este prestador. Un revisor la valida antes de publicarla.",
+  consentimiento:
+    "Acepto que CheckTur trate mis datos de contacto solo para verificar esta opinión (Ley N.° 29733). No se publican: solo se muestra el alias.",
+  enviado: "¡Gracias! Recibimos tu opinión y tu comprobante. Un revisor la validará antes de publicarla.",
+  comprobanteUsado: "Este comprobante ya se usó para una opinión.",
+  error: "No pudimos procesar tu opinión. Intenta de nuevo.",
+} as const;

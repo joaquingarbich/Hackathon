@@ -5,6 +5,7 @@ import { Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { NOMBRE_AUTORIZACION, NOMBRE_TIPO } from "@/config/textos";
 import { cargarPrestador, fuentes, hoyLima } from "@/lib/consultas";
 import { leerAnuncio } from "@/lib/anuncio";
+import { Opiniones } from "@/components/opiniones";
 import { dictamenPrestador, fechaLegible } from "@/lib/dictamen";
 
 export default function Prestador({ params }: PageProps<"/prestador/[id]">) {
@@ -59,6 +60,7 @@ async function Contenido({ params }: Pick<PageProps<"/prestador/[id]">, "params"
           />
         )}
       </VistaDictamen>
+      <Opiniones providerId={p.id} puedeOpinar={!!p.ruc} />
     </>
   );
 }

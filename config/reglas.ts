@@ -5,6 +5,11 @@ export const REGLAS = {
   diasAvisoVencimiento: 30, // "autorización próxima a vencer"
   minimoResenasParaPromedio: 3,
   maxLargoResena: 500,
+  resenas: {
+    maxDiasComprobante: 365, // reseñas de compras de hasta un año
+    maxDiasEntreCompraYServicio: 60, // más separación: se acepta, pero el admin lo ve marcado
+    mostrarUltimas: 5,
+  },
   busqueda: {
     umbralSimilitud: 0.5, // mínimo para ser candidato
     umbralCoincidenciaClara: 0.85, // por encima, y con distancia al 2.º, se elige solo

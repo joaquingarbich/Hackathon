@@ -5,17 +5,7 @@ import { Camera } from "lucide-react";
 import { Boton } from "@/components/ui";
 import { TEXTO_APP, TEXTO_FOTO } from "@/config/textos";
 import { consultarImagen } from "@/app/acciones";
-
-/** Reduce la foto en el navegador (las de celular pesan 3-8 MB): menos datos móviles y bajo el límite de las Server Actions. */
-async function reducir(archivo: File, lado = 1600): Promise<Blob> {
-  const bmp = await createImageBitmap(archivo);
-  const k = Math.min(1, lado / Math.max(bmp.width, bmp.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bmp.width * k);
-  canvas.height = Math.round(bmp.height * k);
-  canvas.getContext("2d")!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
-  return new Promise((ok, mal) => canvas.toBlob((b) => (b ? ok(b) : mal(new Error("toBlob"))), "image/jpeg", 0.85));
-}
+import { reducirImagen } from "@/lib/imagen";
 
 export function ConsultaFoto() {
   const router = useRouter();
@@ -29,7 +19,7 @@ export function ConsultaFoto() {
     setEstado({ cargando: true });
     try {
       const f = new FormData();
-      f.set("imagen", await reducir(archivo), "consulta.jpg");
+      f.set("imagen", await reducirImagen(archivo), "consulta.jpg");
       const r = await consultarImagen(f);
       if ("error" in r) return setEstado({ cargando: false, error: r.error });
       router.push(r.url);

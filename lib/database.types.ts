@@ -183,39 +183,104 @@ export type Database = {
           },
         ]
       }
+      review_contactos: {
+        Row: {
+          celular: string
+          consentimiento_at: string
+          correo: string
+          nombre: string
+          review_id: string
+        }
+        Insert: {
+          celular: string
+          consentimiento_at?: string
+          correo: string
+          nombre: string
+          review_id: string
+        }
+        Update: {
+          celular?: string
+          consentimiento_at?: string
+          correo?: string
+          nombre?: string
+          review_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_contactos_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: true
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           alias: string | null
           comentario: string | null
+          comprobante_fecha: string | null
+          comprobante_path: string | null
+          comprobante_ruc: string | null
+          comprobante_serie: string | null
           created_at: string
           device_hash: string
           estado: string
           estrellas: number
+          fecha_servicio: string | null
           id: string
+          motivo: string | null
           provider_id: string
           respuesta_prestador: string | null
+          revisado_at: string | null
+          revisor: string | null
+          servicio: string | null
+          verificacion: Json | null
+          verificado: boolean
         }
         Insert: {
           alias?: string | null
           comentario?: string | null
+          comprobante_fecha?: string | null
+          comprobante_path?: string | null
+          comprobante_ruc?: string | null
+          comprobante_serie?: string | null
           created_at?: string
           device_hash: string
           estado?: string
           estrellas: number
+          fecha_servicio?: string | null
           id?: string
+          motivo?: string | null
           provider_id: string
           respuesta_prestador?: string | null
+          revisado_at?: string | null
+          revisor?: string | null
+          servicio?: string | null
+          verificacion?: Json | null
+          verificado?: boolean
         }
         Update: {
           alias?: string | null
           comentario?: string | null
+          comprobante_fecha?: string | null
+          comprobante_path?: string | null
+          comprobante_ruc?: string | null
+          comprobante_serie?: string | null
           created_at?: string
           device_hash?: string
           estado?: string
           estrellas?: number
+          fecha_servicio?: string | null
           id?: string
+          motivo?: string | null
           provider_id?: string
           respuesta_prestador?: string | null
+          revisado_at?: string | null
+          revisor?: string | null
+          servicio?: string | null
+          verificacion?: Json | null
+          verificado?: boolean
         }
         Relationships: [
           {
