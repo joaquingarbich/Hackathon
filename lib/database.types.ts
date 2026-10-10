@@ -61,6 +61,12 @@ export type Database = {
           },
         ]
       }
+      limites: {
+        Row: { clave: string; n: number; ventana: string }
+        Insert: { clave: string; n?: number; ventana: string }
+        Update: { clave?: string; n?: number; ventana?: string }
+        Relationships: []
+      }
       lookups: {
         Row: {
           created_at: string
@@ -106,11 +112,24 @@ export type Database = {
           },
         ]
       }
+      proveedor_cambios: {
+        Row: { created_at: string; datos: Json; estado: string; id: string; motivo: string | null; provider_id: string; revisado_at: string | null; revisor: string | null; user_id: string }
+        Insert: { created_at?: string; datos: Json; estado?: string; id?: string; motivo?: string | null; provider_id: string; revisado_at?: string | null; revisor?: string | null; user_id: string }
+        Update: { created_at?: string; datos?: Json; estado?: string; id?: string; motivo?: string | null; provider_id?: string; revisado_at?: string | null; revisor?: string | null; user_id?: string }
+        Relationships: []
+      }
+      proveedor_cuentas: {
+        Row: { created_at: string; provider_id: string; user_id: string }
+        Insert: { created_at?: string; provider_id: string; user_id: string }
+        Update: { created_at?: string; provider_id?: string; user_id?: string }
+        Relationships: []
+      }
       providers: {
         Row: {
           actividades: string[]
           clases: string[]
           correo: string | null
+          descripcion: string | null
           direccion: string | null
           distrito: string | null
           es_muestra: boolean
@@ -133,6 +152,7 @@ export type Database = {
           actividades?: string[]
           clases?: string[]
           correo?: string | null
+          descripcion?: string | null
           direccion?: string | null
           distrito?: string | null
           es_muestra?: boolean
@@ -155,6 +175,7 @@ export type Database = {
           actividades?: string[]
           clases?: string[]
           correo?: string | null
+          descripcion?: string | null
           direccion?: string | null
           distrito?: string | null
           es_muestra?: boolean
@@ -344,6 +365,7 @@ export type Database = {
           id: string
           idiomas: string[]
           ilustracion: string | null
+          motivo: string | null
           incluye: string[]
           itinerario: Json
           no_incluye: string[]
@@ -351,6 +373,8 @@ export type Database = {
           precio_ref: number | null
           provider_id: string
           punto_encuentro: string | null
+          revisado_at: string | null
+          revisor: string | null
           salidas: string | null
           temporada: string | null
           unidad_precio: string
@@ -369,6 +393,7 @@ export type Database = {
           id?: string
           idiomas?: string[]
           ilustracion?: string | null
+          motivo?: string | null
           incluye?: string[]
           itinerario?: Json
           no_incluye?: string[]
@@ -376,6 +401,8 @@ export type Database = {
           precio_ref?: number | null
           provider_id: string
           punto_encuentro?: string | null
+          revisado_at?: string | null
+          revisor?: string | null
           salidas?: string | null
           temporada?: string | null
           unidad_precio?: string
@@ -394,6 +421,7 @@ export type Database = {
           id?: string
           idiomas?: string[]
           ilustracion?: string | null
+          motivo?: string | null
           incluye?: string[]
           itinerario?: Json
           no_incluye?: string[]
@@ -401,6 +429,8 @@ export type Database = {
           precio_ref?: number | null
           provider_id?: string
           punto_encuentro?: string | null
+          revisado_at?: string | null
+          revisor?: string | null
           salidas?: string | null
           temporada?: string | null
           unidad_precio?: string
@@ -576,6 +606,7 @@ export type Database = {
         Args: { telefono?: string; usuario?: string }
         Returns: { id: string }[]
       }
+      consumir_cupo: { Args: { p_clave: string; p_ventana_seg: number }; Returns: number }
       es_admin: { Args: never; Returns: boolean }
       normalizar_nombre: { Args: { t: string }; Returns: string }
     }

@@ -4,7 +4,8 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { extraerComprobante } from "@/lib/vision";
 import { verificarComprobante } from "@/lib/resenas";
 import { hoyLima } from "@/lib/consultas";
-import { SERVICIOS, TEXTO_RESENA } from "@/config/textos";
+import { SERVICIOS, TEXTO_LIMITE, TEXTO_RESENA } from "@/config/textos";
+import { hayCupo } from "@/lib/limite";
 import { REGLAS } from "@/config/reglas";
 import type { Json } from "@/lib/database.types";
 
@@ -43,7 +44,7 @@ export async function enviarResena(f: FormData): Promise<Resultado> {
 
   // ---- comprobante: leído por Gemini y cruzado con el RUC del prestador ----
   const bytes = new Uint8Array(await img.arrayBuffer());
-  // ponytail: sin límite de frecuencia por IP; añadir si se abusa (cada envío consume cuota de Gemini).
+  if (!(await hayCupo("resena"))) return { ok: false, error: TEXTO_LIMITE };
   let campos;
   try {
     campos = await extraerComprobante(bytes, img.type);

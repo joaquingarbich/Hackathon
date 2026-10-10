@@ -16,5 +16,11 @@ export const REGLAS = {
     distanciaMinimaAlSegundo: 0.15,
     maxCandidatos: 3,
   },
+  // Cada acción consume cuota gratuita de Gemini: máximo por IP (o por usuario) en la ventana.
+  limites: {
+    foto: { maximo: 12, ventanaSeg: 600 },
+    resena: { maximo: 5, ventanaSeg: 3600 },
+    documento: { maximo: 10, ventanaSeg: 3600 },
+  },
   dominiosOficialesQR: [".gob.pe"],
 } as const;

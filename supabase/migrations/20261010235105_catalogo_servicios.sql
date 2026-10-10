@@ -1,6 +1,4 @@
 -- Catálogo de servicios por proveedor (web cliente tipo catálogo). docs/CATALOGO.md
--- PENDIENTE DE APLICAR en el proyecto remoto (PENDIENTE.md, prioridad 1). Al aplicarlo con el MCP
--- (apply_migration), renombrar este archivo a la versión que reporte list_migrations.
 -- Solo se publican servicios de proveedores que ya están en `providers` (estar publicado = formal).
 
 create table public.services (

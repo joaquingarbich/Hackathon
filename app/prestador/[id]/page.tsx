@@ -46,6 +46,7 @@ async function Contenido({ params }: Pick<PageProps<"/prestador/[id]">, "params"
         <Datos
           titulo="Datos del proveedor"
           filas={[
+            ["Presentación", p.descripcion], // escrita por la agencia, aprobada por un revisor
             ["Razón social", p.razon_social],
             ["RUC", p.ruc && <><Mono className="font-semibold">{p.ruc}</Mono>{ruc && <span className="text-texto-suave"> · {ruc.estado.toLowerCase()} y {ruc.condicion.toLowerCase()}</span>}</>],
             ["Actividades", p.actividades.join(", ").replaceAll("_", " ")],

@@ -65,7 +65,8 @@ export async function publicarValidacion(id: string) {
   const esMuestra = sunat?.source_id === "muestra";
 
   const { data: existentes } = await db.from("providers").select("id, source_id").eq("ruc", s.ruc);
-  if (existentes?.some((p) => p.source_id !== "checktur_validacion")) return; // ya figura oficialmente: el documento solo confirma
+  const oficial = existentes?.find((p) => p.source_id !== "checktur_validacion");
+  if (oficial) return vincularCuenta(oficial.id, s.user_id); // ya figura oficialmente: el documento solo confirma y da acceso al perfil
 
   let proveedorId = existentes?.[0]?.id;
   if (proveedorId) {
@@ -117,4 +118,14 @@ export async function publicarValidacion(id: string) {
       );
   }
   await db.from("sources").update({ fecha_corte: hoy() }).eq("id", "checktur_validacion");
+  await vincularCuenta(proveedorId!, s.user_id);
+}
+
+/** Documento aprobado = prueba de que la cuenta representa a ese RUC: administra su perfil y servicios.
+ *  Un dueño por proveedor (el primero aprobado); otro reclamo lo resuelve el admin a mano. */
+async function vincularCuenta(providerId: string, userId: string) {
+  const { error } = await supabaseAdmin()
+    .from("proveedor_cuentas")
+    .upsert({ provider_id: providerId, user_id: userId }, { onConflict: "provider_id", ignoreDuplicates: true });
+  if (error) throw error;
 }

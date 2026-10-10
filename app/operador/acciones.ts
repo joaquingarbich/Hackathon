@@ -1,5 +1,7 @@
 "use server";
 import { exigirUsuario } from "@/lib/sesion";
+import { hayCupo } from "@/lib/limite";
+import { TEXTO_LIMITE } from "@/config/textos";
 import { rucValido, normalizarPlaca } from "@/lib/normalizacion";
 import { procesarSolicitud, type Declarados } from "@/lib/validacion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -14,6 +16,7 @@ export async function enviarSolicitud(entrada: {
   ruc: string; tipo: string; ruta: string; nombre_comercial?: string; placa?: string; telefono?: string;
 }): Promise<ResultadoEnvio> {
   const u = await exigirUsuario();
+  if (!(await hayCupo("documento", u.id))) return { ok: false, error: TEXTO_LIMITE };
   const ruc = String(entrada.ruc ?? "").replace(/\D/g, "");
   if (!rucValido(ruc)) return { ok: false, error: "El RUC no es válido. Revisa los 11 dígitos." };
   if (entrada.tipo !== "constancia_agencia" && entrada.tipo !== "tuc") return { ok: false, error: "Tipo de documento no válido." };

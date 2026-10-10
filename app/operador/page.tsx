@@ -10,6 +10,8 @@ import { dictamenPrestador, fechaLegible } from "@/lib/dictamen";
 import { supabasePublico } from "@/lib/supabase/publico";
 import { salir } from "../ingresar/acciones";
 import { FormularioSolicitud } from "./formulario";
+import { misProveedores } from "@/lib/agencia";
+import { NOMBRE_TIPO, TEXTO_AGENCIA } from "@/config/textos";
 
 // P05 Inicio del proveedor + P07 Documentos (una sola página: aún no hay Unidades ni Perfil, ver PENDIENTE.md).
 export default function Operador() {
@@ -37,6 +39,7 @@ async function Panel() {
     .select("id, ruc, tipo_documento, estado, motivo, created_at, vence_el")
     .eq("user_id", u.id)
     .order("created_at", { ascending: false });
+  const agencias = await misProveedores(u.id);
   const ruc = solicitudes?.[0]?.ruc;
   const estado = ruc ? await estadoPublico(ruc) : null;
 
@@ -58,6 +61,17 @@ async function Panel() {
           {estado === "no_encontrado" && <p className="text-[0.9375rem] text-texto-suave">Sube tu constancia para pasar a «En proceso de actualización».</p>}
         </Tarjeta>
       )}
+
+      <Tarjeta className="flex flex-col gap-2 p-5">
+        <h2 className="text-[1.375rem] font-bold">{TEXTO_AGENCIA.tuAgencia}</h2>
+        {!agencias.length && <p className="text-[0.9375rem] text-texto-suave">{TEXTO_AGENCIA.sinAgencia}</p>}
+        {agencias.map((a) => (
+          <Link key={a.id} href={`/operador/agencia/${a.id}`} className="flex min-h-11 flex-col justify-center font-bold">
+            {a.nombre_comercial ?? a.razon_social} → perfil y servicios
+            <span className="text-[0.9375rem] font-normal text-texto-suave">{NOMBRE_TIPO[a.tipo]} · RUC {a.ruc}</span>
+          </Link>
+        ))}
+      </Tarjeta>
 
       <div className="flex flex-col gap-2">
         <h1 className="text-[2.125rem] leading-[1.05] font-extrabold">Documentos</h1>

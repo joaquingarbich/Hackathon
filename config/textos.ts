@@ -217,3 +217,22 @@ export const TEXTO_GUARDADOS = {
   guardado: "Guardado",
   quitar: "Quitar",
 } as const;
+
+// Registro de agencias (cara del proveedor): perfil y servicios, siempre con revisión del admin.
+export const IDIOMAS = ["Español", "Inglés", "Portugués", "Francés", "Alemán"] as const;
+export const UNIDADES_PRECIO = ["por persona", "por grupo", "por noche", "por plato", "por unidad"] as const;
+export const REDES = ["instagram", "facebook", "tiktok"] as const;
+
+export const TEXTO_AGENCIA = {
+  tuAgencia: "Tu agencia",
+  sinAgencia: "Cuando un revisor apruebe tu constancia o TUC, aquí podrás completar el perfil de tu agencia y publicar tus servicios.",
+  perfil: "Perfil",
+  ayudaPerfil: "Datos de contacto y presentación que verán los turistas. Los cambios se publican cuando un revisor los aprueba: así nadie puede cambiar tu teléfono o tus redes sin control.",
+  servicios: "Servicios",
+  ayudaServicios: "Tours, actividades, hospedaje, comida o traslados que ofreces. Cada servicio se publica en el catálogo cuando un revisor lo aprueba.",
+  enviado: "Enviado. Un revisor lo revisará antes de publicarlo.",
+  cambioPendiente: "Tienes un cambio de perfil en revisión.",
+  estadoServicio: { pendiente: "En revisión", publicado: "Publicado", rechazado: "Por corregir" } as Record<string, string>,
+} as const;
+
+export const TEXTO_LIMITE = "Hiciste muchas consultas seguidas. Espera unos minutos e intenta de nuevo.";

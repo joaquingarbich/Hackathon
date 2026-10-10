@@ -2,12 +2,15 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Cargando } from "@/components/dictamen";
-import { ChipProceso, Mono, Pagina } from "@/components/ui";
+import { ChipProceso, Mono, Pagina, Tarjeta } from "@/components/ui";
 import { TIPO_DOCUMENTO } from "@/config/textos";
 import { exigirAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { fechaLegible } from "@/lib/dictamen";
 import { InsigniaConfianza } from "./confianza";
+
+/** ISO de hace n días (fuera del render: Date.now() es impuro). */
+const haceDias = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
 
 export default function Admin() {
   return (
@@ -30,6 +33,20 @@ async function Cola() {
     .select("id, estrellas, comentario, estado, created_at")
     .in("estado", ["pendiente", "reportada"])
     .order("created_at");
+  const db = supabaseAdmin();
+  const [{ data: servicios }, { data: cambios }, { data: consultas }] = await Promise.all([
+    db.from("services").select("id, nombre, created_at, provider_id").eq("estado", "pendiente").order("created_at"),
+    db.from("proveedor_cambios").select("id, created_at, provider_id").eq("estado", "pendiente").order("created_at"),
+    db.from("lookups").select("tipo_entrada, estado_resultado").gte("created_at", haceDias(7)).limit(5000),
+  ]);
+  const ids = [...new Set([...(servicios ?? []), ...(cambios ?? [])].map((x) => x.provider_id))];
+  const { data: nombres } = ids.length ? await db.from("providers").select("id, nombre_comercial, razon_social").in("id", ids) : { data: [] };
+  const cuenta = (k: "tipo_entrada" | "estado_resultado") =>
+    Object.entries((consultas ?? []).reduce<Record<string, number>>((m, c) => ({ ...m, [c[k] ?? "—"]: (m[c[k] ?? "—"] ?? 0) + 1 }), {})).sort((a, b) => b[1] - a[1]);
+  const nombreDe = (x: { provider_id: string }) => {
+    const p = nombres?.find((n) => n.id === x.provider_id);
+    return p?.nombre_comercial ?? p?.razon_social ?? "Proveedor";
+  };
 
   return (
     <Pagina>
@@ -73,6 +90,42 @@ async function Cola() {
           </li>
         ))}
       </ul>
+      <h2 className="mt-2 text-[1.375rem] font-bold">Servicios · por publicar {servicios?.length ?? 0}</h2>
+      {!servicios?.length && <p className="text-texto-suave">No hay servicios pendientes.</p>}
+      <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
+        {servicios?.map((x) => (
+          <li key={x.id} className="border-b border-separador last:border-0">
+            <Link href={`/admin/servicio/${x.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-relleno">
+              <span className="flex flex-col gap-1"><b>{x.nombre}</b><span className="text-[0.9375rem] text-texto-suave">{nombreDe(x)} · <Mono>{fechaLegible(x.created_at.slice(0, 10))}</Mono></span></span>
+              <ChevronRight aria-hidden className="size-5 shrink-0" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <h2 className="mt-2 text-[1.375rem] font-bold">Perfiles · cambios por aprobar {cambios?.length ?? 0}</h2>
+      {!cambios?.length && <p className="text-texto-suave">No hay cambios de perfil pendientes.</p>}
+      <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
+        {cambios?.map((x) => (
+          <li key={x.id} className="border-b border-separador last:border-0">
+            <Link href={`/admin/cambio/${x.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-relleno">
+              <span className="flex flex-col gap-1"><b>{nombreDe(x)}</b><span className="text-[0.9375rem] text-texto-suave">Contacto, redes o presentación · <Mono>{fechaLegible(x.created_at.slice(0, 10))}</Mono></span></span>
+              <ChevronRight aria-hidden className="size-5 shrink-0" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <h2 className="mt-2 text-[1.375rem] font-bold">Consultas · últimos 7 días {consultas?.length ?? 0}</h2>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {(["tipo_entrada", "estado_resultado"] as const).map((k) => (
+          <Tarjeta key={k} className="p-4">
+            <h3 className="mb-2 font-bold">{k === "tipo_entrada" ? "Por tipo de búsqueda" : "Por resultado"}</h3>
+            <ul className="flex flex-col gap-1 text-[0.9375rem]">
+              {cuenta(k).map(([n, c]) => <li key={n} className="flex justify-between gap-3"><span>{n.replaceAll("_", " ")}</span><Mono>{c}</Mono></li>)}
+              {!consultas?.length && <li className="text-texto-suave">Sin consultas.</li>}
+            </ul>
+          </Tarjeta>
+        ))}
+      </div>
       <p className="text-[0.875rem] text-texto-suave">Datos de muestra · empresas ficticias.</p>
       <Link href="/operador" className="flex min-h-11 items-center self-start font-bold">← Volver</Link>
     </Pagina>
