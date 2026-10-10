@@ -419,6 +419,10 @@ export type Database = {
           tipo: string
         }[]
       }
+      buscar_por_contacto: {
+        Args: { telefono?: string; usuario?: string }
+        Returns: { id: string }[]
+      }
       es_admin: { Args: never; Returns: boolean }
       normalizar_nombre: { Args: { t: string }; Returns: string }
     }

@@ -70,9 +70,9 @@ export async function resolver(entrada: Entrada): Promise<Resolucion> {
 }
 
 /** Registro anónimo de la consulta (sin datos del turista). Nunca rompe la respuesta. */
-export async function registrarConsulta(entrada: Entrada, r: Resolucion, estado?: string) {
+export async function registrarConsulta(entrada: Entrada, r: Resolucion, estado?: string, tipoEntrada?: "logo" | "red_social") {
   const { error } = await db().from("lookups").insert({
-    tipo_entrada: entrada.tipo,
+    tipo_entrada: tipoEntrada ?? entrada.tipo,
     entrada_normalizada: entrada.valor.slice(0, 120),
     provider_id: r.tipo === "prestador" ? r.id : null,
     estado_resultado: estado ?? r.tipo,

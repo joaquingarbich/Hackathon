@@ -1,5 +1,5 @@
 // Reglas del dictamen (CHECKTUR_CONTEXTO.md §6). Funciones puras: sin BD, sin fecha implícita.
-import { ADVERTENCIA, NOMBRE_AUTORIZACION, type Estado } from "@/config/textos";
+import { ADVERTENCIA, NOMBRE_AUTORIZACION, OBS_IMAGEN, type CodigoObs, type Estado } from "@/config/textos";
 import { REGLAS } from "@/config/reglas";
 import type { Tables } from "@/lib/database.types";
 
@@ -79,3 +79,14 @@ export function coincidenciaClara(similitudes: number[]): boolean {
   const b = REGLAS.busqueda;
   return primero !== undefined && primero >= b.umbralCoincidenciaClara && primero - segundo >= b.distanciaMinimaAlSegundo;
 }
+
+/** Suma observaciones que no vienen del registro (p. ej. de la imagen consultada). Nunca mejora un estado. */
+export function conObservaciones(d: Dictamen, textos: string[]): Dictamen {
+  if (!textos.length) return d;
+  const advertencias = [...d.advertencias, ...textos.map((texto) => ({ nivel: "observacion" as const, texto }))];
+  return { estado: d.estado === "verificado" ? "observaciones" : d.estado, advertencias };
+}
+
+/** ?obs=sin_ruc,datos_distintos → textos. Lista blanca: la URL no puede inyectar texto. */
+export const observacionesDe = (param: string | string[] | undefined) =>
+  String(param ?? "").split(",").filter((c): c is CodigoObs => c in OBS_IMAGEN).map((c) => OBS_IMAGEN[c]);

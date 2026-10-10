@@ -2,6 +2,7 @@
 // Requiere la app corriendo en :3456 (npx next start -p 3456) y SUPABASE_SERVICE_ROLE_KEY en .env.local.
 // Crea 2 usuarios de prueba (*@checktur.test) y BORRA todo lo que crea al terminar, pase o falle.
 // Uso: npm run e2e
+import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "../lib/supabase/admin.ts";
 import { procesarSolicitud, publicarValidacion } from "../lib/validacion.ts";
@@ -31,7 +32,7 @@ try {
   const ad = await usuario("admin.prueba@checktur.test", "admin");
 
   // Subida directa a Storage con la sesión del operador (igual que el navegador)
-  const pdf = new TextEncoder().encode("%PDF-1.4\n% constancia de prueba\n/Producer (Prueba CheckTur)\n%%EOF");
+  const pdf = new Uint8Array(readFileSync("data/muestras/constancia-mancora.pdf")); // constancia ficticia (Anexo III)
   const ruta = `${op.id}/${crypto.randomUUID()}.pdf`;
   const up = await op.c.storage.from("documentos").upload(ruta, pdf, { contentType: "application/pdf" });
   creados.archivos.push(ruta);
@@ -52,9 +53,13 @@ try {
   if (eIns) throw eIns;
   await procesarSolicitud(sol.id);
   const { data: p } = await op.c.from("submissions").select("hash, confianza, resultado_capas, estado").eq("id", sol.id).single();
-  log(!!p?.hash && p.confianza === "media" && Array.isArray(p.resultado_capas) && p.resultado_capas.length === 8, `capas procesadas: confianza ${p?.confianza}, ${Array.isArray(p?.resultado_capas) ? p.resultado_capas.length : 0} capas`);
-  const sunat = (p?.resultado_capas as { id: string; resultado: string; detalle: string }[]).find((c) => c.id === "sunat");
-  log(sunat?.resultado === "ok", `capa SUNAT: ${sunat?.detalle}`);
+  const capas = (p?.resultado_capas ?? []) as { id: string; resultado: string; detalle: string }[];
+  log(!!p?.hash && capas.length === 8, `capas procesadas: confianza ${p?.confianza}`);
+  for (const c of capas) console.log(`       ${c.resultado.padEnd(11)} ${c.id}: ${c.detalle}`);
+  const esperado = process.env.GEMINI_API_KEY
+    ? { extraccion: "ok", estructura: "ok", coherencia: "ok", sunat: "ok", padron: "ok" }
+    : { extraccion: "no_evaluado", sunat: "ok", padron: "ok" };
+  for (const [id, r] of Object.entries(esperado)) log(capas.find((c) => c.id === id)?.resultado === r, `capa ${id} = ${r}`);
 
   // El operador no puede aprobarse
   const auto = await op.c.from("submissions").update({ estado: "aprobado" }).eq("id", sol.id).select("id");
@@ -70,7 +75,7 @@ try {
   log(!reap.data?.length, "una solicitud ya resuelta no se vuelve a resolver (TOCTOU)");
 
   const { data: prov } = await admin.from("providers").select("id, nombre_comercial, razon_social, telefono, validacion_vence").eq("ruc", RUC).single();
-  log(prov?.nombre_comercial !== "Vaca Loca Tours" && !prov?.telefono, `publicado sin datos declarados: «${prov?.razon_social}», tel ${prov?.telefono ?? "—"}`);
+  log(prov?.nombre_comercial !== "Vaca Loca Tours" && !prov?.telefono, `publicado sin datos declarados: «${prov?.nombre_comercial ?? prov?.razon_social}», tel ${prov?.telefono ?? "—"}`);
 
   const despues = await (await fetch(`http://localhost:3456/prestador/${prov!.id}`)).text();
   log(despues.includes("En proceso de actualización"), "después: el turista lo ve «En proceso de actualización»");

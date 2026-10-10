@@ -6,7 +6,8 @@ import { Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { Tarjeta } from "@/components/ui";
 import { CONSEJO, NOMBRE_TIPO } from "@/config/textos";
 import { clasificarEntrada } from "@/lib/normalizacion";
-import { fuentes, registrarConsulta, resolver } from "@/lib/consultas";
+import { fuentes, registrarConsulta, resolver, type Resolucion } from "@/lib/consultas";
+import { observacionesDe } from "@/lib/dictamen";
 
 export default function Consulta({ searchParams }: PageProps<"/consulta">) {
   return (
@@ -17,11 +18,14 @@ export default function Consulta({ searchParams }: PageProps<"/consulta">) {
 }
 
 async function Resultado({ searchParams }: Pick<PageProps<"/consulta">, "searchParams">) {
-  const q = String((await searchParams).q ?? "").trim();
+  const sp = await searchParams;
+  const q = String(sp.q ?? "").trim();
   if (!q) redirect("/");
+  const obs = observacionesDe(sp.obs);
   const entrada = clasificarEntrada(q);
-  const r = await resolver(entrada);
-  await registrarConsulta(entrada, r);
+  // nf=1: la consulta por imagen ya resolvió que no hay coincidencia (no volver a buscar parecidos).
+  const r: Resolucion = sp.nf === "1" ? { tipo: "no_encontrado", ruc: null } : await resolver(entrada);
+  if (sp.nf !== "1") await registrarConsulta(entrada, r);
 
   if (r.tipo === "prestador") redirect(`/prestador/${r.id}`);
   if (r.tipo === "vehiculo") redirect(`/vehiculo/${r.placa}`);
@@ -53,7 +57,7 @@ async function Resultado({ searchParams }: Pick<PageProps<"/consulta">, "searchP
     );
 
   return (
-    <VistaDictamen estado="no_encontrado" fuentes={await fuentes()} consejos={CONSEJO.noEncontrado}>
+    <VistaDictamen estado="no_encontrado" advertencias={obs.map((texto) => ({ nivel: "observacion" as const, texto }))} fuentes={await fuentes()} consejos={CONSEJO.noEncontrado}>
       <Datos
         titulo="Lo que consultaste"
         filas={[

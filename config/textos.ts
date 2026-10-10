@@ -101,3 +101,19 @@ export const TIPO_DOCUMENTO: Record<string, string> = {
   constancia_agencia: "Constancia de inscripción de agencia (DIRCETUR)",
   tuc: "Tarjeta Única de Circulación (TUC) de una unidad",
 };
+
+// Advertencias que salen de la imagen consultada (no del registro). Se pasan por código en la URL.
+export const OBS_IMAGEN = {
+  sin_ruc:
+    "El anuncio o perfil no muestra RUC ni n.° de constancia. Las agencias deben mostrarlos en sus canales digitales (art. 22, D.S. 005-2020-MINCETUR).",
+  datos_distintos:
+    "Los datos del anuncio (teléfono, cuenta o RUC) no coinciden con los registrados para este prestador. Contáctalo solo por el canal oficial que figura aquí.",
+} as const;
+export type CodigoObs = keyof typeof OBS_IMAGEN;
+
+export const TEXTO_FOTO = {
+  leyendo: "Leyendo la imagen…",
+  ilegible: "No pudimos identificar datos en la imagen. Prueba con una foto más nítida o escribe el nombre, RUC o placa.",
+  error: "No pudimos procesar la imagen. Intenta de nuevo o escribe el nombre, RUC o placa.",
+  ayuda: "Foto de un letrero, logo o unidad, o captura de un anuncio en redes.",
+} as const;

@@ -4,23 +4,24 @@ import { connection } from "next/server";
 import { Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { NOMBRE_AUTORIZACION, NOMBRE_TIPO } from "@/config/textos";
 import { cargarPrestador, fuentes, hoyLima } from "@/lib/consultas";
-import { dictamenPrestador, fechaLegible } from "@/lib/dictamen";
+import { conObservaciones, dictamenPrestador, fechaLegible, observacionesDe } from "@/lib/dictamen";
 
-export default function Prestador({ params }: PageProps<"/prestador/[id]">) {
+export default function Prestador({ params, searchParams }: PageProps<"/prestador/[id]">) {
   return (
     <Suspense fallback={<Cargando />}>
-      <Contenido params={params} />
+      <Contenido params={params} searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function Contenido({ params }: Pick<PageProps<"/prestador/[id]">, "params">) {
+async function Contenido({ params, searchParams }: Pick<PageProps<"/prestador/[id]">, "params" | "searchParams">) {
   const { id } = await params;
+  const obs = observacionesDe((await searchParams).obs);
   await connection();
   const [datos, lista] = await Promise.all([cargarPrestador(id), fuentes()]);
   if (!datos) notFound();
   const { prestador: p, autorizaciones, ruc } = datos;
-  const { estado, advertencias } = dictamenPrestador(p, autorizaciones, ruc, hoyLima());
+  const { estado, advertencias } = conObservaciones(dictamenPrestador(p, autorizaciones, ruc, hoyLima()), obs);
   const redes = Object.values((p.redes ?? {}) as Record<string, string>).join(" · ");
 
   return (
