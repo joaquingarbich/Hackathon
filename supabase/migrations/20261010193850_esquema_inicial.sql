@@ -115,7 +115,7 @@ create table public.submissions (
   ruc char(11) not null,
   tipo_documento text not null check (tipo_documento in ('constancia_agencia', 'tuc')),
   archivo_path text not null,          -- ruta en el bucket 'documentos': <user_id>/<archivo>
-  hash text not null,
+  hash text,                           -- lo calcula el servidor (no el cliente) junto con las capas
   campos_extraidos jsonb,
   resultado_capas jsonb,
   confianza text check (confianza in ('alta', 'media', 'baja')),
@@ -201,8 +201,11 @@ create policy "registrar consulta" on public.lookups for insert to anon, authent
 create policy "admin lee consultas" on public.lookups for select to authenticated using ((select public.es_admin()));
 
 -- Reseñas: cualquiera publica y ve las visibles; el admin ve y modera todas.
-grant select, insert on public.reviews to anon, authenticated;
-grant update on public.reviews to authenticated;
+-- Permisos por columna: device_hash no se expone y el autor no fija estado/fecha/respuesta.
+-- (Leer con .select('id, provider_id, ...'): select('*') falla para anon por diseño.)
+grant select (id, provider_id, estrellas, comentario, alias, estado, respuesta_prestador, created_at) on public.reviews to anon, authenticated;
+grant insert (provider_id, estrellas, comentario, alias, device_hash) on public.reviews to anon, authenticated;
+grant update (estado) on public.reviews to authenticated;
 create policy "ver visibles" on public.reviews for select to anon, authenticated
   using (estado = 'visible' or (select public.es_admin()));
 create policy "publicar resena" on public.reviews for insert to anon, authenticated
@@ -211,11 +214,18 @@ create policy "admin modera" on public.reviews for update to authenticated
   using ((select public.es_admin())) with check ((select public.es_admin()));
 
 -- Solicitudes: el operador crea y ve las suyas; el admin ve y resuelve todas.
-grant select, insert, update on public.submissions to authenticated;
+-- El operador solo aporta RUC, tipo y archivo. Extracción, capas, confianza y hash
+-- los escribe el servidor con service role: el operador no puede falsificarlos.
+grant select on public.submissions to authenticated;
+grant insert (ruc, tipo_documento, archivo_path) on public.submissions to authenticated;
+grant update (estado, motivo, revisor, revisado_at, vence_el) on public.submissions to authenticated;
 create policy "operador ve las suyas" on public.submissions for select to authenticated
   using (user_id = (select auth.uid()) or (select public.es_admin()));
 create policy "operador crea" on public.submissions for insert to authenticated
-  with check (user_id = (select auth.uid()) and estado = 'pendiente' and revisor is null);
+  with check (
+    user_id = (select auth.uid())
+    and (storage.foldername(archivo_path))[1] = (select auth.uid())::text  -- solo documentos propios
+  );
 create policy "admin resuelve" on public.submissions for update to authenticated
   using ((select public.es_admin())) with check ((select public.es_admin()));
 
@@ -224,7 +234,8 @@ grant execute on function public.buscar_prestadores(text, real, int) to anon, au
 -- ---------------------------------------------------------------------------
 -- Storage: documentos privados en <user_id>/<archivo>
 -- ---------------------------------------------------------------------------
-insert into storage.buckets (id, name, public) values ('documentos', 'documentos', false)
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('documentos', 'documentos', false, 10485760, array['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
 on conflict (id) do nothing;
 
 create policy "operador sube a su carpeta" on storage.objects for insert to authenticated
