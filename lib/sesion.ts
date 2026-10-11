@@ -21,8 +21,10 @@ export async function exigirUsuario() {
   return u;
 }
 
+/** El panel de revisión tiene su propio login (/admin/ingresar), separado del de empresas. */
 export async function exigirAdmin() {
-  const u = await exigirUsuario();
-  if (!u.esAdmin) redirect("/operador");
+  const u = await usuarioActual();
+  if (!u) redirect("/admin/ingresar");
+  if (!u.esAdmin) redirect(`/admin/ingresar?error=${encodeURIComponent("Esta cuenta no es de revisor.")}`);
   return u;
 }

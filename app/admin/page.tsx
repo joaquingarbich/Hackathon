@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, LogOut } from "lucide-react";
+import { salirAdmin } from "../ingresar/acciones";
 import { Cargando } from "@/components/dictamen";
-import { ChipProceso, Mono, Pagina, Tarjeta } from "@/components/ui";
+import { Button, ChipProceso, Mono, Pagina, Tarjeta } from "@/components/ui";
 import { TIPO_DOCUMENTO } from "@/config/textos";
 import { exigirAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -53,6 +54,10 @@ async function Cola({ searchParams }: Pick<PageProps<"/admin">, "searchParams">)
 
   return (
     <Pagina>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-2 text-[0.9375rem] shadow-suave">
+        <span className="min-w-0 truncate text-muted-foreground">Revisor · {admin.email}</span>
+        <form action={salirAdmin}><Button variant="ghost" size="sm"><LogOut aria-hidden /> Salir</Button></form>
+      </div>
       <div className="flex flex-col gap-1">
         <h1 className="text-[1.875rem] leading-[1.1] font-bold sm:text-[2.25rem]">Panel de validación</h1>
         <p className="text-muted-foreground">Documentos, altas de canales, vehículos y personal, reportes de turistas y búsquedas sin resultado.</p>
@@ -130,8 +135,6 @@ async function Cola({ searchParams }: Pick<PageProps<"/admin">, "searchParams">)
         ))}
       </div>
       <Fiscalizacion destino={DESTINOS.some((d) => d.id === sp.d) ? String(sp.d) : undefined} error={typeof sp.error === "string" ? sp.error : undefined} />
-      <p className="text-[0.875rem] text-muted-foreground">Datos de muestra · empresas ficticias.</p>
-      <Link href="/operador" className="inline-flex min-h-11 items-center gap-1.5 self-start font-medium text-muted-foreground no-underline hover:text-foreground">← Volver</Link>
     </Pagina>
   );
 }

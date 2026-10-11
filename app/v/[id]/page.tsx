@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { Cargando } from "@/components/dictamen";
 import { registrarConsulta, resolverQr } from "@/lib/consultas";
 
-// Destino de todos los QR impresos: abre la ficha EN VIVO (si algo vence o se suspende, el QR ya lo muestra).
+// Enlace corto para compartir una ficha: abre la empresa, el vehículo o la persona EN VIVO.
 export default function Qr({ params }: PageProps<"/v/[id]">) {
   return <Suspense fallback={<Cargando />}><Redirigir params={params} /></Suspense>;
 }

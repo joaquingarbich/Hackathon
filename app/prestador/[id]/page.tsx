@@ -63,7 +63,7 @@ async function Contenido({ params }: Pick<PageProps<"/prestador/[id]">, "params"
               <div className="flex flex-col gap-2">
                 <TituloSeccion className="text-base">{TEXTO_FICHA.servicios}</TituloSeccion>
                 <ul className="flex flex-wrap gap-1.5">
-                  {servicios.map((s) => <li key={s.nombre}><Badge variant="muted" className="py-1.5 text-[0.875rem] text-foreground">{s.nombre.replace(/\s*\(muestra\)/i, "")}</Badge></li>)}
+                  {servicios.map((s) => <li key={s.id}><Badge variant="muted" className="py-1.5 text-[0.875rem] text-foreground">{s.nombre.replace(/\s*\(muestra\)/i, "")}<span className="font-normal text-muted-foreground">· {nombreDestino(s.destino)}</span></Badge></li>)}
                 </ul>
               </div>
             )}

@@ -6,11 +6,9 @@ import { BuscadorVerificar } from "@/components/buscador-verificar";
 import { Alert, AlertDescription, AlertTitle, Encabezado, InsigniaEstado, Skeleton, Tarjeta, claseBoton } from "@/components/ui";
 import { DESTINOS, NOMBRE_TIPO, TEXTO_DESTINOS, TEXTO_HOME, nombreDestino } from "@/config/textos";
 import { conteoPorDestino, empresasPorDestino, type EmpresaDirectorio } from "@/lib/consultas";
-import { cn } from "@/lib/utils";
 
 // Directorio (secundario): empresas registradas por destino, para contactarlas por su canal oficial.
 // Sin precios, sin reseñas, sin rankings. Solo empresas REGISTRADAS en CheckTur que declararon el destino (extra del verificador)
-const TIPOS = ["agencia", "transporte_terrestre", "hospedaje", "restaurante", "guia"];
 
 export default function Destinos({ searchParams }: PageProps<"/destinos">) {
   return (
@@ -33,11 +31,10 @@ function AvisoDeclarados({ corto = false }: { corto?: boolean }) {
 async function Directorio({ searchParams }: Pick<PageProps<"/destinos">, "searchParams">) {
   const sp = await searchParams;
   const d = DESTINOS.find((x) => x.id === sp.d);
-  const t = TIPOS.includes(String(sp.t)) ? String(sp.t) : undefined;
 
   if (!d) return <Selector />;
 
-  const declaradas = await empresasPorDestino(d.id, t);
+  const declaradas = await empresasPorDestino(d.id);
   return (
     <>
       <Link href="/destinos" className="inline-flex min-h-11 items-center gap-1.5 self-start font-medium text-muted-foreground no-underline hover:text-foreground">
@@ -45,18 +42,6 @@ async function Directorio({ searchParams }: Pick<PageProps<"/destinos">, "search
       </Link>
       <Encabezado eyebrow="Destino" titulo={d.nombre} />
       <AvisoDeclarados corto />
-
-      <nav aria-label="Tipo de empresa" className="-mx-4 flex gap-1 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
-        {[undefined, ...TIPOS].map((x) => {
-          const activo = t === x;
-          return (
-            <Link key={x ?? "todas"} href={x ? `/destinos?d=${d.id}&t=${x}` : `/destinos?d=${d.id}`} aria-current={activo ? "page" : undefined}
-              className={cn("pulsable inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-[0.9375rem] font-medium no-underline", activo ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground")}>
-              {x ? NOMBRE_TIPO[x] : "Todas"}
-            </Link>
-          );
-        })}
-      </nav>
 
       <section aria-labelledby="t-declararon" className="flex flex-col gap-3">
         <div className="flex flex-col gap-0.5">
@@ -66,7 +51,7 @@ async function Directorio({ searchParams }: Pick<PageProps<"/destinos">, "search
         {declaradas.length ? <ListaEmpresas empresas={declaradas} /> : (
           <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-input/60 bg-card px-6 py-8 text-center">
             <SearchX aria-hidden className="size-7 text-muted-foreground" />
-            <p className="text-[0.9375rem] text-muted-foreground">{TEXTO_DESTINOS.sinDeclarar(d.nombre)}{t ? ` (${NOMBRE_TIPO[t]})` : ""}</p>
+            <p className="text-[0.9375rem] text-muted-foreground">{TEXTO_DESTINOS.sinDeclarar(d.nombre)}</p>
           </div>
         )}
       </section>

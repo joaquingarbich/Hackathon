@@ -39,7 +39,7 @@ export async function cargarPrestador(id: string) {
     db().from("personal").select("id, nombre, rol, dni_ultimos3, foto_url, carne_numero, carne_vence").eq("provider_id", id).order("nombre").then(lista),
     db().from("canales").select("id, tipo, visible").eq("provider_id", id).then(lista),
     db().from("empresa_destinos").select("destino").eq("provider_id", id).then(lista),
-    db().from("services").select("id, nombre, categoria").eq("provider_id", id).eq("estado", "publicado").then(lista),
+    db().from("services").select("id, nombre, categoria, destino").eq("provider_id", id).eq("estado", "publicado").then(lista),
   ]);
   return { prestador, autorizaciones, ruc, vehiculos, personal, canales, destinos: destinos.map((d) => d.destino), servicios };
 }
@@ -148,33 +148,34 @@ export async function cargarPersona(id: string) {
 
 export type EmpresaDirectorio = { id: string; nombre: string; tipo: string; lugar: string | null; estado: Estado; servicios: string[]; whatsapp: string | null };
 
-/** Directorio por destino: empresas que DECLARARON atenderlo, con estado publicable (no "alerta" ni validación caducada). */
 /** Empresas con cuenta en CheckTur (registraron sus servicios con nosotros). Solo ids: dato no sensible. */
 async function registradas(): Promise<Set<string>> {
   const { data } = await supabaseAdmin().from("proveedor_cuentas").select("provider_id");
   return new Set((data ?? []).map((c) => c.provider_id));
 }
 
-/** Directorio (extra del verificador): solo empresas REGISTRADAS en CheckTur que declararon atender el destino. */
-export async function empresasPorDestino(destino: string, tipo?: string): Promise<EmpresaDirectorio[]> {
+/** Pares destino–empresa: lo declarado en "Destinos" + los servicios publicados en ese destino. Solo empresas registradas. */
+async function destinosDeclarados(destino?: string) {
   const conCuenta = await registradas();
-  const ids = lista(await db().from("empresa_destinos").select("provider_id").eq("destino", destino)).map((d) => d.provider_id).filter((id) => conCuenta.has(id));
+  let d = db().from("empresa_destinos").select("destino, provider_id");
+  let s = db().from("services").select("destino, provider_id").eq("estado", "publicado");
+  if (destino) { d = d.eq("destino", destino); s = s.eq("destino", destino); }
+  const filas = [...lista(await d), ...lista(await s)].filter((x) => conCuenta.has(x.provider_id));
+  return [...new Map(filas.map((x) => [`${x.destino}|${x.provider_id}`, x])).values()];
+}
+
+/** Directorio (extra del verificador): solo empresas REGISTRADAS en CheckTur que atienden el destino. */
+export async function empresasPorDestino(destino: string): Promise<EmpresaDirectorio[]> {
+  const ids = (await destinosDeclarados(destino)).map((x) => x.provider_id);
   if (!ids.length) return [];
-  let q = db().from("providers").select("*").in("id", ids);
-  if (tipo) q = q.eq("tipo", tipo);
-  return armarDirectorio(lista(await q));
+  return armarDirectorio(lista(await db().from("providers").select("*").in("id", ids)), destino);
 }
 
 /** "LOS ORGANOS" (padrón en mayúsculas) → "Los Organos"; lo demás queda igual. */
 const legible = (t: string | null) => (t && t === t.toUpperCase() ? t.toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase()) : t);
 
-/**
- * Empresas registradas con local en los distritos del destino que NO declararon destinos en CheckTur
- * (p. ej. las cargadas del Directorio MINCETUR). Pueden atenderlo aunque no lo hayan declarado.
- */
-
-/** Estado (reusa dictamenPrestador), servicios y WhatsApp oficial de cada empresa; solo las publicables. */
-async function armarDirectorio(ps: Tables<"providers">[]): Promise<EmpresaDirectorio[]> {
+/** Estado (reusa dictamenPrestador), servicios EN ESE DESTINO y WhatsApp oficial de cada empresa; solo las publicables. */
+async function armarDirectorio(ps: Tables<"providers">[], destino: string): Promise<EmpresaDirectorio[]> {
   if (!ps.length) return [];
   const ids = ps.map((p) => p.id);
   const rucs = ps.map((p) => p.ruc).filter((r): r is string => !!r);
@@ -184,7 +185,7 @@ async function armarDirectorio(ps: Tables<"providers">[]): Promise<EmpresaDirect
     db().from("vehicles").select("provider_id, placa, soat_vencimiento, citv_vencimiento").in("provider_id", ids).then(lista),
     db().from("personal").select("provider_id, nombre, carne_vence").in("provider_id", ids).then(lista),
     db().from("canales").select("provider_id, tipo, visible").in("provider_id", ids).eq("tipo", "whatsapp").then(lista),
-    db().from("services").select("provider_id, nombre").in("provider_id", ids).eq("estado", "publicado").then(lista),
+    db().from("services").select("provider_id, nombre").in("provider_id", ids).eq("estado", "publicado").eq("destino", destino).then(lista),
   ]);
   const hoy = hoyLima();
   const de = <T extends { provider_id: string }>(xs: T[], id: string) => xs.filter((x) => x.provider_id === id);
@@ -202,9 +203,8 @@ async function armarDirectorio(ps: Tables<"providers">[]): Promise<EmpresaDirect
     .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
 }
 
-/** Cuántas empresas declararon cada destino (para el selector del directorio). */
+/** Cuántas empresas atienden cada destino (para el selector del directorio). */
 export async function conteoPorDestino(): Promise<Record<string, number>> {
-  const conCuenta = await registradas();
-  const filas = lista(await db().from("empresa_destinos").select("destino, provider_id")).filter((d) => conCuenta.has(d.provider_id));
+  const filas = await destinosDeclarados();
   return filas.reduce<Record<string, number>>((m, d) => ({ ...m, [d.destino]: (m[d.destino] ?? 0) + 1 }), {});
 }

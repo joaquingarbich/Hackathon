@@ -237,7 +237,7 @@ export const TEXTO_AGENCIA = {
   perfil: "Perfil",
   ayudaPerfil: "Datos de contacto y presentación que verán los turistas. Los cambios se publican cuando un revisor los aprueba: así nadie puede cambiar tu teléfono o tus redes sin control.",
   servicios: "Servicios",
-  ayudaServicios: "Tours, actividades, hospedaje, comida o traslados que ofreces. Cada servicio se publica en el catálogo cuando un revisor lo aprueba.",
+  ayudaServicios: "Los tours o actividades que ofreces, cada uno con su destino. Cuando un revisor lo aprueba, aparece en tu ficha y en ese destino del directorio.",
   enviado: "Enviado. Un revisor lo revisará antes de publicarlo.",
   cambioPendiente: "Tienes un cambio de perfil en revisión.",
   estadoServicio: { pendiente: "En revisión", publicado: "Publicado", rechazado: "Por corregir" } as Record<string, string>,
@@ -323,7 +323,7 @@ export const CASOS = {
   van: {
     titulo: "Ya estoy en la van",
     pasos: [
-      "Escribe la placa (o apunta la cámara de tu teléfono al QR pegado en la unidad).",
+      "Escribe la placa de la unidad.",
       "Compara la foto y la placa de la ficha con la van que tienes enfrente.",
       "Comparte la verificación con alguien de confianza.",
     ],
@@ -357,7 +357,7 @@ export const TEXTO_DESTINOS = {
   aviso: "No ver a una empresa en esta lista no significa que no atienda este destino.",
   avisoCorto: "Aquí solo aparecen las empresas que se registraron en CheckTur y declararon sus destinos. Si te ofrecen un servicio de otra, búscala por su nombre, RUC o placa: el verificador consulta los registros oficiales.",
   avisoDetalle:
-    "Aquí solo aparecen las empresas que se registraron en CheckTur y declararon a qué destinos llevan. Que una empresa no esté en esta lista no significa que sea informal: búscala por su nombre, RUC o placa en el verificador, que consulta el Directorio MINCETUR y los registros de transporte.",
+    "Aquí solo aparecen las empresas que se registraron en CheckTur y declararon a qué destinos llevan. Que una empresa no esté en esta lista no dice nada de su formalidad: búscala por su nombre, RUC o placa en el verificador, que consulta el Directorio MINCETUR y los registros de transporte.",
   verDetalle: "Ver ficha completa",
   buscarOtra: (destino: string) => `¿Te ofrecieron algo en ${destino} que no está aquí?`,
 } as const;
@@ -396,7 +396,7 @@ export const TEXTO_FAQ = {
     },
     {
       p: "¿Cómo compruebo la van o al guía?",
-      r: "Escribe la placa del vehículo o el nombre de la empresa. En la ficha verás la foto de la unidad y los datos del personal registrado: compáralos con lo que tienes enfrente. Las empresas también pueden pegar un código QR que abre esa misma ficha con la cámara del teléfono.",
+      r: "Escribe la placa del vehículo o el nombre de la empresa. En la ficha verás la foto de la unidad y los datos del personal registrado: compáralos con lo que tienes enfrente.",
     },
     {
       p: "¿Qué hago si tuve un problema?",

@@ -28,9 +28,9 @@ Los 5 estados de siempre. Además, `dictamenPrestador(…, { vehiculos, personal
 
 11 dígitos con prefijo 10/15/17/20 → RUC · 9 dígitos que empiezan con 9 (o +51) → celular/Yape/Plin · 13–20 dígitos → cuenta bancaria · `ABC-123` / `A1B-234` → placa · resto → nombre (difuso; sin coincidencias, sugerencias con umbral bajo y aviso de posible suplantación).
 
-## QR
+## Enlaces para compartir
 
-`/v/[id]` abre en vivo la ficha de la empresa, el vehículo o la persona (`resolverQr`). La empresa imprime sus QR en `/operador/agencia/[id]/qr` (stickers, carnet, vitrina; PDF con la impresión del navegador). No hay lector dentro de la app: la cámara del teléfono abre el QR impreso directamente.
+`/v/[id]` abre en vivo la ficha de la empresa, el vehículo o la persona (`resolverQr`); lo usa el botón «Compartir». No hay códigos QR en la app.
 
 ## Datos
 

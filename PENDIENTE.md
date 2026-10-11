@@ -24,6 +24,6 @@ Producción: https://checktur-piura.vercel.app · Supabase `hrycpqowvaixewbjdsbf
 ## Falta
 - **CSV del MTC completo / actualizado** cuando llegue: re-correr `load:padrones` (omite lo no turístico y poda lo que ya no figure). 2 placas de turismo del extracto vienen sin empresa (GORE 1236-2015) y se omiten. Errores de lectura del PDF (p. ej. `MARTlNEZ`, `YSERVICIOS`) hay que corregirlos en el CSV de origen.
 - **Scraping periódico:** el directorio MINCETUR tiene botón «Exportar» y las resoluciones MTC están en gob.pe (PDF). Automatizarlo sin evadir captchas ni simular navegadores ante portales del Estado (regla de `CHECKTUR_CONTEXTO.md`): descargar exports/PDF públicos y re-correr el loader.
-- Probar el alta de empresa con un correo real y definir el admin real.
+- Admin: matias.garbich@gmail.com (login en `/admin/ingresar`). El alta de empresa ya no pide confirmar correo.
 - SUNAT (opcional): `npm run load:sunat` para sumar advertencias de RUC de baja / no habido.
 - Mover el proyecto fuera del Escritorio sincronizado con iCloud.

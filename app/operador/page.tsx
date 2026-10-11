@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
-import { Building2, ChevronRight, Eye, FileText, Lightbulb, LogOut, ShieldCheck, Upload } from "lucide-react";
+import { Building2, ChevronRight, Eye, FileText, Lightbulb, LogOut, Upload } from "lucide-react";
 import { Cargando, TituloSeccion } from "@/components/dictamen";
 import { Alert, AlertDescription, Button, ChipProceso, Encabezado, InsigniaEstado, Mono, Pagina, Tarjeta } from "@/components/ui";
 import { TEXTO_OPERADOR, TIPO_DOCUMENTO, type Estado } from "@/config/textos";
@@ -49,7 +49,6 @@ async function Panel() {
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-2 text-[0.9375rem] shadow-suave">
         <span className="min-w-0 truncate text-muted-foreground">{u.email}</span>
         <div className="flex shrink-0 items-center gap-1">
-          {u.esAdmin && <Link className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 font-semibold no-underline hover:bg-muted" href="/admin"><ShieldCheck aria-hidden className="size-4" /> Panel de validación</Link>}
           <form action={salir}><Button variant="ghost" size="sm"><LogOut aria-hidden /> Salir</Button></form>
         </div>
       </div>

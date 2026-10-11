@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { Eye, QrCode } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Cargando } from "@/components/dictamen";
-import { Boton, Campo, ChipProceso, Mono, Pagina, Tarjeta, soles, Textarea, Aviso, Button, Encabezado, Label, claseBoton } from "@/components/ui";
+import { Boton, Campo, ChipProceso, Mono, Pagina, Tarjeta, Textarea, Aviso, Button, Encabezado, Label, claseBoton } from "@/components/ui";
 import { NOMBRE_TIPO, REDES, TEXTO_AGENCIA, DESTINOS } from "@/config/textos";
 import { exigirDueno } from "@/lib/agencia";
 import type { Perfil } from "@/lib/agencia-validar";
@@ -50,7 +50,6 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/operador/age
       <Encabezado eyebrow={NOMBRE_TIPO[p.tipo]} titulo={p.nombre_comercial ?? p.razon_social} bajada={<>RUC <Mono>{p.ruc}</Mono></>}>
         <div className="mt-2 flex flex-col gap-2 sm:flex-row">
           <Link href={`/prestador/${p.id}`} className={claseBoton("secundario")}><Eye aria-hidden /> Ver como turista</Link>
-          <Link href={`/operador/agencia/${p.id}/qr`} className={claseBoton("secundario")}><QrCode aria-hidden /> Códigos QR</Link>
         </div>
       </Encabezado>
 
@@ -95,7 +94,7 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/operador/age
                   <ChipProceso tipo={CHIP[s.estado as keyof typeof CHIP] ?? "revision"} texto={TEXTO_AGENCIA.estadoServicio[s.estado]} />
                 </div>
                 <p className="text-[0.9375rem] text-muted-foreground">
-                  {DESTINOS.find((d) => d.id === s.destino)?.nombre}{s.precio_ref !== null && ` · ${soles(s.precio_ref)} ${s.unidad_precio}`}
+                  {DESTINOS.find((d) => d.id === s.destino)?.nombre}
                   {s.estado === "publicado" && <> · <Link href={`/prestador/${p.id}`}>ver en tu ficha</Link></>}
                 </p>
                 {s.estado === "rechazado" && s.motivo && <p className="text-[0.9375rem] text-observaciones">{s.motivo}</p>}

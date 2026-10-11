@@ -37,7 +37,7 @@ export async function crearServicio(providerId: string, f: FormData): Promise<Re
   const r = validarServicio(campos(f), proveedor.tipo);
   if (!r.ok) return r;
   const { error } = await db.from("services").insert({
-    ...r.datos, provider_id: providerId, estado: "pendiente", es_muestra: proveedor.es_muestra, itinerario: r.datos.itinerario as unknown as Json,
+    ...r.datos, provider_id: providerId, estado: "pendiente", es_muestra: proveedor.es_muestra,
   });
   return error ? { ok: false, error: "No se pudo guardar el servicio. Intenta de nuevo." } : { ok: true };
 }
