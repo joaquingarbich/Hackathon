@@ -5,6 +5,7 @@ import { Plegable, Sello, Skeleton, Tarjeta } from "@/components/ui";
 import { CONSEJO, TEXTO_ESTADO, type Estado } from "@/config/textos";
 import { fechaLegible, type Advertencia } from "@/lib/dictamen";
 import { cn } from "@/lib/utils";
+import { AparecerCargando } from "@/components/movimiento";
 
 type Fuente = { id: string; nombre: string; url: string | null; fecha_corte: string };
 
@@ -142,11 +143,13 @@ export function CabeceraDictamen({ titulo, detalle, eyebrow }: { titulo: ReactNo
 
 /** Esqueleto del resultado: algo aparece al instante mientras se consultan los registros. */
 export const Cargando = () => (
-  <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-6 sm:px-6 sm:py-10" role="status" aria-live="polite">
+  <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 sm:py-10" role="status" aria-live="polite">
     <span className="sr-only">Consultando registros…</span>
-    <Skeleton className="h-9 w-2/3 rounded-xl" />
-    <Skeleton className="h-5 w-1/3 rounded-lg" />
-    <Skeleton className="h-52 rounded-3xl" />
-    <Skeleton className="h-28 rounded-2xl" />
+    <AparecerCargando className="flex flex-col gap-5">
+      <Skeleton className="h-9 w-2/3 rounded-xl" />
+      <Skeleton className="h-5 w-1/3 rounded-lg" />
+      <Skeleton className="h-52 rounded-3xl" />
+      <Skeleton className="h-28 rounded-2xl" />
+    </AparecerCargando>
   </div>
 );

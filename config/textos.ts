@@ -29,7 +29,7 @@ export const TEXTO_ESTADO: Record<Estado, { titulo: string; resumen: string }> =
 
 export const TEXTO_APP = {
   nombre: "CheckTur Piura",
-  lema: "Experiencias, hospedajes y restaurantes de Piura con registro oficial verificado.",
+  lema: "Verifica agencias de turismo y transporte turístico de Piura en los registros oficiales antes de pagar.",
   campoBusqueda: "Nombre, RUC o placa",
   ejemploBusqueda: "Ej.: Colán Aventura, 20123456789 o ABC-123",
   botonBuscar: "Verificar",
@@ -333,13 +333,20 @@ export const CASOS = {
 export type Caso = keyof typeof CASOS;
 
 export const TEXTO_HOME = {
-  bajada: "Escribe el RUC, el celular o Yape, la placa o el nombre de la empresa. Se contrasta con los registros oficiales de Piura y con los datos que cada empresa registró.",
+  bajada: "Escribe el RUC, el celular o Yape, la placa o el nombre. Se contrasta con los registros oficiales de Piura.",
+  fuentesTitulo: "Qué se consulta",
+  fuentes: [
+    { nombre: "Directorio de agencias de viajes", entidad: "MINCETUR / DIRCETUR Piura", que: "Agencias inscritas y sus teléfonos" },
+    { nombre: "Resoluciones de transporte turístico", entidad: "MTC, GORE Piura y municipalidades", que: "Placas habilitadas y su vigencia" },
+    { nombre: "Padrón RUC", entidad: "SUNAT", que: "Solo advierte si el RUC no está activo o habido" },
+  ],
+  fuentesNota: "Lo que una empresa declara en CheckTur se muestra aparte, nunca como oficial.",
+  imagen: "¿Tienes una foto o una captura?",
   casos: "¿Qué estás por hacer?",
-  casosAyuda: "Toca tu caso para ver qué revisar antes de pagar o subir.",
   destinoCaso: "Busco empresa para ir a un destino",
   destinoPasos: [
-    "En «Destinos» verás las empresas registradas que declararon atender ese lugar, con su estado y su WhatsApp oficial.",
-    "También aparecen otras empresas registradas con local en la zona que aún no declararon sus destinos: puede que sí atiendan ese lugar.",
+    "En «Destinos» verás las empresas registradas en CheckTur que atienden ese lugar, con su estado y su WhatsApp oficial.",
+    "Que una empresa no aparezca ahí no dice nada de su formalidad: búscala por su nombre o RUC.",
     "Contrata por el canal oficial que figura en su ficha, no por números que te pasen en la calle.",
   ],
   verDestinos: "Ver empresas por destino",

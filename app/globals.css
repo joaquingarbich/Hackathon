@@ -220,6 +220,15 @@
 
 /* Pulido de interacción (Emil Kowalski) ------------------------------------------------- */
 
+/* Esqueleto de carga: un brillo que recorre el bloque (dice "cargando", no "roto"). */
+.esqueleto { position: relative; overflow: hidden; }
+.esqueleto::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--card) 70%, transparent), transparent);
+  animation: brillo 1.4s var(--ease-in-out) infinite;
+}
+@keyframes brillo { to { transform: translateX(100%); } }
+
 /* Presionar: respuesta inmediata en todo lo pulsable. */
 .pulsable {
   transition: transform 160ms var(--ease-out), background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
@@ -260,6 +269,7 @@
   .entrada { @starting-style { transform: none; } }
   .escalonado > * { animation-name: fundido; }
   .chip-entrada { @starting-style { transform: none; } }
+  .esqueleto::after { animation: none; }
   @keyframes fundido { from { opacity: 0; } }
   *, *::before, *::after { scroll-behavior: auto !important; }
 }

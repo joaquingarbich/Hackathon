@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TEXTO_APP } from "@/config/textos";
 import { BarraPestanas, Cabecera, CabeceraBase, Pie } from "@/components/navegacion";
+import { MovimientoGlobal } from "@/components/movimiento";
 import "./globals.css";
 
 // Tipografía: Geist (interfaz y títulos) + Geist Mono (RUC, placas, fechas). Tokens en app/globals.css.
@@ -28,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Suspense fallback={<CabeceraBase />}>
           <Cabecera />
         </Suspense>
-        <main className="flex flex-1 flex-col">{children}</main>
+        <main className="flex flex-1 flex-col"><MovimientoGlobal>{children}</MovimientoGlobal></main>
         <Pie />
         <Suspense>
           <BarraPestanas />
