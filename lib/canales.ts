@@ -4,6 +4,10 @@ export const TIPOS_CANAL = ["whatsapp", "telefono", "yape", "plin", "banco", "in
 export type TipoCanal = (typeof TIPOS_CANAL)[number];
 export const CANALES_CELULAR: TipoCanal[] = ["whatsapp", "telefono", "yape", "plin"];
 
+/** Tipos que comparten el mismo espacio de búsqueda: un celular es el mismo número sea WhatsApp, teléfono, Yape o Plin.
+ *  Toda comprobación de "¿ya es de otra empresa?" debe usar este grupo, igual que la búsqueda pública. */
+export const grupoCanal = (tipo: TipoCanal): TipoCanal[] => (CANALES_CELULAR.includes(tipo) ? CANALES_CELULAR : [tipo]);
+
 export const celularVisible = (d: string) => `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}`;
 
 export function normalizarCanal(

@@ -5,7 +5,7 @@ import { validarPerfil, validarServicio, type Campos } from "@/lib/agencia-valid
 import type { Json } from "@/lib/database.types";
 import { createHash } from "node:crypto";
 import { DESTINOS } from "@/config/textos";
-import { normalizarCanal, TIPOS_CANAL, type TipoCanal } from "@/lib/canales";
+import { grupoCanal, normalizarCanal, TIPOS_CANAL, type TipoCanal } from "@/lib/canales";
 import { normalizarPlaca } from "@/lib/normalizacion";
 import { hayCupo } from "@/lib/limite";
 import { TEXTO_LIMITE } from "@/config/textos";
@@ -85,7 +85,8 @@ export async function crearCanal(providerId: string, f: FormData): Promise<Resul
   const n = normalizarCanal(tipo, String(f.get("valor") ?? ""), (s) => createHash("sha256").update(s).digest("hex"), String(f.get("etiqueta") ?? ""));
   if ("error" in n) return fallo(n.error);
   // ¿Ya está aprobado para OTRA empresa? (un número/cuenta no puede ser de dos)
-  const { data: ajeno } = await db.from("canales").select("provider_id").eq("tipo", tipo).eq("valor", n.valor).eq("estado", "aprobado").neq("provider_id", providerId).limit(1);
+  // Mismo criterio que la búsqueda pública: un celular cruza WhatsApp/teléfono/Yape/Plin (incluye el Directorio MINCETUR).
+  const { data: ajeno } = await db.from("canales").select("provider_id").in("tipo", grupoCanal(tipo)).eq("valor", n.valor).eq("estado", "aprobado").neq("provider_id", providerId).limit(1);
   if (ajeno?.length) return fallo("Ese número o cuenta ya figura registrado por otra empresa. Si es tuyo, escribe al revisor.");
   const { error } = await db.from("canales").insert({ provider_id: providerId, tipo, valor: n.valor, visible: n.visible });
   return error ? fallo("No se pudo guardar. Intenta de nuevo.") : { ok: true };

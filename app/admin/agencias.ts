@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { exigirAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Perfil } from "@/lib/agencia-validar";
+import { grupoCanal, type TipoCanal } from "@/lib/canales";
 
 const revision = (adminId: string) => ({ revisor: adminId, revisado_at: new Date().toISOString() });
 
@@ -67,6 +68,17 @@ export async function resolverAlta(f: FormData) {
   if (!ALTAS[tipo] || (decision !== "aprobado" && decision !== "rechazado")) redirect("/admin");
   if (decision === "rechazado" && !motivo) redirect(`/admin?error=motivo#altas`);
   const { tabla, campo } = ALTAS[tipo];
+  if (tipo === "canal" && decision === "aprobado") {
+    // Misma puerta que el alta y la búsqueda: el número/cuenta no puede quedar aprobado para dos empresas,
+    // aunque esté con otro tipo (p. ej. «Yape» de una empresa = teléfono MINCETUR de otra).
+    const db = supabaseAdmin();
+    const { data: c } = await db.from("canales").select("provider_id, tipo, valor").eq("id", id).maybeSingle();
+    if (c) {
+      const { data: ajeno } = await db.from("canales").select("id").in("tipo", grupoCanal(c.tipo as TipoCanal)).eq("valor", c.valor)
+        .eq("estado", "aprobado").neq("provider_id", c.provider_id).limit(1);
+      if (ajeno?.length) redirect("/admin?error=duplicado#altas");
+    }
+  }
   const { error } = await supabaseAdmin()
     .from(tabla)
     .update({ [campo]: decision, motivo: motivo || null, ...revision(admin.id) })

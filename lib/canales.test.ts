@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { normalizarCanal } from "./canales";
+import { grupoCanal, normalizarCanal } from "./canales";
 
 const h = (s: string) => `hash(${s})`;
 test("normalizarCanal", () => {
@@ -11,4 +11,6 @@ test("normalizarCanal", () => {
   assert.ok("error" in normalizarCanal("yape", "12345", h));
   assert.ok("error" in normalizarCanal("banco", "123", h));
   assert.ok("error" in normalizarCanal("web", "javascript:alert(1)", h));
+  assert.deepEqual(grupoCanal("yape"), ["whatsapp", "telefono", "yape", "plin"]); // un celular es uno solo para comprobar dueños
+  assert.deepEqual(grupoCanal("instagram"), ["instagram"]);
 });
