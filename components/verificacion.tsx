@@ -13,19 +13,14 @@ export async function urlAbsoluta(ruta: string) {
   return `${h.get("x-forwarded-proto") ?? "https"}://${h.get("host")}${ruta}`;
 }
 
-/** Foto grande para comparar con lo que se tiene enfrente (evita QR fotocopiados). Sin foto: iniciales. */
-export function Foto({ src, alt, texto, className = "" }: { src: string | null; alt: string; texto: string; className?: string }) {
-  return src ? (
-    // eslint-disable-next-line @next/next/no-img-element -- fotos subidas a Storage público, tamaño variable
-    <img src={src} alt={alt} className={cn("aspect-[4/3] w-full rounded-2xl border border-border bg-muted object-cover shadow-suave", className)} />
-  ) : (
-    <div role="img" aria-label={`${alt} (sin foto registrada)`} className={cn("flex aspect-[4/3] w-full items-center justify-center rounded-2xl border border-dashed border-input/60 bg-[linear-gradient(135deg,var(--secondary),var(--muted))] text-4xl font-bold tracking-tight text-secondary-foreground", className)}>
-      {texto}
-    </div>
-  );
+/** Foto para comparar con lo que se tiene enfrente. Sin foto registrada no se muestra nada
+ *  (los registros oficiales del MTC/MINCETUR no traen fotos; solo las sube la empresa). */
+export function Foto({ src, alt, className = "" }: { src: string | null; alt: string; className?: string }) {
+  if (!src) return null;
+  // eslint-disable-next-line @next/next/no-img-element -- fotos subidas a Storage público, tamaño variable
+  return <img src={src} alt={alt} className={cn("aspect-[4/3] w-full rounded-2xl border border-border bg-muted object-cover shadow-suave", className)} />;
 }
 
-export const iniciales = (n: string) => n.split(/\s+/).filter((p) => !/^\(|muestra/i.test(p)).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 
 type Canal = { id: string; tipo: string; visible: string };
 

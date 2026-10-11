@@ -1,11 +1,12 @@
 import { Suspense } from "react";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { ScanFace } from "lucide-react";
 import { CabeceraDictamen, Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { Alert, AlertDescription, InsigniaEstado, Mono, Pagina } from "@/components/ui";
-import { AccionesFicha, Foto, iniciales, urlAbsoluta, whatsappOficial } from "@/components/verificacion";
+import { AccionesFicha, Foto, urlAbsoluta, whatsappOficial } from "@/components/verificacion";
 import { TEXTO_FICHA } from "@/config/textos";
 import { cargarPersona, fuentes, hoyLima } from "@/lib/consultas";
 import { dictamenPrestador, fechaLegible } from "@/lib/dictamen";
@@ -30,8 +31,8 @@ async function Contenido({ params }: Pick<PageProps<"/persona/[id]">, "params">)
   const rol = TEXTO_FICHA.rol[x.rol];
   return (
     <Pagina className="gap-5 pb-0 sm:pb-10">
-      <div className="grid items-center gap-4 sm:grid-cols-[12rem_1fr]">
-        <Foto src={x.foto_url} alt={`Foto de ${x.nombre}`} texto={iniciales(x.nombre)} className="aspect-square max-w-48 sm:max-w-none" />
+      <div className={cn("grid items-center gap-4", x.foto_url && "sm:grid-cols-[12rem_1fr]")}>
+        <Foto src={x.foto_url} alt={`Foto de ${x.nombre}`} className="aspect-square max-w-48 sm:max-w-none" />
         <CabeceraDictamen eyebrow={rol} titulo={x.nombre} detalle={<>de <Link href={`/prestador/${p.id}`} className="inline-flex min-h-11 items-center font-semibold">{nombreEmpresa}</Link></>} />
       </div>
       <Alert variant="info">

@@ -5,7 +5,7 @@ import { connection } from "next/server";
 import { BusFront, ChevronRight, FileCheck2, MapPin, UserRound } from "lucide-react";
 import { CabeceraDictamen, Cargando, Datos, TituloSeccion, VistaDictamen } from "@/components/dictamen";
 import { Badge, Mono, Pagina, Plegable } from "@/components/ui";
-import { AccionesFicha, Canales, Foto, iniciales, urlAbsoluta, whatsappOficial } from "@/components/verificacion";
+import { AccionesFicha, Canales, Foto, urlAbsoluta, whatsappOficial } from "@/components/verificacion";
 import { NOMBRE_AUTORIZACION, NOMBRE_TIPO, TEXTO_ESTADO, TEXTO_FICHA, nombreDestino } from "@/config/textos";
 import { cargarPrestador, fuentes, hoyLima } from "@/lib/consultas";
 import { leerAnuncio } from "@/lib/anuncio";
@@ -41,8 +41,8 @@ async function Contenido({ params }: Pick<PageProps<"/prestador/[id]">, "params"
     <Pagina className="gap-5 pb-0 sm:pb-10">
       <CabeceraDictamen eyebrow="Empresa" titulo={nombre} detalle={detalle} />
       <VistaDictamen estado={estado} advertencias={advertencias} anuncio={anuncio.textos} fuentes={lista} muestra={p.es_muestra}>
-        <div className="grid gap-4 sm:grid-cols-[13rem_1fr]">
-          <Foto src={p.foto_url} alt={`Foto o logo de ${nombre}`} texto={iniciales(nombre)} className="bg-card object-contain p-3" />
+        <div className={cn("grid gap-4", p.foto_url && "sm:grid-cols-[13rem_1fr]")}>
+          <Foto src={p.foto_url} alt={`Foto o logo de ${nombre}`} className="bg-card object-contain p-3" />
           <div className="flex flex-col gap-4">
             {p.descripcion && <p className="text-[1.0625rem]">{p.descripcion}</p>}
             {destinos.length > 0 && (

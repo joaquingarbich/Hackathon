@@ -44,7 +44,7 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/vehiculo/[pl
         <CabeceraDictamen eyebrow="Vehículo" titulo={`Unidad ${placaLegible}`} detalle={[p.nombre_comercial ?? p.razon_social, v.modalidad === "turistico" ? "transporte turístico" : v.modalidad].filter(Boolean).join(" · ")} />
       </div>
       <VistaDictamen estado={estado} advertencias={advertencias} fuentes={lista} consejos={[CONSEJO.vehiculo]} muestra={v.es_muestra}>
-        <Foto src={v.foto_url} alt={`Foto de la unidad ${placaLegible}`} texto={placaLegible} className="sm:max-w-md" />
+        <Foto src={v.foto_url} alt={`Foto de la unidad ${placaLegible}`} className="sm:max-w-md" />
         <OtraEmpresa accion={`/vehiculo/${v.placa}`} dato={`la placa ${placaLegible}`} titulares={[empresa]} dicha={dicha || undefined} />
         <AccionesFicha whatsapp={whatsappOficial(canales, p.telefono)} textoCompartir={TEXTO_FICHA.compartirVehiculo(placaLegible, empresa, TEXTO_ESTADO[estado].titulo, url)} datoReporte={`Placa ${placaLegible}`} providerId={p.id} />
         <Datos
