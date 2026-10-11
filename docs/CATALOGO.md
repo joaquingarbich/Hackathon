@@ -6,7 +6,7 @@ No hay reservas ni pagos: la ficha arma un mensaje de WhatsApp o una llamada al 
 
 ## Modelo: `public.services`
 
-Migración: `supabase/migrations/20261011000000_catalogo_servicios.sql`. **Todavía no está aplicada**; ver `PENDIENTE.md`, prioridad 1.
+Migración: `supabase/migrations/20261010235105_catalogo_servicios.sql` (aplicada el 10/10/2026, junto con `seed_catalogo.sql`). Moderación: `20261010235253_agencias_cuentas_cambios.sql` añade `motivo`, `revisor` y `revisado_at`.
 
 | Columna | Uso |
 |---|---|
@@ -20,7 +20,7 @@ Migración: `supabase/migrations/20261011000000_catalogo_servicios.sql`. **Todav
 | `ilustracion`, `fotos` | Clave de `components/ilustracion.tsx` mientras no haya fotos |
 | `estado` | `pendiente` · `publicado` · `rechazado`. El público solo ve `publicado` |
 
-**Seguridad:** sigue el mismo patrón que el resto. `revoke all`, `grant select` y la política `estado = 'publicado' or es_admin()`. Anon y authenticated no tienen INSERT ni UPDATE: hoy las altas las hace el admin o el SQL con service role. El formulario de la agencia, con validación previa, está pendiente.
+**Seguridad:** sigue el mismo patrón que el resto. `revoke all`, `grant select` y la política `estado = 'publicado' or es_admin()`. Anon y authenticated no tienen INSERT ni UPDATE. Las agencias crean servicios desde `/operador/agencia/[id]` (Server Action con service role tras `exigirDueno`, validación en `lib/agencia-validar.ts`): entran como `pendiente` y el admin los publica o pide corrección en `/admin/servicio/[id]`.
 
 **Datos de muestra:** `supabase/seed_catalogo.sql` crea 3 proveedores ficticios nuevos (RUC `2099999995x`–`2099999997x`, "(muestra)") y 6 servicios publicados. Se corre una vez, después de `seed.sql` y de la migración.
 
