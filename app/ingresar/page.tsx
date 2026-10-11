@@ -1,8 +1,10 @@
 import { Suspense } from "react";
-import { Info, LockKeyhole, OctagonAlert, ShieldCheck } from "lucide-react";
+import { LockKeyhole, ShieldCheck } from "lucide-react";
 import { Alert, AlertDescription, Boton, Campo, Encabezado, Pagina, Tarjeta } from "@/components/ui";
 import { TEXTO_OPERADOR } from "@/config/textos";
-import { ingresar, registrarse } from "./acciones";
+import Link from "next/link";
+import { ingresar } from "./acciones";
+import { Mensaje } from "./mensaje";
 
 export default function Ingresar({ searchParams }: PageProps<"/ingresar">) {
   return (
@@ -15,24 +17,15 @@ export default function Ingresar({ searchParams }: PageProps<"/ingresar">) {
       <Tarjeta>
         <form className="flex flex-col gap-4">
           <Campo id="email" name="email" type="email" etiqueta="Correo" autoComplete="email" required />
-          <Campo id="password" name="password" type="password" etiqueta="Contraseña" ayuda="Mínimo 8 caracteres." autoComplete="current-password" required minLength={8} />
-          <div className="flex flex-col gap-2 pt-1">
-            <Boton formAction={ingresar}>Ingresar</Boton>
-            <Boton formAction={registrarse} variante="secundario">Crear cuenta</Boton>
-          </div>
+          <Campo id="password" name="password" type="password" etiqueta="Contraseña" autoComplete="current-password" required />
+          <Boton formAction={ingresar} className="mt-1">Ingresar</Boton>
         </form>
       </Tarjeta>
+      <p className="text-center">¿Aún no tienes cuenta? <Link href="/registro" className="inline-flex min-h-11 items-center font-semibold">Crear cuenta</Link></p>
       <Alert variant="info">
         <ShieldCheck aria-hidden />
         <AlertDescription><b>¿Cómo se protege tu empresa?</b> Crear una cuenta no cambia lo que ve el turista. Solo un documento oficial validado por un revisor lo hace.</AlertDescription>
       </Alert>
     </Pagina>
   );
-}
-
-async function Mensaje({ searchParams }: Pick<PageProps<"/ingresar">, "searchParams">) {
-  const { error, aviso } = await searchParams;
-  if (error) return <Alert role="alert" variant="peligro"><OctagonAlert aria-hidden /><AlertDescription>{String(error)}</AlertDescription></Alert>;
-  if (aviso) return <Alert role="status" variant="info"><Info aria-hidden /><AlertDescription>{String(aviso)}</AlertDescription></Alert>;
-  return null;
 }

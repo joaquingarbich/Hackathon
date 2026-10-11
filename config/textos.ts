@@ -93,7 +93,9 @@ export const TEXTO_OPERADOR = {
   invitacion: "¿Eres un proveedor recién acreditado y aún no apareces?",
   enlaceInvitacion: "Sube tu constancia",
   tituloIngreso: "Acceso para proveedores",
-  ayudaIngreso: "Crea una cuenta con tu correo para subir tu constancia o TUC. Un revisor la validará.",
+  ayudaIngreso: "Ingresa con tu correo para subir tu constancia o TUC. Un revisor la validará.",
+  tituloRegistro: "Crear cuenta de proveedor",
+  ayudaRegistro: "Solo correo y contraseña. Luego subes tu constancia o TUC y un revisor la valida.",
   tituloPanel: "Actualización anticipada de tu registro",
   ayudaPanel:
     "Sube tu constancia de inscripción (DIRCETUR) o la TUC de tu unidad. Un revisor la validará y, si es correcta, los turistas te verán como «En proceso de actualización» hasta que aparezcas en el padrón oficial.",
