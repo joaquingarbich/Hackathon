@@ -40,6 +40,8 @@ const clave = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerC
 const sumarAnios = (iso: string, n: number) => { const [a, m, d] = iso.split("-").map(Number); return `${a + n}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`; };
 /** "972503429 / 905984477" → celulares peruanos de 9 dígitos (los fijos quedan solo como teléfono visible). */
 const celulares = (t: string) => [...new Set((t.match(/\d[\d\s-]{5,}\d/g) ?? []).map((x) => x.replace(/\D/g, "").replace(/^51(?=9\d{8}$)/, "")).filter((x) => /^9\d{8}$/.test(x)))];
+/** Comillas sueltas que deja la extracción del PDF: '"EMPRESA X E.I.R.L' → 'EMPRESA X E.I.R.L'. Solo formato. */
+const limpiarNombre = (t: string) => t.replace(/["“”]/g, " ").replace(/\s+/g, " ").trim();
 const visible = (d: string) => `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}`;
 
 async function ok<T>(p: PromiseLike<{ data: T; error: { message: string } | null }>): Promise<NonNullable<T>> {
@@ -98,13 +100,21 @@ const corteMtc = mtc[0]?.fecha_corte?.slice(0, 10);
 await ok(db.from("sources").update({ fecha_corte: corteMtc, n_registros: mtc.length }).eq("id", "mtc_resoluciones"));
 
 const sinEmpresa: string[] = [];
+const placasTurismo = new Set<string>();
+let noTurismo = 0;
 const autorizacionesVistas = new Set<string>();
 let placas = 0, empresasNuevas = 0;
 for (const r of mtc) {
   const placa = normalizarPlaca(r.placa);
+  // Solo lo válido para verificar turismo: las placas de otra modalidad (trabajadores, privado) no se cargan.
+  if (r.modalidad !== "turistico" || r.es_turismo === "False") { noTurismo++; continue; }
+  r.empresa = limpiarNombre(r.empresa);
   if (!placa || !r.empresa) { sinEmpresa.push(`${r.placa} (${r.emisor} ${r.numero_resolucion})`); continue; }
+  placasTurismo.add(placa);
   // Empresa: por RUC; si no trae RUC, por razón social normalizada; si no existe, se crea como transporte
   let id = (r.ruc && porRuc.get(r.ruc)) || porNombre.get(clave(r.empresa));
+  // Empresa creada por esta carga: se refresca el nombre (limpio). Las agencias MINCETUR conservan el suyo.
+  if (id) await ok(db.from("providers").update({ razon_social: r.empresa }).eq("id", id).eq("source_id", "mtc_resoluciones"));
   if (!id) {
     id = (await ok(db.from("providers").insert({
       tipo: "transporte_terrestre", ruc: r.ruc && rucValido(r.ruc) ? r.ruc : nulo(r.ruc), razon_social: r.empresa,
@@ -145,5 +155,21 @@ for (const r of mtc) {
 }
 
 console.log(`MINCETUR: ${agencias} agencias (corte ${corteMincetur}), ${canalesMincetur} celulares oficiales`);
-console.log(`MTC: ${placas} placas, ${empresasNuevas} empresas de transporte nuevas (corte ${corteMtc})`);
+// ---------- 3) Poda: lo que ya no está en el registro (o no es de turismo) sale de la base ----------
+const enBase = await ok(db.from("vehicles").select("id, placa").eq("source_id", "mtc_resoluciones"));
+const sobran = enBase.filter((v) => !placasTurismo.has(v.placa)).map((v) => v.id);
+if (sobran.length) await ok(db.from("vehicles").delete().in("id", sobran));
+// Empresas de transporte creadas por esta carga que quedaron sin placas (y sin cuenta en CheckTur)
+const transportes = await ok(db.from("providers").select("id").eq("source_id", "mtc_resoluciones"));
+const conPlacas = new Set((await ok(db.from("vehicles").select("provider_id"))).map((v) => v.provider_id));
+const conCuenta = new Set((await ok(db.from("proveedor_cuentas").select("provider_id"))).map((c) => c.provider_id));
+const vacias = transportes.filter((p) => !conPlacas.has(p.id) && !conCuenta.has(p.id)).map((p) => p.id);
+if (vacias.length) await ok(db.from("providers").delete().in("id", vacias)); // cascada: autorizaciones
+// Autorizaciones MTC de agencias MINCETUR que ya no tienen placas de turismo
+const agenciasSinPlacas = (await ok(db.from("authorizations").select("id, provider_id").eq("source_id", "mtc_resoluciones")))
+  .filter((a) => !conPlacas.has(a.provider_id)).map((a) => a.id);
+if (agenciasSinPlacas.length) await ok(db.from("authorizations").delete().in("id", agenciasSinPlacas));
+
+console.log(`MTC: ${placas} placas de turismo, ${empresasNuevas} empresas de transporte nuevas (corte ${corteMtc}) · ${noTurismo} filas de otra modalidad omitidas`);
+console.log(`Poda: ${sobran.length} placas, ${vacias.length} empresas y ${agenciasSinPlacas.length} autorizaciones que ya no corresponden`);
 if (sinEmpresa.length) console.log(`Omitidas (sin empresa en el registro): ${sinEmpresa.join(", ")}`);
