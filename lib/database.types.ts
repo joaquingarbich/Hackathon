@@ -13,6 +13,18 @@ export type Database = {
   }
   public: {
     Tables: {
+      canales: {
+        Row: { created_at: string; estado: string; id: string; motivo: string | null; provider_id: string; revisado_at: string | null; revisor: string | null; tipo: string; valor: string; visible: string }
+        Insert: { created_at?: string; estado?: string; id?: string; motivo?: string | null; provider_id: string; revisado_at?: string | null; revisor?: string | null; tipo: string; valor: string; visible: string }
+        Update: { created_at?: string; estado?: string; id?: string; motivo?: string | null; provider_id?: string; revisado_at?: string | null; revisor?: string | null; tipo?: string; valor?: string; visible?: string }
+        Relationships: []
+      }
+      empresa_destinos: {
+        Row: { destino: string; provider_id: string }
+        Insert: { destino: string; provider_id: string }
+        Update: { destino?: string; provider_id?: string }
+        Relationships: []
+      }
       authorizations: {
         Row: {
           entidad_emisora: string
@@ -70,6 +82,7 @@ export type Database = {
       lookups: {
         Row: {
           created_at: string
+          destino: string | null
           entrada_normalizada: string | null
           estado_resultado: string | null
           id: number
@@ -79,6 +92,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          destino?: string | null
           entrada_normalizada?: string | null
           estado_resultado?: string | null
           id?: never
@@ -88,6 +102,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          destino?: string | null
           entrada_normalizada?: string | null
           estado_resultado?: string | null
           id?: never
@@ -112,6 +127,12 @@ export type Database = {
           },
         ]
       }
+      personal: {
+        Row: { carne_numero: string | null; carne_vence: string | null; created_at: string; dni_ultimos3: string; estado: string; foto_url: string | null; id: string; motivo: string | null; nombre: string; provider_id: string; revisado_at: string | null; revisor: string | null; rol: string }
+        Insert: { carne_numero?: string | null; carne_vence?: string | null; created_at?: string; dni_ultimos3: string; estado?: string; foto_url?: string | null; id?: string; motivo?: string | null; nombre: string; provider_id: string; revisado_at?: string | null; revisor?: string | null; rol: string }
+        Update: { carne_numero?: string | null; carne_vence?: string | null; created_at?: string; dni_ultimos3?: string; estado?: string; foto_url?: string | null; id?: string; motivo?: string | null; nombre?: string; provider_id?: string; revisado_at?: string | null; revisor?: string | null; rol?: string }
+        Relationships: []
+      }
       proveedor_cambios: {
         Row: { created_at: string; datos: Json; estado: string; id: string; motivo: string | null; provider_id: string; revisado_at: string | null; revisor: string | null; user_id: string }
         Insert: { created_at?: string; datos: Json; estado?: string; id?: string; motivo?: string | null; provider_id: string; revisado_at?: string | null; revisor?: string | null; user_id: string }
@@ -134,6 +155,7 @@ export type Database = {
           distrito: string | null
           es_muestra: boolean
           estado_inscripcion: string
+          foto_url: string | null
           id: string
           modalidad: string | null
           nombre_comercial: string | null
@@ -157,6 +179,7 @@ export type Database = {
           distrito?: string | null
           es_muestra?: boolean
           estado_inscripcion?: string
+          foto_url?: string | null
           id?: string
           modalidad?: string | null
           nombre_comercial?: string | null
@@ -180,6 +203,7 @@ export type Database = {
           distrito?: string | null
           es_muestra?: boolean
           estado_inscripcion?: string
+          foto_url?: string | null
           id?: string
           modalidad?: string | null
           nombre_comercial?: string | null
@@ -203,6 +227,12 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      reportes: {
+        Row: { created_at: string; dato: string | null; destino: string | null; estado: string; foto_path: string | null; id: string; provider_id: string | null; que_paso: string }
+        Insert: { created_at?: string; dato?: string | null; destino?: string | null; estado?: string; foto_path?: string | null; id?: string; provider_id?: string | null; que_paso: string }
+        Update: { created_at?: string; dato?: string | null; destino?: string | null; estado?: string; foto_path?: string | null; id?: string; provider_id?: string | null; que_paso?: string }
+        Relationships: []
       }
       review_contactos: {
         Row: {
@@ -529,6 +559,12 @@ export type Database = {
       vehicles: {
         Row: {
           ambito: string | null
+          aprobacion: string
+          autorizacion_mtc: string | null
+          foto_url: string | null
+          motivo: string | null
+          revisado_at: string | null
+          revisor: string | null
           citv_vencimiento: string | null
           es_muestra: boolean
           estado: string
@@ -543,6 +579,12 @@ export type Database = {
         }
         Insert: {
           ambito?: string | null
+          aprobacion?: string
+          autorizacion_mtc?: string | null
+          foto_url?: string | null
+          motivo?: string | null
+          revisado_at?: string | null
+          revisor?: string | null
           citv_vencimiento?: string | null
           es_muestra?: boolean
           estado?: string
@@ -557,6 +599,12 @@ export type Database = {
         }
         Update: {
           ambito?: string | null
+          aprobacion?: string
+          autorizacion_mtc?: string | null
+          foto_url?: string | null
+          motivo?: string | null
+          revisado_at?: string | null
+          revisor?: string | null
           citv_vencimiento?: string | null
           es_muestra?: boolean
           estado?: string

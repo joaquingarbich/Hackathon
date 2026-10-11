@@ -31,11 +31,35 @@ function advertenciasRuc(rucNumero: string | null, ruc: Ruc): Advertencia[] {
 /** validacionVence: solo para prestadores publicados por validación del admin (no por padrón oficial). */
 function estadoDe(advertencias: Advertencia[], validacionVence: string | null, hoy: string): Estado {
   if (advertencias.some((a) => a.nivel === "alerta")) return "alerta";
-  if (validacionVence) return validacionVence >= hoy ? "actualizacion" : "no_encontrado"; // caducada: vuelve a revisión
+  if (validacionVence) {
+    if (validacionVence < hoy) return "no_encontrado"; // caducada: vuelve a revisión
+    // Algo vencido u observado pesa más que "en actualización" (si vence un documento, pasa solo a observaciones).
+    return advertencias.length ? "observaciones" : "actualizacion";
+  }
   return advertencias.length ? "observaciones" : "verificado";
 }
 
-export function dictamenPrestador(p: Prestador, autorizaciones: Autorizacion[], ruc: Ruc, hoy: string): Dictamen {
+type Unidad = Pick<Tables<"vehicles">, "placa" | "soat_vencimiento" | "citv_vencimiento">;
+type Persona = { nombre: string; carne_vence: string | null };
+
+/** Flota y personal: documentos vencidos → "Con observaciones" automático (por vencer: aviso). */
+function advertenciasFlota(vehiculos: Unidad[], personal: Persona[], hoy: string): Advertencia[] {
+  const a: Advertencia[] = [];
+  for (const v of vehiculos)
+    for (const [doc, fecha] of [["el SOAT", v.soat_vencimiento], ["la revisión técnica", v.citv_vencimiento]] as const) {
+      if (!fecha) continue;
+      const d = diasHasta(fecha, hoy);
+      if (d < 0) a.push({ nivel: "observacion", texto: ADVERTENCIA.flotaVencida(v.placa, doc, fechaLegible(fecha)) });
+      else if (d <= REGLAS.diasAvisoVencimiento) a.push({ nivel: "observacion", texto: ADVERTENCIA.flotaPorVencer(v.placa, doc, fechaLegible(fecha)) });
+    }
+  for (const p of personal)
+    if (p.carne_vence && diasHasta(p.carne_vence, hoy) < 0) a.push({ nivel: "observacion", texto: ADVERTENCIA.carneVencido(p.nombre, fechaLegible(p.carne_vence)) });
+  return a;
+}
+
+export function dictamenPrestador(
+  p: Prestador, autorizaciones: Autorizacion[], ruc: Ruc, hoy: string, flota: { vehiculos?: Unidad[]; personal?: Persona[] } = {},
+): Dictamen {
   const a = advertenciasRuc(p.ruc, ruc);
   if (p.estado_inscripcion === "suspendida") a.push({ nivel: "alerta", texto: ADVERTENCIA.inscripcionSuspendida });
   if (p.tipo === "agencia" && p.clases.includes("mayorista")) a.push({ nivel: "observacion", texto: ADVERTENCIA.mayorista });
@@ -53,6 +77,7 @@ export function dictamenPrestador(p: Prestador, autorizaciones: Autorizacion[], 
     else if (dias <= REGLAS.diasAvisoVencimiento)
       a.push({ nivel: "observacion", texto: ADVERTENCIA.autorizacionPorVencer(nombre, fechaLegible(aut.fecha_vencimiento)) });
   }
+  a.push(...advertenciasFlota(flota.vehiculos ?? [], flota.personal ?? [], hoy));
   return { estado: estadoDe(a, p.validacion_vence, hoy), advertencias: a };
 }
 
@@ -80,3 +105,15 @@ export function coincidenciaClara(similitudes: number[]): boolean {
   return primero !== undefined && primero >= b.umbralCoincidenciaClara && primero - segundo >= b.distanciaMinimaAlSegundo;
 }
 
+
+export type Vencimiento = { que: string; fecha: string; estado: "vencido" | "por_vencer" };
+
+/** Documentos vencidos o que vencen dentro de REGLAS.diasAvisoVencimiento (panel de la empresa). */
+export function vencimientos(docs: { que: string; fecha: string | null }[], hoy: string): Vencimiento[] {
+  return docs
+    .filter((d): d is { que: string; fecha: string } => !!d.fecha)
+    .map((d) => ({ ...d, dias: diasHasta(d.fecha, hoy) }))
+    .filter((d) => d.dias <= REGLAS.diasAvisoVencimiento)
+    .sort((a, b) => a.dias - b.dias)
+    .map(({ que, fecha, dias }) => ({ que, fecha, estado: dias < 0 ? "vencido" : "por_vencer" }));
+}

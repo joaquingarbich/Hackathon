@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { TriangleAlert } from "lucide-react";
 import { ConsultaFoto } from "@/components/consulta-foto";
-import { InsigniaEstado, Pagina, claseBoton, claseControl } from "@/components/ui";
-import { CONSEJO, TEXTO_APP, TEXTO_OPERADOR } from "@/config/textos";
+import { InsigniaEstado, Pagina } from "@/components/ui";
+import { BuscadorVerificar } from "@/components/buscador-verificar";
+import { CONSEJO, TEXTO_OPERADOR } from "@/config/textos";
 
 // W05 / C01: el verificador, para quien te ofrece un servicio fuera de CheckTur.
 const RESPUESTAS = [
@@ -17,17 +18,15 @@ export default function Verificar() {
   return (
     <Pagina>
       <div className="flex flex-col gap-2">
-        <h1 className="text-[2.125rem] font-extrabold">Verificar un proveedor</h1>
-        <p className="text-texto-suave">Para quien te ofrece un servicio fuera de CheckTur: en la calle, la playa o por redes. Agencias, hospedajes, restaurantes, guías y transporte, contrastados con los registros oficiales de Piura.</p>
+        <h1 className="text-[2.125rem] font-extrabold">Verificar con foto</h1>
+        <p className="text-texto-suave">Toma una foto del logo, letrero o placa, o sube la captura de un anuncio en redes. Leemos los datos y los contrastamos con los registros.</p>
       </div>
-      <form action="/consulta" className="flex flex-col gap-2.5">
-        <label htmlFor="q" className="text-[0.9375rem] font-bold">{TEXTO_APP.campoBusqueda}</label>
-        <input id="q" name="q" autoComplete="off" required placeholder={TEXTO_APP.ejemploBusqueda} className={claseControl} />
-        <button className={claseBoton("primario")}>{TEXTO_APP.botonBuscar}</button>
-      </form>
-      <section aria-labelledby="t-imagen" className="flex flex-col gap-2.5">
-        <h2 id="t-imagen" className="text-[1.375rem] font-bold">O verifica con una imagen</h2>
+      <section id="foto" aria-label="Verificar con una imagen" className="flex flex-col gap-2.5">
         <ConsultaFoto />
+      </section>
+      <section aria-labelledby="t-texto" className="flex flex-col gap-2">
+        <h2 id="t-texto" className="text-[1.375rem] font-bold">O escribe el dato</h2>
+        <BuscadorVerificar />
       </section>
       <p className="flex gap-2 rounded-control bg-observaciones-fondo p-3.5 text-[0.9375rem] text-observaciones">
         <TriangleAlert aria-hidden className="mt-0.5 size-5 shrink-0" /> {CONSEJO.ambulatorio}

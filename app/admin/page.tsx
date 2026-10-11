@@ -8,20 +8,23 @@ import { exigirAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { fechaLegible } from "@/lib/dictamen";
 import { InsigniaConfianza } from "./confianza";
+import { Fiscalizacion } from "./fiscalizacion";
+import { DESTINOS } from "@/config/textos";
 
 /** ISO de hace n días (fuera del render: Date.now() es impuro). */
 const haceDias = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
 
-export default function Admin() {
+export default function Admin({ searchParams }: PageProps<"/admin">) {
   return (
     <Suspense fallback={<Cargando />}>
-      <Cola />
+      <Cola searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function Cola() {
+async function Cola({ searchParams }: Pick<PageProps<"/admin">, "searchParams">) {
   const admin = await exigirAdmin();
+  const sp = await searchParams;
   const { data: pendientes } = await admin.supabase
     .from("submissions")
     .select("id, ruc, tipo_documento, confianza, created_at, datos_declarados")
@@ -52,7 +55,7 @@ async function Cola() {
     <Pagina>
       <div className="flex flex-col gap-1">
         <h1 className="text-[2.125rem] leading-[1.05] font-extrabold">Panel de validación</h1>
-        <p className="text-texto-suave">Documentos de proveedores y opiniones con comprobante.</p>
+        <p className="text-texto-suave">Documentos, altas de canales, vehículos y personal, reportes de turistas y búsquedas sin resultado.</p>
       </div>
       <h2 className="text-[1.375rem] font-bold">Documentos · pendientes {pendientes?.length ?? 0}</h2>
       {!pendientes?.length && <p className="text-texto-suave">No hay documentos pendientes.</p>}
@@ -126,6 +129,7 @@ async function Cola() {
           </Tarjeta>
         ))}
       </div>
+      <Fiscalizacion destino={DESTINOS.some((d) => d.id === sp.d) ? String(sp.d) : undefined} error={typeof sp.error === "string" ? sp.error : undefined} />
       <p className="text-[0.875rem] text-texto-suave">Datos de muestra · empresas ficticias.</p>
       <Link href="/operador" className="flex min-h-11 items-center self-start font-bold">← Volver</Link>
     </Pagina>

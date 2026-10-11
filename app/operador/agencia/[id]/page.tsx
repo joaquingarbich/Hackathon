@@ -7,6 +7,8 @@ import { exigirDueno } from "@/lib/agencia";
 import type { Perfil } from "@/lib/agencia-validar";
 import { proponerPerfil, retirarServicio } from "./acciones";
 import { FormularioServicio } from "./formulario-servicio";
+import { SeccionesVerificables, Vencimientos } from "./secciones";
+import { hoyLima } from "@/lib/consultas";
 
 const CHIP = { pendiente: "revision", publicado: "aprobado", rechazado: "corregir" } as const;
 
@@ -22,6 +24,17 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/operador/age
   const { id } = await params;
   const { ok, error } = await searchParams;
   const { proveedor: p, db } = await exigirDueno(id);
+  const [{ data: canalesTodos }, { data: vehiculosTodos }, { data: personalTodo }, { data: destinosSel }, { data: auts }] = await Promise.all([
+    db.from("canales").select("id, tipo, visible, estado, motivo").eq("provider_id", id).order("created_at"),
+    db.from("vehicles").select("id, placa, aprobacion, motivo, soat_vencimiento, citv_vencimiento, habilitacion_vencimiento").eq("provider_id", id).order("placa"),
+    db.from("personal").select("id, nombre, rol, dni_ultimos3, estado, motivo, carne_vence").eq("provider_id", id).order("nombre"),
+    db.from("empresa_destinos").select("destino").eq("provider_id", id),
+    db.from("authorizations").select("tipo, fecha_vencimiento").eq("provider_id", id),
+  ]);
+  const verificables = {
+    providerId: id, hoy: hoyLima(), destinos: (destinosSel ?? []).map((d) => d.destino),
+    canales: canalesTodos ?? [], vehiculos: vehiculosTodos ?? [], personal: personalTodo ?? [], autorizaciones: auts ?? [],
+  };
   const [{ data: servicios }, { data: cambio }] = await Promise.all([
     db.from("services").select("id, nombre, categoria, destino, precio_ref, unidad_precio, estado, motivo").eq("provider_id", id).order("created_at", { ascending: false }),
     db.from("proveedor_cambios").select("datos, estado, motivo, created_at").eq("provider_id", id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
@@ -35,8 +48,11 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/operador/age
       <Link href="/operador" className="flex min-h-11 items-center self-start font-bold">← Documentos</Link>
       <div className="flex flex-col gap-1">
         <h1 className="text-[2.125rem] leading-[1.05] font-extrabold">{p.nombre_comercial ?? p.razon_social}</h1>
-        <p className="text-texto-suave">{NOMBRE_TIPO[p.tipo]} · RUC <Mono>{p.ruc}</Mono> · <Link href={`/prestador/${p.id}`}>ver como turista</Link></p>
+        <p className="text-texto-suave">{NOMBRE_TIPO[p.tipo]} · RUC <Mono>{p.ruc}</Mono> · <Link href={`/prestador/${p.id}`}>ver como turista</Link> · <Link href={`/operador/agencia/${p.id}/qr`}>códigos QR</Link></p>
       </div>
+
+      <Vencimientos {...verificables} />
+      <SeccionesVerificables {...verificables} />
 
       <Tarjeta id="perfil" className="flex flex-col gap-4 p-5">
         <h2 className="text-[1.375rem] font-bold">{TEXTO_AGENCIA.perfil}</h2>

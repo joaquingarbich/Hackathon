@@ -7,8 +7,9 @@ import { Boton, Mono, Pagina, Tarjeta, claseControl } from "@/components/ui";
 import { exigirAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { fechaLegible } from "@/lib/dictamen";
-import type { Chequeo } from "@/lib/resenas";
-import type { CamposComprobante } from "@/lib/vision";
+// Opiniones históricas (el formulario público se retiró al reenfocar en verificación): solo moderación.
+type Chequeo = { ok: boolean; texto: string };
+type CamposComprobante = { razon_social_emisor?: string | null };
 import { moderarResena } from "../acciones";
 
 export default function DetalleResena({ params, searchParams }: PageProps<"/admin/resena/[id]">) {

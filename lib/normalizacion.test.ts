@@ -22,4 +22,9 @@ test("clasificarEntrada", () => {
   assert.deepEqual(clasificarEntrada("mue-001"), { tipo: "placa", valor: "MUE001" });
   assert.deepEqual(clasificarEntrada("Vaca Loca Tours"), { tipo: "nombre", valor: "Vaca Loca Tours" });
   assert.deepEqual(clasificarEntrada("Tours1"), { tipo: "nombre", valor: "Tours1" }); // 6 alfanuméricos pero no termina en 3 dígitos
+  assert.deepEqual(clasificarEntrada("987 654 321"), { tipo: "celular", valor: "987654321" });
+  assert.deepEqual(clasificarEntrada("+51 987-654-321"), { tipo: "celular", valor: "987654321" });
+  assert.deepEqual(clasificarEntrada("51987654321"), { tipo: "celular", valor: "987654321" }); // 11 dígitos pero no es RUC
+  assert.deepEqual(clasificarEntrada("191-12345678-0-12"), { tipo: "banco", valor: "19112345678012" });
+  assert.deepEqual(clasificarEntrada("812345678"), { tipo: "nombre", valor: "812345678" }); // 9 dígitos sin 9 inicial
 });

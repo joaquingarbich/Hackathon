@@ -57,6 +57,9 @@ export const ADVERTENCIA = {
     `Esta unidad está habilitada para la modalidad "${modalidad}", no para transporte turístico.`,
   citvVencido: (fecha: string) => `La inspección técnica vehicular (CITV) venció el ${fecha}.`,
   soatVencido: (fecha: string) => `El SOAT venció el ${fecha}.`,
+  flotaVencida: (placa: string, doc: string, fecha: string) => `La unidad ${placa} tiene ${doc} vencido desde el ${fecha}.`,
+  flotaPorVencer: (placa: string, doc: string, fecha: string) => `A la unidad ${placa} se le vence ${doc} el ${fecha}.`,
+  carneVencido: (nombre: string, fecha: string) => `El carné de guía de ${nombre} venció el ${fecha}.`,
 } as const;
 
 export const NOMBRE_AUTORIZACION: Record<string, string> = {
@@ -236,3 +239,104 @@ export const TEXTO_AGENCIA = {
 } as const;
 
 export const TEXTO_LIMITE = "Hiciste muchas consultas seguidas. Espera unos minutos e intenta de nuevo.";
+
+// Verificación centrada en el dato (celular, Yape/Plin, cuenta, placa, nombre).
+export const TEXTO_VERIFICAR = {
+  titulo: "Verifica antes de pagar o subir",
+  placeholder: "Nombre, RUC, celular/Yape o placa",
+  chip: { ruc: "Buscando RUC…", celular: "Buscando celular / WhatsApp / Yape / Plin…", banco: "Buscando cuenta bancaria…", placa: "Buscando placa…", nombre: "Buscando nombre de empresa…" } as Record<string, string>,
+  canalDe: { celular: "Este número", banco: "Esta cuenta" } as Record<string, string>,
+  perteneceA: (que: string, n: number) => `${que} pertenece a ${n === 1 ? "esta empresa registrada" : "estas empresas registradas"}`,
+  noRegistrado: (que: string) => `${que} NO está registrado por ninguna empresa en CheckTur.`,
+  noPagues: "No pagues ni envíes dinero a este número o cuenta hasta confirmar con la empresa por su canal oficial registrado.",
+  quizas: "¿Quizás buscabas…?",
+  suplantacion: "Ojo: si te dieron un nombre parecido pero no igual, podría ser una suplantación. Contacta solo por el canal oficial de la empresa registrada.",
+  empresaDicha: "¿Qué empresa te dijeron?",
+  empresaDichaAyuda: "Escribe el nombre que te dieron y lo comparamos con el titular registrado.",
+  otraEmpresa: (dato: string, titular: string, dicha: string) => `Ojo: ${dato} pertenece a «${titular}», no a «${dicha}».`,
+  mismaEmpresa: (dato: string, titular: string) => `Coincide: ${dato} pertenece a «${titular}».`,
+} as const;
+
+export const NOMBRE_CANAL: Record<string, string> = {
+  whatsapp: "WhatsApp", telefono: "Teléfono", yape: "Yape", plin: "Plin", banco: "Cuenta bancaria",
+  instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok", web: "Web",
+};
+
+export const TEXTO_FICHA = {
+  whatsappOficial: "Contactar por WhatsApp oficial",
+  llamarOficial: "Llamar al número oficial",
+  compartir: "Compartir verificación",
+  reportar: "Reportar",
+  canales: "Canales oficiales",
+  canalesAyuda: "Paga y escribe solo a estos números y cuentas. Si te piden pagar a otro, desconfía.",
+  destinos: "Destinos que atiende",
+  vehiculos: "Vehículos",
+  personal: "Personal",
+  documentos: "Documentos y autorizaciones",
+  servicios: "Servicios",
+  queSignifica: "«Verificado» significa que figura en un registro oficial vigente y que sus datos registrados coinciden. No mide la calidad del servicio.",
+  compartirEmpresa: (empresa: string, estado: string, url: string) => `Verifiqué a ${empresa} en CheckTur Piura: ${estado}. ${url}`,
+  compartirVehiculo: (placa: string, empresa: string, estado: string, url: string) => `Estoy en la van placa ${placa} de ${empresa}, ${estado.toLowerCase()} en CheckTur Piura: ${url}`,
+  compartirPersona: (nombre: string, rol: string, empresa: string, url: string) => `${nombre} (${rol} de ${empresa}) figura en CheckTur Piura: ${url}`,
+  rol: { guia: "Guía", conductor: "Conductor", vendedor: "Vendedor", otro: "Personal" } as Record<string, string>,
+} as const;
+
+export const TEXTO_REPORTE = {
+  titulo: "Reportar un problema",
+  ayuda: "Tu reporte llega a los revisores de CheckTur. No reemplaza una denuncia: si hubo un delito o perdiste dinero, acude también a las autoridades.",
+  motivos: ["Me cobraron y no prestaron el servicio", "Me pidieron pagar a un Yape/cuenta que no es de la empresa", "La placa o el vehículo no coincide", "Se hacen pasar por otra empresa", "Venta de tours en la calle", "Otro"],
+  enviado: "Gracias. Tu reporte fue recibido y un revisor lo verá.",
+  dondeAcudir: [
+    { quien: "Emergencias o robo: Policía Nacional del Perú", como: "Llama al 105 o acude a la comisaría más cercana (Policía de Turismo si la hay en el destino)." },
+    { quien: "Cobros o servicios no prestados: INDECOPI", como: "Presenta un reclamo en gob.pe/indecopi o en el Libro de Reclamaciones de la empresa." },
+    { quien: "Agencias y prestadores turísticos: DIRCETUR Piura", como: "Dirección Regional de Comercio Exterior y Turismo del Gobierno Regional Piura (gob.pe/regionpiura)." },
+    { quien: "Orientación al turista: iPerú", como: "www.iperu.org" },
+  ],
+} as const;
+
+// Accesos rápidos de la home: cada caso de uso con sus pasos y el buscador adaptado.
+export const CASOS = {
+  calle: {
+    titulo: "Me ofrecieron un tour en la calle",
+    pasos: [
+      "La venta de tours en la calle, playas o terminales está prohibida (D.S. 005-2020-MINCETUR, art. 15.2).",
+      "Pide el nombre comercial o el RUC de la agencia y verifícalo aquí antes de pagar.",
+      "Contrata solo en su local o por su canal oficial registrado.",
+    ],
+    placeholder: "Nombre o RUC de la agencia",
+  },
+  yape: {
+    titulo: "Voy a pagar por Yape o Plin",
+    pasos: [
+      "Escribe el número de Yape o Plin (o la cuenta) que te dieron, antes de pagar.",
+      "Si no está registrado por ninguna empresa, no pagues: confirma por el canal oficial de la empresa.",
+      "Si pertenece a otra empresa distinta a la que te dijeron, desconfía.",
+    ],
+    placeholder: "Número de Yape / Plin o cuenta",
+  },
+  van: {
+    titulo: "Ya estoy en la van",
+    pasos: [
+      "Escribe la placa o escanea el QR pegado en la unidad.",
+      "Compara la foto y la placa de la ficha con la van que tienes enfrente.",
+      "Comparte la verificación con alguien de confianza.",
+    ],
+    placeholder: "Placa, p. ej. ABC-123",
+  },
+} as const;
+export type Caso = keyof typeof CASOS;
+
+export const TEXTO_HOME = {
+  bajada: "Agencias, transporte, hospedajes y restaurantes de Piura, contrastados con los registros oficiales y los datos que cada empresa registró.",
+  escanear: "Escanear QR",
+  escanearAyuda: "Del vehículo, el carné o la vitrina",
+  foto: "Verificar con foto",
+  fotoAyuda: "Logo, letrero o captura de redes",
+  casos: "¿Qué estás por hacer?",
+  destinoCaso: "Busco empresa para ir a un destino",
+  porDestino: "Empresas verificadas por destino",
+  porDestinoAyuda: "Directorio de empresas con registro vigente. Sin precios ni publicidad: solo su estado y su contacto oficial.",
+  empresas: (n: number) => `${n} ${n === 1 ? "empresa" : "empresas"}`,
+} as const;
+
+export const nombreDestino = (id: string | null | undefined) => DESTINOS.find((d) => d.id === id)?.nombre ?? id ?? "";

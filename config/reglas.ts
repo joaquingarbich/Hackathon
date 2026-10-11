@@ -12,6 +12,7 @@ export const REGLAS = {
   },
   busqueda: {
     umbralSimilitud: 0.5, // mínimo para ser candidato
+    umbralSugerencia: 0.3, // "¿quizás buscabas…?" cuando no hay candidatos (posible suplantación)
     umbralCoincidenciaClara: 0.85, // por encima, y con distancia al 2.º, se elige solo
     distanciaMinimaAlSegundo: 0.15,
     maxCandidatos: 3,
@@ -21,6 +22,7 @@ export const REGLAS = {
     foto: { maximo: 12, ventanaSeg: 600 },
     resena: { maximo: 5, ventanaSeg: 3600 },
     documento: { maximo: 10, ventanaSeg: 3600 },
+    reporte: { maximo: 5, ventanaSeg: 3600 },
   },
   dominiosOficialesQR: [".gob.pe"],
 } as const;

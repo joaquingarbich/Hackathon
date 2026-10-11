@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { CabeceraDictamen, Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { Mono, Pagina, claseBoton } from "@/components/ui";
-import { CONSEJO, NOMBRE_TIPO } from "@/config/textos";
+import { CONSEJO, DESTINOS, NOMBRE_CANAL, NOMBRE_TIPO, TEXTO_VERIFICAR } from "@/config/textos";
+import { celularVisible } from "@/lib/canales";
+import { OtraEmpresa } from "@/components/otra-empresa";
 import { clasificarEntrada } from "@/lib/normalizacion";
 import { fuentes, registrarConsulta, resolver, type Resolucion } from "@/lib/consultas";
 import { leerAnuncio } from "@/lib/anuncio";
@@ -20,20 +22,56 @@ export default function Consulta({ searchParams }: PageProps<"/consulta">) {
 async function Resultado({ searchParams }: Pick<PageProps<"/consulta">, "searchParams">) {
   const sp = await searchParams;
   const q = String(sp.q ?? "").trim();
-  if (!q) redirect("/verificar");
+  if (!q) redirect("/");
   // De una consulta por imagen en ESTE navegador (cookie firmada); nunca de la URL.
   const { textos: anuncio, noEncontrado } = await leerAnuncio(`consulta:${q}`);
   const entrada = clasificarEntrada(q);
   const r: Resolucion = noEncontrado ? { tipo: "no_encontrado", ruc: null } : await resolver(entrada);
-  if (!noEncontrado) await registrarConsulta(entrada, r);
+  const destino = DESTINOS.some((d) => d.id === sp.d) ? String(sp.d) : undefined; // búsqueda hecha desde /destinos
+  if (!noEncontrado) await registrarConsulta(entrada, r, undefined, undefined, destino);
 
   if (r.tipo === "prestador") redirect(`/prestador/${r.id}`);
   if (r.tipo === "vehiculo") redirect(`/vehiculo/${r.placa}`);
 
+  if (r.tipo === "canal") {
+    const que = TEXTO_VERIFICAR.canalDe[r.canal];
+    const visible = entrada.tipo === "banco" ? `•••• ${entrada.valor.slice(-4)}` : celularVisible(entrada.valor);
+    if (!r.empresas.length)
+      return (
+        <Pagina className="gap-5">
+          <CabeceraDictamen titulo={<Mono>{visible}</Mono>} detalle={r.canal === "banco" ? "Cuenta bancaria" : "Celular · WhatsApp · Yape · Plin"} />
+          <VistaDictamen estado="no_encontrado" anuncio={anuncio} advertencias={[{ nivel: "alerta", texto: TEXTO_VERIFICAR.noRegistrado(que) }, { nivel: "alerta", texto: TEXTO_VERIFICAR.noPagues }]} fuentes={await fuentes()} consejos={CONSEJO.noEncontrado} />
+          <Link href={`/reportar?dato=${encodeURIComponent(visible)}`} className={claseBoton("secundario", "self-start")}>Reportar este número o cuenta</Link>
+          <Link href="/" className={claseBoton("secundario", "self-start")}>Hacer otra consulta</Link>
+        </Pagina>
+      );
+    return (
+      <Pagina className="gap-5">
+        <CabeceraDictamen titulo={<Mono>{visible}</Mono>} detalle={TEXTO_VERIFICAR.perteneceA(que, r.empresas.length)} />
+        <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie">
+          {r.empresas.map((e) => (
+            <li key={e.id} className="border-b border-separador last:border-0">
+              <Link href={`/prestador/${e.id}`} className="flex min-h-16 items-center justify-between gap-3 px-4 py-3 no-underline hover:bg-relleno">
+                <span>
+                  <b className="block text-lg">{e.nombre}</b>
+                  <span className="block text-[0.9375rem] text-texto-suave">{NOMBRE_TIPO[e.tipo] ?? e.tipo} · registrado como {e.canales.map((c) => NOMBRE_CANAL[c] ?? c).join(", ")}</span>
+                </span>
+                <ChevronRight aria-hidden className="size-5 shrink-0" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <OtraEmpresa accion="/consulta" dato={que.toLowerCase()} titulares={r.empresas.map((e) => e.nombre)} dicha={String(sp.empresa ?? "") || undefined} ocultos={{ q }} />
+        <Link href="/" className={claseBoton("secundario", "self-start")}>Hacer otra consulta</Link>
+      </Pagina>
+    );
+  }
+
   if (r.tipo === "candidatos")
     return (
       <Pagina>
-        <CabeceraDictamen titulo="¿Cuál de estos buscas?" detalle={`Hay nombres parecidos a «${q}». Elige el correcto.`} />
+        <CabeceraDictamen titulo={TEXTO_VERIFICAR.quizas} detalle={`Hay empresas registradas con nombres parecidos a «${q}». Elige la correcta.`} />
+        <p role="note" className="rounded-tarjeta border border-observaciones-borde bg-observaciones-fondo p-4 text-observaciones">{TEXTO_VERIFICAR.suplantacion}</p>
         <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie">
           {r.lista.map((c) => (
             <li key={c.id} className="border-b border-separador last:border-0">
@@ -49,13 +87,22 @@ async function Resultado({ searchParams }: Pick<PageProps<"/consulta">, "searchP
             </li>
           ))}
         </ul>
-        <Link href="/verificar" className={claseBoton("secundario", "self-start")}>Ninguno es el que busco</Link>
+        <Link href={`/reportar?dato=${encodeURIComponent(q)}`} className={claseBoton("secundario", "self-start")}>Ninguno es: reportar</Link>
       </Pagina>
     );
 
   return (
     <Pagina className="gap-5">
     <CabeceraDictamen titulo={q} detalle={anuncio.length ? "Leído de la imagen consultada" : "Consulta"} />
+    {!!r.parecidos?.length && (
+      <section aria-labelledby="t-quizas" className="flex flex-col gap-2 rounded-tarjeta border border-observaciones-borde bg-observaciones-fondo p-4">
+        <h2 id="t-quizas" className="font-base text-lg font-bold tracking-normal text-observaciones">{TEXTO_VERIFICAR.quizas}</h2>
+        <ul className="flex flex-col gap-1">
+          {r.parecidos.map((c) => <li key={c.id}><Link href={`/prestador/${c.id}`} className="font-bold">{c.nombre_comercial ?? c.razon_social}</Link></li>)}
+        </ul>
+        <p className="text-observaciones">{TEXTO_VERIFICAR.suplantacion}</p>
+      </section>
+    )}
     <VistaDictamen estado="no_encontrado" anuncio={anuncio} fuentes={await fuentes()} consejos={CONSEJO.noEncontrado}>
       <Datos
         titulo="Lo que consultaste"
@@ -70,7 +117,8 @@ async function Resultado({ searchParams }: Pick<PageProps<"/consulta">, "searchP
         ]}
       />
     </VistaDictamen>
-    <Link href="/verificar" className={claseBoton("secundario", "self-start")}>Hacer otra consulta</Link>
+    <Link href={`/reportar?dato=${encodeURIComponent(q)}`} className={claseBoton("secundario", "self-start")}>Reportar</Link>
+    <Link href="/" className={claseBoton("secundario", "self-start")}>Hacer otra consulta</Link>
     </Pagina>
   );
 }

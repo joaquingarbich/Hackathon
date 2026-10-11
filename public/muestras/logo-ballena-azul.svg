@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Logo de muestra Ballena Azul Tours">
+<rect width="400" height="300" fill="#D7E7EC"/><rect y="170" width="400" height="130" fill="#2F6F86"/>
+<path d="M150 190 C156 140 182 128 196 170 C210 128 236 140 236 190 C220 176 208 182 196 200 C184 182 172 176 150 190Z" fill="#173F4D"/>
+<text x="200" y="100" text-anchor="middle" font-family="Arial" font-size="34" font-weight="800" fill="#173F4D">BALLENA AZUL</text>
+<text x="200" y="40" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#B91C1C">LOGO DE MUESTRA FICTICIO</text></svg>

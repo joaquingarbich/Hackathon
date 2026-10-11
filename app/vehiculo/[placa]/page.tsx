@@ -4,28 +4,33 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { CabeceraDictamen, Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { Mono, Pagina } from "@/components/ui";
-import { CONSEJO } from "@/config/textos";
+import { CONSEJO, TEXTO_ESTADO, TEXTO_FICHA } from "@/config/textos";
+import { AccionesFicha, Foto, urlAbsoluta, whatsappOficial } from "@/components/verificacion";
+import { OtraEmpresa } from "@/components/otra-empresa";
 import { cargarVehiculo, fuentes, hoyLima } from "@/lib/consultas";
 import { dictamenVehiculo, fechaLegible } from "@/lib/dictamen";
 
-export default function Vehiculo({ params }: PageProps<"/vehiculo/[placa]">) {
+export default function Vehiculo({ params, searchParams }: PageProps<"/vehiculo/[placa]">) {
   return (
     <Suspense fallback={<Cargando />}>
-      <Contenido params={params} />
+      <Contenido params={params} searchParams={searchParams} />
     </Suspense>
   );
 }
 
 const f = (iso: string | null) => (iso ? fechaLegible(iso) : null);
 
-async function Contenido({ params }: Pick<PageProps<"/vehiculo/[placa]">, "params">) {
+async function Contenido({ params, searchParams }: Pick<PageProps<"/vehiculo/[placa]">, "params" | "searchParams">) {
   const { placa } = await params;
+  const dicha = String((await searchParams).empresa ?? "").trim().slice(0, 80);
   await connection();
   const [datos, lista] = await Promise.all([cargarVehiculo(placa.toUpperCase()), fuentes()]);
   if (!datos) notFound();
-  const { vehiculo: v, prestador: p, ruc } = datos;
+  const { vehiculo: v, prestador: p, ruc, canales } = datos;
   const { estado, advertencias } = dictamenVehiculo(v, p.ruc, ruc, hoyLima(), p.validacion_vence);
   const placaLegible = `${v.placa.slice(0, 3)}-${v.placa.slice(3)}`;
+  const empresa = p.nombre_comercial ?? p.razon_social ?? "Empresa";
+  const url = await urlAbsoluta(`/v/${v.id}`);
 
   return (
     <Pagina className="gap-5">
@@ -37,6 +42,9 @@ async function Contenido({ params }: Pick<PageProps<"/vehiculo/[placa]">, "param
         <CabeceraDictamen titulo={`Unidad ${placaLegible}`} detalle={[p.nombre_comercial ?? p.razon_social, v.modalidad === "turistico" ? "turístico" : v.modalidad].filter(Boolean).join(" · ")} />
       </div>
       <VistaDictamen estado={estado} advertencias={advertencias} fuentes={lista} consejos={[CONSEJO.vehiculo]} muestra={v.es_muestra}>
+        <Foto src={v.foto_url} alt={`Foto de la unidad ${placaLegible}`} texto={placaLegible} className="sm:max-w-md" />
+        <OtraEmpresa accion={`/vehiculo/${v.placa}`} dato={`la placa ${placaLegible}`} titulares={[empresa]} dicha={dicha || undefined} />
+        <AccionesFicha whatsapp={whatsappOficial(canales, p.telefono)} textoCompartir={TEXTO_FICHA.compartirVehiculo(placaLegible, empresa, TEXTO_ESTADO[estado].titulo, url)} datoReporte={`Placa ${placaLegible}`} providerId={p.id} />
         <Datos
           titulo="Empresa titular"
           filas={[
@@ -53,6 +61,7 @@ async function Contenido({ params }: Pick<PageProps<"/vehiculo/[placa]">, "param
             ["Ámbito", v.ambito],
             ["Estado", v.estado],
             ["TUC", v.tuc_numero],
+            ["Autorización MTC", v.autorizacion_mtc],
             ["Habilitación vence", f(v.habilitacion_vencimiento)],
             ["CITV vence", f(v.citv_vencimiento)],
             ["SOAT vence", f(v.soat_vencimiento)],

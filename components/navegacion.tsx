@@ -2,8 +2,8 @@
 // Cabecera única (escritorio: categorías + accesos) y barra de pestañas del turista (móvil).
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Check, Compass, Heart, ShieldCheck } from "lucide-react";
-import { CATEGORIAS, TEXTO_APP, TEXTO_CATALOGO, TEXTO_GUARDADOS } from "@/config/textos";
+import { Check, MapPin, QrCode, ShieldCheck } from "lucide-react";
+import { TEXTO_APP } from "@/config/textos";
 
 export function Logo() {
   return (
@@ -31,31 +31,25 @@ export function CabeceraBase({ ruta = "" }: { ruta?: string }) {
     <header className="border-b border-separador bg-superficie">
       <div className="mx-auto flex max-w-[77.5rem] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5 sm:px-8">
         <Logo />
-        <nav aria-label="Categorías" className="hidden flex-wrap gap-1 lg:flex">
-          {CATEGORIAS.map((c) => (
-            <Link key={c.id} href={`/explorar?c=${c.id}`} className={`${enlace} px-3.5 text-base`}>{c.nombre}</Link>
+        <nav aria-label="Secciones" className="ml-auto hidden flex-wrap items-center gap-1 md:flex">
+          {PESTANAS.map(({ href, activo, texto, Icono }) => (
+            <Link key={href} href={href} aria-current={activo(ruta) ? "page" : undefined} className={`${enlace} aria-[current=page]:bg-relleno aria-[current=page]:font-bold`}>
+              <Icono aria-hidden className="size-4.5" /> {texto}
+            </Link>
           ))}
+          <Link href="/operador" className={enlace}>Para empresas</Link>
         </nav>
-        <div className="ml-auto hidden flex-wrap items-center gap-1 md:flex">
-          <Link href="/guardados" aria-current={ruta === "/guardados" ? "page" : undefined} className={`${enlace} aria-[current=page]:bg-relleno aria-[current=page]:font-bold`}>
-            <Heart aria-hidden className="size-4.5" /> {TEXTO_GUARDADOS.titulo}
-          </Link>
-          <Link href="/verificar" aria-current={ruta === "/verificar" ? "page" : undefined} className={`${enlace} aria-[current=page]:bg-relleno aria-[current=page]:font-bold`}>
-            <ShieldCheck aria-hidden className="size-4.5" /> Verificar
-          </Link>
-          <Link href="/operador" className={enlace}>{TEXTO_CATALOGO.publica}</Link>
-        </div>
       </div>
     </header>
   );
 }
 
 const PESTANAS = [
-  { href: "/", activo: (r: string) => r === "/" || r.startsWith("/explorar"), texto: "Explorar", Icono: Compass },
-  { href: "/guardados", activo: (r: string) => r === "/guardados", texto: TEXTO_GUARDADOS.titulo, Icono: Heart },
-  { href: "/verificar", activo: (r: string) => r === "/verificar", texto: "Verificar", Icono: ShieldCheck },
+  { href: "/", activo: (r: string) => r === "/" || r.startsWith("/caso") || r === "/verificar", texto: "Verificar", Icono: ShieldCheck },
+  { href: "/escanear", activo: (r: string) => r === "/escanear", texto: "Escanear QR", Icono: QrCode },
+  { href: "/destinos", activo: (r: string) => r.startsWith("/destinos"), texto: "Destinos", Icono: MapPin },
 ];
-const CON_PESTANAS = ["/", "/explorar", "/guardados", "/verificar"];
+const CON_PESTANAS = ["/", "/verificar", "/escanear", "/destinos"];
 
 /** Móvil: visible en las secciones del turista; seleccionado con ícono relleno + fondo, no solo color. */
 export function BarraPestanas() {
@@ -86,7 +80,7 @@ export function Pie() {
     <footer className="border-t border-separador bg-superficie">
       <div className="mx-auto flex max-w-[77.5rem] flex-wrap justify-between gap-2 px-4 py-6 text-[0.875rem] text-texto-suave sm:px-8">
         <span>{TEXTO_APP.nombre} · Hackathon Piura Innova 2026 · Reto 16</span>
-        <span>Datos de muestra: nombres, notas y precios ficticios.</span>
+        <span>Datos de muestra: empresas, personas, placas y números ficticios.</span>
       </div>
     </footer>
   );

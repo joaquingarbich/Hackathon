@@ -1,87 +1,76 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
-import { Buscador, TarjetaProveedor, TarjetaServicio, claseRejilla } from "@/components/catalogo";
-import { Ilustracion } from "@/components/ilustracion";
-import { Contenedor, claseBoton } from "@/components/ui";
-import { DESTINOS, TEXTO_CATALOGO } from "@/config/textos";
-import { conteoPorDestino, listarServicios } from "@/lib/catalogo";
+import { Camera, ChevronRight, MapPin, QrCode, ShieldCheck } from "lucide-react";
+import { BuscadorVerificar } from "@/components/buscador-verificar";
+import { Contenedor } from "@/components/ui";
+import { CASOS, CONSEJO, DESTINOS, TEXTO_HOME, TEXTO_VERIFICAR } from "@/config/textos";
+import { supabasePublico } from "@/lib/supabase/publico";
+import { connection } from "next/server";
 
-// W01 Inicio: el catálogo es lo principal; el verificador queda como franja secundaria.
+// Home: VERIFICAR es el núcleo. El directorio por destino es secundario (solo para encontrar empresas formales).
+const botonGrande = "flex min-h-[4.5rem] items-center gap-3.5 rounded-tarjeta border-[1.5px] border-borde bg-superficie px-4 no-underline hover:bg-relleno";
+
 export default function Inicio() {
   return (
-    <>
-      <section className="bg-portada text-sobre-portada">
-        <Contenedor className="flex flex-wrap items-center gap-10 pt-10 pb-24 lg:pt-12">
-          <div className="flex flex-[1_1_28rem] flex-col gap-3.5">
-            <h1 className="text-[2.125rem] font-extrabold tracking-[-0.03em] sm:text-[3.25rem] sm:leading-[1.02]">{TEXTO_CATALOGO.titular}</h1>
-            <p className="text-lg leading-normal text-sobre-portada-suave sm:text-[1.1875rem]">{TEXTO_CATALOGO.bajada}</p>
-          </div>
-          <div className="hidden h-64 flex-[1_1_25rem] overflow-hidden rounded-sello md:block">
-            <Ilustracion clave="ballenas" etiqueta="cola de ballena frente a Los Órganos" />
-          </div>
-        </Contenedor>
+    <Contenedor className="flex flex-col gap-8 pt-6 pb-16 sm:pt-10">
+      <section aria-labelledby="t-verificar" className="flex max-w-2xl flex-col gap-3">
+        <h1 id="t-verificar" className="flex items-center gap-2.5 text-[2rem] leading-[1.05] font-extrabold sm:text-[2.75rem]">
+          <ShieldCheck aria-hidden className="size-9 shrink-0" strokeWidth={2.2} /> {TEXTO_VERIFICAR.titulo}
+        </h1>
+        <p className="text-lg text-texto-suave">{TEXTO_HOME.bajada}</p>
+        <BuscadorVerificar />
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <Link href="/escanear" className={botonGrande}>
+            <QrCode aria-hidden className="size-7 shrink-0" />
+            <span className="flex flex-col"><b className="text-lg">{TEXTO_HOME.escanear}</b><span className="text-[0.9375rem] text-texto-suave">{TEXTO_HOME.escanearAyuda}</span></span>
+          </Link>
+          <Link href="/verificar" className={botonGrande}>
+            <Camera aria-hidden className="size-7 shrink-0" />
+            <span className="flex flex-col"><b className="text-lg">{TEXTO_HOME.foto}</b><span className="text-[0.9375rem] text-texto-suave">{TEXTO_HOME.fotoAyuda}</span></span>
+          </Link>
+        </div>
       </section>
 
-      <Contenedor className="-mt-14 flex flex-col gap-2.5">
-        <Buscador />
-        <details className="max-w-3xl">
-          <summary className="flex min-h-11 cursor-pointer items-start gap-2 py-2">
-            <ShieldCheck aria-hidden className="mt-0.5 size-5 shrink-0" />
-            <span>{TEXTO_CATALOGO.garantia} <u className="font-bold">{TEXTO_CATALOGO.comoSeRevisa}</u></span>
-          </summary>
-          <p className="pb-2 pl-7 text-[0.9375rem] text-texto-suave">{TEXTO_CATALOGO.comoSeRevisaTexto}</p>
-        </details>
-      </Contenedor>
+      <section aria-labelledby="t-casos" className="flex flex-col gap-3">
+        <h2 id="t-casos" className="text-[1.375rem] font-bold">{TEXTO_HOME.casos}</h2>
+        <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+          {(Object.keys(CASOS) as (keyof typeof CASOS)[]).map((c) => (
+            <li key={c}><Link href={`/caso/${c}`} className={`${botonGrande} h-full justify-between`}><b>{CASOS[c].titulo}</b><ChevronRight aria-hidden className="size-5 shrink-0" /></Link></li>
+          ))}
+          <li><Link href="/destinos" className={`${botonGrande} h-full justify-between`}><b>{TEXTO_HOME.destinoCaso}</b><ChevronRight aria-hidden className="size-5 shrink-0" /></Link></li>
+        </ul>
+        <p className="text-[0.9375rem] text-texto-suave">{CONSEJO.ambulatorio}</p>
+      </section>
 
-      <Contenedor className="flex flex-col gap-12 pt-8 pb-16">
-        <Suspense fallback={<p role="status" className="text-texto-suave">Cargando catálogo…</p>}>
-          <Catalogo />
+      <section aria-labelledby="t-destinos" className="flex flex-col gap-3">
+        <h2 id="t-destinos" className="text-[1.375rem] font-bold">{TEXTO_HOME.porDestino}</h2>
+        <p className="text-texto-suave">{TEXTO_HOME.porDestinoAyuda}</p>
+        <Suspense fallback={<GrillaDestinos conteo={{}} />}>
+          <Destinos />
         </Suspense>
-
-        <section aria-labelledby="t-verificar" className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-tarjeta border border-separador bg-superficie px-6 py-5">
-          <ShieldCheck aria-hidden className="size-8 shrink-0" strokeWidth={1.8} />
-          <div className="flex flex-[1_1_26rem] flex-col gap-1">
-            <h2 id="t-verificar" className="font-base text-lg font-bold tracking-normal">{TEXTO_CATALOGO.verificarTitulo}</h2>
-            <p className="text-texto-suave">{TEXTO_CATALOGO.verificarTexto}</p>
-          </div>
-          <Link href="/verificar" className={claseBoton("secundario", "border-primario")}>{TEXTO_CATALOGO.verificarBoton}</Link>
-        </section>
-      </Contenedor>
-    </>
+      </section>
+    </Contenedor>
   );
 }
 
-async function Catalogo() {
-  const [r, conteo] = await Promise.all([listarServicios({ orden: "valoradas", limite: 60 }), conteoPorDestino()]);
-  const top = r.disponible ? r.servicios.slice(0, 4) : [];
-  return (
-    <>
-      <section aria-labelledby="t-destinos" className="flex flex-col gap-4">
-        <h2 id="t-destinos" className="text-[1.375rem] font-bold sm:text-[2rem]">{TEXTO_CATALOGO.destinos}</h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(11rem,1fr))]">
-          {DESTINOS.map((d) => (
-            <Link key={d.id} href={`/explorar?d=${d.id}`} className="flex flex-col gap-1.5 no-underline">
-              <div className="h-28 overflow-hidden rounded-[0.875rem] sm:h-36"><Ilustracion clave={d.id} etiqueta={d.nombre} /></div>
-              <b className="text-lg">{d.nombre}</b>
-              {conteo[d.id] ? <span className="text-[0.9375rem] text-texto-suave">{conteo[d.id]} {conteo[d.id] === 1 ? "servicio" : "servicios"}</span> : null}
-            </Link>
-          ))}
-        </div>
-      </section>
+async function Destinos() {
+  await connection();
+  const { data } = await supabasePublico().from("empresa_destinos").select("destino");
+  const conteo = (data ?? []).reduce<Record<string, number>>((m, d) => ({ ...m, [d.destino]: (m[d.destino] ?? 0) + 1 }), {});
+  return <GrillaDestinos conteo={conteo} />;
+}
 
-      <section aria-labelledby="t-top" className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <h2 id="t-top" className="text-[1.375rem] font-bold sm:text-[2rem]">{r.disponible ? TEXTO_CATALOGO.mejorValoradas : "Proveedores registrados"}</h2>
-          <Link href="/explorar" className="flex min-h-11 items-center font-bold">{TEXTO_CATALOGO.verTodas}</Link>
-        </div>
-        {!r.disponible && <p className="text-texto-suave">{TEXTO_CATALOGO.respaldoAviso}</p>}
-        <div className={claseRejilla}>
-          {r.disponible
-            ? top.map((s) => <TarjetaServicio key={s.id} s={s} />)
-            : r.proveedores.slice(0, 8).map((p) => <TarjetaProveedor key={p.id} p={p} />)}
-        </div>
-      </section>
-    </>
+function GrillaDestinos({ conteo }: { conteo: Record<string, number> }) {
+  return (
+    <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+      {DESTINOS.map((d) => (
+        <li key={d.id}>
+          <Link href={`/destinos?d=${d.id}`} className="flex min-h-16 flex-col justify-center rounded-tarjeta border border-separador bg-superficie px-4 py-3 no-underline hover:bg-relleno">
+            <span className="flex items-center gap-1.5 font-bold"><MapPin aria-hidden className="size-4 shrink-0" />{d.nombre}</span>
+            {conteo[d.id] ? <span className="text-[0.9375rem] text-texto-suave">{TEXTO_HOME.empresas(conteo[d.id])}</span> : null}
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
