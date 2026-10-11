@@ -3,10 +3,10 @@ import { BusFront, CalendarClock, Check, MapPin, OctagonAlert, UserRound, Wallet
 import { Button, Campo, ChipProceso, Label, Mono, NativeSelect, Tarjeta } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { DESTINOS, NOMBRE_CANAL, TEXTO_FICHA } from "@/config/textos";
-import { TIPOS_CANAL } from "@/lib/canales";
 import { fechaLegible, vencimientos } from "@/lib/dictamen";
 import { crearCanal, crearPersonal, crearVehiculo, guardarDestinos, retirar } from "./acciones";
 import { FormularioAlta } from "./formulario-alta";
+import { CamposCanal } from "./campos-canal";
 
 const CHIP = { pendiente: "revision", aprobado: "aprobado", rechazado: "corregir" } as const;
 const Chip = ({ estado }: { estado: string }) => <ChipProceso tipo={CHIP[estado as keyof typeof CHIP] ?? "revision"} texto={{ pendiente: "En revisión", aprobado: "Aprobado", rechazado: "Por corregir" }[estado]} />;
@@ -87,14 +87,7 @@ export function SeccionesVerificables({ providerId, destinos, canales, vehiculos
         )}
         <Tarjeta className="bg-muted/40 shadow-none">
           <FormularioAlta accion={crearCanal.bind(null, providerId)} boton="Agregar canal">
-            <div className="grid gap-3 sm:grid-cols-[12rem_1fr_12rem]">
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="c-tipo">Tipo</Label>
-                <NativeSelect id="c-tipo" name="tipo">{TIPOS_CANAL.map((t) => <option key={t} value={t}>{NOMBRE_CANAL[t]}</option>)}</NativeSelect>
-              </div>
-              <Campo id="c-valor" name="valor" etiqueta="Número, cuenta, @usuario o web" required maxLength={80} />
-              <Campo id="c-etiqueta" name="etiqueta" etiqueta="Banco (si es cuenta)" maxLength={30} />
-            </div>
+            <CamposCanal />
           </FormularioAlta>
         </Tarjeta>
       </section>
