@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   // El catálogo con precios se retiró: el directorio ahora es /destinos (la query, p. ej. ?d=mancora, se conserva).
-  // Escáner, verificación por foto y páginas de caso se retiraron: todo se busca a mano desde la home.
+  // Escáner y páginas de caso se retiraron; la consulta por foto vive en la home (antes en /verificar).
   redirects: async () => [
     { source: "/explorar", destination: "/destinos", permanent: false },
     { source: "/escanear", destination: "/", permanent: false },

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { ArrowRight, Bus, MapPin, Megaphone, TriangleAlert, Wallet, type LucideIcon } from "lucide-react";
 import { BuscadorVerificar } from "@/components/buscador-verificar";
+import { ConsultaFoto } from "@/components/consulta-foto";
 import { Alert, AlertDescription, Contenedor, claseBoton } from "@/components/ui";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { CASOS, CONSEJO, TEXTO_HOME, TEXTO_VERIFICAR, type Caso } from "@/config/textos";
+import { CASOS, CONSEJO, TEXTO_FOTO, TEXTO_HOME, TEXTO_VERIFICAR, type Caso } from "@/config/textos";
 
-// Home: solo el buscador y la información de cada caso, que se despliega aquí mismo (sin ir a otra página).
+// Home: el buscador, la consulta con foto o captura, y la información de cada caso (se despliega aquí mismo).
 const ICONO_CASO: Record<Caso, LucideIcon> = { calle: Megaphone, yape: Wallet, van: Bus };
 
 function Pasos({ pasos }: { pasos: readonly string[] }) {
@@ -50,6 +51,11 @@ export default function Inicio() {
         <div className="w-full rounded-3xl border border-border bg-card p-3 text-left shadow-media sm:p-4">
           <BuscadorVerificar />
         </div>
+
+        <section aria-labelledby="t-foto" className="flex w-full flex-col gap-3 text-left">
+          <h2 id="t-foto" className="text-[0.9375rem] font-semibold text-muted-foreground">O con una imagen: {TEXTO_FOTO.ayuda.charAt(0).toLowerCase() + TEXTO_FOTO.ayuda.slice(1)}</h2>
+          <ConsultaFoto />
+        </section>
 
         <div className="mt-4 flex w-full flex-col gap-4 text-left">
           <div className="flex flex-col gap-1">
