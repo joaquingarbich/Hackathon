@@ -63,7 +63,8 @@ export function dictamenPrestador(
 ): Dictamen {
   const a = advertenciasRuc(p.ruc, ruc);
   if (p.estado_inscripcion === "suspendida") a.push({ nivel: "alerta", texto: ADVERTENCIA.inscripcionSuspendida });
-  if (p.tipo === "agencia" && p.clases.includes("mayorista")) a.push({ nivel: "observacion", texto: ADVERTENCIA.mayorista });
+  // Solo si es ÚNICAMENTE mayorista: si también es minorista u operador, sí puede venderle al turista.
+  if (p.tipo === "agencia" && p.clases.includes("mayorista") && !p.clases.some((c) => c === "minorista" || c === "operador")) a.push({ nivel: "observacion", texto: ADVERTENCIA.mayorista });
 
   const tiene = (tipo: string) => autorizaciones.some((x) => x.tipo === tipo);
   if (p.actividades.includes("aventura") && !tiene("certificado_aventura"))
