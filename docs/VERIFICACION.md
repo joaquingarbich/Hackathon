@@ -26,7 +26,7 @@ Los 5 estados de siempre. Además, `dictamenPrestador(…, { vehiculos, personal
 
 ## QR
 
-`/v/[id]` abre en vivo la ficha de la empresa, el vehículo o la persona (`resolverQr`). La empresa imprime sus QR en `/operador/agencia/[id]/qr` (stickers, carnet, vitrina; PDF con la impresión del navegador). `/escanear` lee con la cámara (`BarcodeDetector` o `jsqr`) y solo abre QR de este mismo sitio.
+`/v/[id]` abre en vivo la ficha de la empresa, el vehículo o la persona (`resolverQr`). La empresa imprime sus QR en `/operador/agencia/[id]/qr` (stickers, carnet, vitrina; PDF con la impresión del navegador). No hay lector dentro de la app: la cámara del teléfono abre el QR impreso directamente.
 
 ## Datos de muestra
 

@@ -99,6 +99,6 @@ Con `prefers-reduced-motion` se quitan los desplazamientos y escalas y quedan so
 
 Medido en local (build de producción con datos de muestra), a 360×740, en claro y oscuro:
 
-- **axe-core 4.10 (WCAG 2.2 AA):** 15 rutas sin violaciones. Hay una sola excepción en `/escanear`: un botón queda tapado por la barra de pestañas en la posición de la captura.
-- **Lighthouse:** 100 en accesibilidad y 100 en buenas prácticas en `/`, `/verificar`, `/destinos`, `/prestador/…` y `/vehiculo/…`.
+- **axe-core 4.10 (WCAG 2.2 AA):** 15 rutas sin violaciones (la única excepción era `/escanear`, que se retiró).
+- **Lighthouse:** 100 en accesibilidad y 100 en buenas prácticas en `/`, `/destinos`, `/prestador/…` y `/vehiculo/…`.
 - **Antes, en producción (Sello v0.2):** accesibilidad entre 96 y 100 (`/explorar` daba 96 por `target-size`).

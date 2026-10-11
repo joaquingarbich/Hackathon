@@ -3,7 +3,8 @@ import { supabasePublico } from "@/lib/supabase/publico";
 import { REGLAS } from "@/config/reglas";
 import type { Entrada } from "@/lib/normalizacion";
 import { coincidenciaClara, dictamenPrestador } from "@/lib/dictamen";
-import type { Estado } from "@/config/textos";
+import { DESTINOS, type Estado } from "@/config/textos";
+import type { Tables } from "@/lib/database.types";
 import { createHash } from "node:crypto";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { CANALES_CELULAR } from "@/lib/canales";
@@ -151,13 +152,45 @@ export async function cargarPersona(id: string) {
 
 export type EmpresaDirectorio = { id: string; nombre: string; tipo: string; lugar: string | null; estado: Estado; servicios: string[]; whatsapp: string | null };
 
-/** Directorio por destino: empresas que lo atienden con estado publicable (no "alerta" ni validación caducada). */
+/** Directorio por destino: empresas que DECLARARON atenderlo, con estado publicable (no "alerta" ni validación caducada). */
 export async function empresasPorDestino(destino: string, tipo?: string): Promise<EmpresaDirectorio[]> {
   const ids = lista(await db().from("empresa_destinos").select("provider_id").eq("destino", destino)).map((d) => d.provider_id);
   if (!ids.length) return [];
   let q = db().from("providers").select("*").in("id", ids);
   if (tipo) q = q.eq("tipo", tipo);
-  const ps = lista(await q);
+  return armarDirectorio(lista(await q));
+}
+
+const sinTildes = (t: string | null) => (t ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+/** "LOS ORGANOS" (padrón en mayúsculas) → "Los Organos"; lo demás queda igual. */
+const legible = (t: string | null) => (t && t === t.toUpperCase() ? t.toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase()) : t);
+const PROVINCIAS = ["piura", "sullana", "talara", "paita", "sechura", "morropon", "ayabaca", "huancabamba"];
+
+/**
+ * Empresas registradas con local en los distritos del destino que NO declararon destinos en CheckTur
+ * (p. ej. las cargadas del Directorio MINCETUR). Pueden atenderlo aunque no lo hayan declarado.
+ */
+export async function empresasDeLaZona(destino: string, tipo?: string): Promise<EmpresaDirectorio[]> {
+  const d = DESTINOS.find((x) => x.id === destino);
+  if (!d) return [];
+  const zona: readonly string[] = d.distritos;
+  const conDestinos = new Set(lista(await db().from("empresa_destinos").select("provider_id")).map((x) => x.provider_id));
+  let q = db().from("providers").select("id, distrito, provincia").limit(2000);
+  if (tipo) q = q.eq("tipo", tipo);
+  const candidatos = lista(await q).filter((p) => {
+    if (conDestinos.has(p.id)) return false;
+    const prov = sinTildes(p.provincia);
+    // La provincia solo cuenta si no es una provincia (filas del padrón con columnas corridas, p. ej. "MANCORA").
+    return zona.includes(sinTildes(p.distrito)) || (!PROVINCIAS.includes(prov) && zona.includes(prov));
+  });
+  if (!candidatos.length) return [];
+  return armarDirectorio(lista(await db().from("providers").select("*").in("id", candidatos.map((p) => p.id))));
+}
+
+/** Estado (reusa dictamenPrestador), servicios y WhatsApp oficial de cada empresa; solo las publicables. */
+async function armarDirectorio(ps: Tables<"providers">[]): Promise<EmpresaDirectorio[]> {
+  if (!ps.length) return [];
+  const ids = ps.map((p) => p.id);
   const rucs = ps.map((p) => p.ruc).filter((r): r is string => !!r);
   const [auts, rucsEst, vehs, pers, cans, servs] = await Promise.all([
     db().from("authorizations").select("provider_id, tipo, fecha_vencimiento").in("provider_id", ids).then(lista),
@@ -174,11 +207,17 @@ export async function empresasPorDestino(destino: string, tipo?: string): Promis
       const { estado } = dictamenPrestador(p, de(auts, p.id), rucsEst.find((r) => r.ruc === p.ruc) ?? null, hoy, { vehiculos: de(vehs, p.id), personal: de(pers, p.id) });
       const tel = p.telefono?.replace(/\D/g, "").slice(-9);
       return {
-        id: p.id, nombre: p.nombre_comercial ?? p.razon_social ?? "Empresa", tipo: p.tipo, lugar: p.distrito ?? p.provincia, estado,
+        id: p.id, nombre: p.nombre_comercial ?? p.razon_social ?? "Empresa", tipo: p.tipo, lugar: legible(p.distrito ?? p.provincia), estado,
         servicios: de(servs, p.id).map((s) => s.nombre.replace(/\s*\(muestra\)/i, "")),
         whatsapp: de(cans, p.id)[0]?.visible.replace(/\D/g, "") ?? (tel && /^9\d{8}$/.test(tel) ? tel : null),
       };
     })
     .filter((e) => e.estado === "verificado" || e.estado === "observaciones" || e.estado === "actualizacion")
     .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+}
+
+/** Cuántas empresas declararon cada destino (para el selector del directorio). */
+export async function conteoPorDestino(): Promise<Record<string, number>> {
+  const filas = lista(await db().from("empresa_destinos").select("destino"));
+  return filas.reduce<Record<string, number>>((m, d) => ({ ...m, [d.destino]: (m[d.destino] ?? 0) + 1 }), {});
 }

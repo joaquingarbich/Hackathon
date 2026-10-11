@@ -153,13 +153,15 @@ export const CATEGORIAS = [
 export type Categoria = (typeof CATEGORIAS)[number]["id"];
 
 // Destinos de Piura: `services.destino` guarda el id. `ilustracion` elige la escena de components/ilustracion.tsx.
+// distritos: dónde puede tener su local una empresa de la zona (sin tildes, en minúsculas). Sirve para mostrar
+// las empresas registradas que aún no declararon sus destinos en CheckTur (p. ej. las del Directorio MINCETUR).
 export const DESTINOS = [
-  { id: "mancora", nombre: "Máncora" },
-  { id: "los_organos", nombre: "Los Órganos y El Ñuro" },
-  { id: "colan_paita", nombre: "Colán y Paita" },
-  { id: "catacaos", nombre: "Catacaos" },
-  { id: "chulucanas", nombre: "Chulucanas" },
-  { id: "piura", nombre: "Piura ciudad" },
+  { id: "mancora", nombre: "Máncora", distritos: ["mancora"] },
+  { id: "los_organos", nombre: "Los Órganos y El Ñuro", distritos: ["los organos", "el alto"] },
+  { id: "colan_paita", nombre: "Colán y Paita", distritos: ["paita", "colan", "la huaca"] },
+  { id: "catacaos", nombre: "Catacaos", distritos: ["catacaos"] },
+  { id: "chulucanas", nombre: "Chulucanas", distritos: ["chulucanas"] },
+  { id: "piura", nombre: "Piura ciudad", distritos: ["piura", "castilla", "veintiseis de octubre"] },
 ] as const;
 
 export const TEXTO_CATALOGO = {
@@ -317,7 +319,7 @@ export const CASOS = {
   van: {
     titulo: "Ya estoy en la van",
     pasos: [
-      "Escribe la placa o escanea el QR pegado en la unidad.",
+      "Escribe la placa (o apunta la cámara de tu teléfono al QR pegado en la unidad).",
       "Compara la foto y la placa de la ficha con la van que tienes enfrente.",
       "Comparte la verificación con alguien de confianza.",
     ],
@@ -327,16 +329,87 @@ export const CASOS = {
 export type Caso = keyof typeof CASOS;
 
 export const TEXTO_HOME = {
-  bajada: "Agencias, transporte, hospedajes y restaurantes de Piura, contrastados con los registros oficiales y los datos que cada empresa registró.",
-  escanear: "Escanear QR",
-  escanearAyuda: "Del vehículo, el carné o la vitrina",
-  foto: "Verificar con foto",
-  fotoAyuda: "Logo, letrero o captura de redes",
+  bajada: "Escribe el RUC, el celular o Yape, la placa o el nombre de la empresa. Se contrasta con los registros oficiales de Piura y con los datos que cada empresa registró.",
   casos: "¿Qué estás por hacer?",
+  casosAyuda: "Toca tu caso para ver qué revisar antes de pagar o subir.",
   destinoCaso: "Busco empresa para ir a un destino",
-  porDestino: "Empresas verificadas por destino",
-  porDestinoAyuda: "Directorio de empresas con registro vigente. Sin precios ni publicidad: solo su estado y su contacto oficial.",
+  destinoPasos: [
+    "En «Destinos» verás las empresas registradas que declararon atender ese lugar, con su estado y su WhatsApp oficial.",
+    "También aparecen otras empresas registradas con local en la zona que aún no declararon sus destinos: puede que sí atiendan ese lugar.",
+    "Contrata por el canal oficial que figura en su ficha, no por números que te pasen en la calle.",
+  ],
+  verDestinos: "Ver empresas por destino",
+  porDestino: "Empresas por destino",
+  porDestinoAyuda: "Empresas con registro vigente que atienden cada destino. Sin precios ni publicidad: solo su estado y su contacto oficial.",
   empresas: (n: number) => `${n} ${n === 1 ? "empresa" : "empresas"}`,
+} as const;
+
+export const TEXTO_DESTINOS = {
+  elegir: "¿A dónde vas?",
+  cambiar: "Cambiar destino",
+  declararon: (destino: string) => `Declararon atender ${destino}`,
+  declararonAyuda: "Estas empresas registradas indicaron en CheckTur que ofrecen servicios en este destino.",
+  sinDeclarar: (destino: string) => `Aún no hay empresas que hayan declarado atender ${destino}.`,
+  zona: "Otras empresas registradas en la zona",
+  zonaAyuda: (distritos: string) =>
+    `Figuran en los registros oficiales con local en ${distritos}, pero todavía no declararon en CheckTur a qué destinos llevan. Puede que sí ofrezcan servicios aquí: consúltales por su canal oficial.`,
+  aviso: "No ver a una empresa en esta lista no significa que no atienda este destino.",
+  avisoCorto: "Aquí aparecen los destinos que cada empresa declaró en CheckTur; muchas agencias registradas aún no lo han hecho. Si te ofrecen un servicio, búscala por su nombre o RUC.",
+  avisoDetalle:
+    "Aquí aparecen los destinos que cada empresa declaró en CheckTur. Las agencias del Directorio MINCETUR figuran como registradas aunque todavía no hayan declarado sus destinos. Si te ofrecen un servicio, busca la empresa por su nombre o RUC.",
+  verDetalle: "Ver ficha completa",
+  buscarOtra: (destino: string) => `¿Te ofrecieron algo en ${destino} que no está aquí?`,
+} as const;
+
+export const TEXTO_FAQ = {
+  titulo: "Preguntas frecuentes",
+  bajada: "Qué es CheckTur Piura, qué significa cada resultado y qué hacer si algo no cuadra.",
+  preguntas: [
+    {
+      p: "¿Qué es CheckTur Piura?",
+      r: "Una herramienta gratuita para comprobar, antes de pagar o subir, si una agencia, transporte, hospedaje, restaurante o guía de Piura figura en los registros oficiales, y si el número, la cuenta o la placa que te dieron le pertenece.",
+    },
+    {
+      p: "¿Qué puedo buscar?",
+      r: "Escribe en el buscador el RUC (11 dígitos), un celular de WhatsApp, Yape o Plin (9 dígitos), una cuenta bancaria, la placa del vehículo (por ejemplo ABC-123) o el nombre comercial. El tipo de dato se detecta solo; no necesitas elegir nada.",
+    },
+    {
+      p: "¿De dónde salen los datos?",
+      r: "Del Directorio de Prestadores de Servicios Turísticos de MINCETUR y DIRCETUR Piura, del padrón de SUNAT (estado del RUC), de los registros de transporte (MTC y municipalidades) y de los canales, vehículos y personal que cada empresa registró y que un revisor aprobó. Cada resultado muestra su fuente y la fecha de corte.",
+    },
+    {
+      p: "¿Qué significa cada resultado?",
+      r: "«Verificado»: figura en un registro oficial vigente. «Con observaciones»: figura, pero hay algo que conviene saber, como un documento vencido. «En proceso de actualización»: presentó su constancia y fue validada, pero aún no aparece en el padrón. «No encontrado»: no hay coincidencias a la fecha de corte. «Alerta»: un registro oficial muestra un hecho importante, como un RUC de baja o una habilitación vencida.",
+    },
+    {
+      p: "Si sale «No encontrado», ¿la empresa es informal?",
+      r: "No necesariamente. Los padrones oficiales se publican con retraso y una empresa puede operar hasta 30 días antes de inscribirse. Pídele su RUC o su constancia, vuelve a consultar y, ante la duda, contrata solo por canales oficiales.",
+    },
+    {
+      p: "¿Por qué una empresa no aparece en un destino?",
+      r: "Porque en «Destinos» se muestran los lugares que cada empresa declaró en CheckTur. Muchas agencias del Directorio MINCETUR figuran como registradas, pero aún no han declarado a qué destinos llevan. Por eso también ves «Otras empresas registradas en la zona». Si te ofrecen un servicio, búscala por su nombre o RUC.",
+    },
+    {
+      p: "Me pidieron pagar por Yape o Plin, ¿cómo lo compruebo?",
+      r: "Escribe el número antes de pagar. Si pertenece a una empresa registrada, verás cuál. Si no está registrado por ninguna, no pagues hasta confirmar con la empresa por su canal oficial. Si pertenece a otra empresa distinta a la que te dijeron, desconfía.",
+    },
+    {
+      p: "¿Cómo compruebo la van o al guía?",
+      r: "Escribe la placa del vehículo o el nombre de la empresa. En la ficha verás la foto de la unidad y los datos del personal registrado: compáralos con lo que tienes enfrente. Las empresas también pueden pegar un código QR que abre esa misma ficha con la cámara del teléfono.",
+    },
+    {
+      p: "¿Qué hago si tuve un problema?",
+      r: "Usa «Reportar» en la ficha o en el resultado: llega a los revisores de CheckTur. Si perdiste dinero o hubo un delito, acude también a la Policía Nacional (105), a INDECOPI o a la DIRCETUR Piura.",
+    },
+    {
+      p: "¿CheckTur guarda lo que busco?",
+      r: "Solo se registra el dato consultado y el resultado, sin tu identidad, para saber qué se busca y no existe. No se guardan fotos ni datos personales de los turistas.",
+    },
+    {
+      p: "Tengo una empresa, ¿cómo aparezco o actualizo mis datos?",
+      r: "Entra a «Para empresas», crea una cuenta con tu correo y sube tu constancia de DIRCETUR o la TUC de tu unidad. Cuando un revisor la valida, puedes declarar tus destinos, canales oficiales, vehículos y personal.",
+    },
+  ],
 } as const;
 
 export const nombreDestino = (id: string | null | undefined) => DESTINOS.find((d) => d.id === id)?.nombre ?? id ?? "";

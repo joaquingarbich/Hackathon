@@ -1,129 +1,84 @@
-import { Suspense } from "react";
 import Link from "next/link";
-import { connection } from "next/server";
-import { ArrowRight, Bus, Camera, Database, Fingerprint, Landmark, MapPin, Megaphone, QrCode, ShieldCheck, Wallet, type LucideIcon } from "lucide-react";
+import { ArrowRight, Bus, MapPin, Megaphone, TriangleAlert, Wallet, type LucideIcon } from "lucide-react";
 import { BuscadorVerificar } from "@/components/buscador-verificar";
-import { Alert, AlertDescription, Contenedor, Skeleton } from "@/components/ui";
-import { CASOS, CONSEJO, DESTINOS, TEXTO_HOME, TEXTO_VERIFICAR, type Caso } from "@/config/textos";
-import { supabasePublico } from "@/lib/supabase/publico";
+import { Alert, AlertDescription, Contenedor, claseBoton } from "@/components/ui";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { CASOS, CONSEJO, TEXTO_HOME, TEXTO_VERIFICAR, type Caso } from "@/config/textos";
 
-// Home: VERIFICAR es el núcleo. Buscador arriba, accesos por foto/QR, casos de uso; el directorio va al final.
+// Home: solo el buscador y la información de cada caso, que se despliega aquí mismo (sin ir a otra página).
 const ICONO_CASO: Record<Caso, LucideIcon> = { calle: Megaphone, yape: Wallet, van: Bus };
-const FUENTES = [
-  { Icono: Landmark, texto: "SUNAT · estado del RUC" },
-  { Icono: Database, texto: "MINCETUR y DIRCETUR Piura" },
-  { Icono: Fingerprint, texto: "Canales que cada empresa registró" },
-];
 
-const accion = "pulsable elevable group flex items-center gap-4 rounded-2xl border border-border bg-card p-4 text-foreground no-underline shadow-suave";
-const tile = "flex size-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground";
-
-export default function Inicio() {
+function Pasos({ pasos }: { pasos: readonly string[] }) {
+  // Los números dicen algo cierto: es una secuencia.
   return (
-    <>
-      <section className="relative overflow-hidden border-b border-border bg-[radial-gradient(120%_80%_at_50%_-10%,color-mix(in_srgb,var(--primary)_12%,transparent),transparent_70%)]">
-        <Contenedor className="flex flex-col items-center gap-6 pt-10 pb-12 text-center sm:pt-16 sm:pb-16">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-[0.8125rem] font-medium text-muted-foreground shadow-suave">
-            <span aria-hidden className="size-1.5 rounded-full bg-verificado-borde" /> Registros oficiales de Piura
-          </span>
-          <div className="flex max-w-3xl flex-col gap-3">
-            <h1 className="text-[2.25rem] leading-[1.05] font-bold tracking-[-0.035em] sm:text-[3.5rem]">
-              {TEXTO_VERIFICAR.titulo.replace(" o subir", "")}<span className="text-primary"> o subir</span>
-            </h1>
-            <p className="mx-auto max-w-[56ch] text-[1.0625rem] text-muted-foreground sm:text-lg">{TEXTO_HOME.bajada}</p>
-          </div>
-
-          <div className="w-full max-w-2xl rounded-3xl border border-border bg-card p-3 text-left shadow-media sm:p-4">
-            <BuscadorVerificar />
-          </div>
-
-          <div className="grid w-full max-w-2xl gap-3 text-left sm:grid-cols-2">
-            <Link href="/escanear" className={accion}>
-              <span className={tile}><QrCode aria-hidden className="size-6" /></span>
-              <span className="flex min-w-0 flex-col"><b className="font-semibold">{TEXTO_HOME.escanear}</b><span className="text-[0.875rem] text-muted-foreground">{TEXTO_HOME.escanearAyuda}</span></span>
-              <ArrowRight aria-hidden className="ml-auto size-5 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-0.5" />
-            </Link>
-            <Link href="/verificar" className={accion}>
-              <span className={tile}><Camera aria-hidden className="size-6" /></span>
-              <span className="flex min-w-0 flex-col"><b className="font-semibold">{TEXTO_HOME.foto}</b><span className="text-[0.875rem] text-muted-foreground">{TEXTO_HOME.fotoAyuda}</span></span>
-              <ArrowRight aria-hidden className="ml-auto size-5 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-0.5" />
-            </Link>
-          </div>
-
-          <ul aria-label="Con qué se contrasta" className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[0.875rem] text-muted-foreground">
-            {FUENTES.map(({ Icono, texto }) => <li key={texto} className="flex items-center gap-2"><Icono aria-hidden className="size-4 text-primary" />{texto}</li>)}
-          </ul>
-        </Contenedor>
-      </section>
-
-      <Contenedor className="flex flex-col gap-14 py-12 sm:py-16">
-        <section aria-labelledby="t-casos" className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1">
-            <h2 id="t-casos" className="text-[1.5rem] font-bold sm:text-[1.75rem]">{TEXTO_HOME.casos}</h2>
-            <p className="text-muted-foreground">Te guiamos paso a paso según lo que tienes enfrente.</p>
-          </div>
-          <ul className="escalonado grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {(Object.keys(CASOS) as Caso[]).map((c) => {
-              const Icono = ICONO_CASO[c];
-              return (
-                <li key={c}>
-                  <Link href={`/caso/${c}`} className={`${accion} h-full sm:flex-col sm:items-start sm:gap-6 sm:p-5`}>
-                    <span className={tile}><Icono aria-hidden className="size-6" /></span>
-                    <span className="flex flex-1 items-center justify-between gap-3 sm:w-full sm:items-end">
-                      <b className="text-[1.0625rem] leading-snug font-semibold">{CASOS[c].titulo}</b>
-                      <ArrowRight aria-hidden className="size-5 shrink-0 text-muted-foreground" />
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-            <li>
-              <Link href="/destinos" className={`${accion} h-full sm:flex-col sm:items-start sm:gap-6 sm:p-5`}>
-                <span className={tile}><MapPin aria-hidden className="size-6" /></span>
-                <span className="flex flex-1 items-center justify-between gap-3 sm:w-full sm:items-end">
-                  <b className="text-[1.0625rem] leading-snug font-semibold">{TEXTO_HOME.destinoCaso}</b>
-                  <ArrowRight aria-hidden className="size-5 shrink-0 text-muted-foreground" />
-                </span>
-              </Link>
-            </li>
-          </ul>
-          <Alert variant="aviso">
-            <ShieldCheck aria-hidden />
-            <AlertDescription>{CONSEJO.ambulatorio}</AlertDescription>
-          </Alert>
-        </section>
-
-        <section aria-labelledby="t-destinos" className="flex flex-col gap-5">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <h2 id="t-destinos" className="text-[1.5rem] font-bold sm:text-[1.75rem]">{TEXTO_HOME.porDestino}</h2>
-              <p className="max-w-[60ch] text-muted-foreground">{TEXTO_HOME.porDestinoAyuda}</p>
-            </div>
-            <Link href="/destinos" className="inline-flex min-h-11 items-center gap-1.5 font-semibold no-underline hover:underline">Ver directorio <ArrowRight aria-hidden className="size-4" /></Link>
-          </div>
-          <Suspense fallback={<ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">{DESTINOS.map((d) => <li key={d.id}><Skeleton className="h-[5.5rem] rounded-2xl" /></li>)}</ul>}>
-            <Destinos />
-          </Suspense>
-        </section>
-      </Contenedor>
-    </>
+    <ol className="flex flex-col gap-2.5">
+      {pasos.map((p, i) => (
+        <li key={p} className="flex gap-3 text-[0.9375rem] text-foreground">
+          <span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-secondary font-mono text-[0.8125rem] font-semibold text-secondary-foreground">{i + 1}</span>
+          <span className="pt-0.5">{p}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
 
-async function Destinos() {
-  await connection();
-  const { data } = await supabasePublico().from("empresa_destinos").select("destino");
-  const conteo = (data ?? []).reduce<Record<string, number>>((m, d) => ({ ...m, [d.destino]: (m[d.destino] ?? 0) + 1 }), {});
+function Titulo({ Icono, texto }: { Icono: LucideIcon; texto: string }) {
   return (
-    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-      {DESTINOS.map((d) => (
-        <li key={d.id}>
-          <Link href={`/destinos?d=${d.id}`} className="pulsable elevable flex min-h-[5.5rem] flex-col justify-between gap-2 rounded-2xl border border-border bg-card p-4 text-foreground no-underline shadow-suave">
-            <span className="flex items-center gap-1.5 font-semibold"><MapPin aria-hidden className="size-4 shrink-0 text-primary" />{d.nombre}</span>
-            <span className="text-[0.875rem] text-muted-foreground">{conteo[d.id] ? TEXTO_HOME.empresas(conteo[d.id]) : "Sin empresas aún"}</span>
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <span className="flex items-center gap-3.5">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground"><Icono aria-hidden className="size-5" /></span>
+      <span className="text-[1.0625rem] leading-snug font-semibold">{texto}</span>
+    </span>
+  );
+}
+
+const item = "rounded-2xl border border-border bg-card px-4 shadow-suave not-last:border-b sm:px-5 data-[state=open]:shadow-media";
+
+export default function Inicio() {
+  return (
+    <section className="flex-1 bg-[radial-gradient(120%_70%_at_50%_-10%,color-mix(in_srgb,var(--primary)_12%,transparent),transparent_70%)]">
+      <Contenedor className="flex max-w-3xl flex-col items-center gap-6 pt-10 pb-14 text-center sm:pt-16 sm:pb-20">
+        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-[0.8125rem] font-medium text-muted-foreground shadow-suave">
+          <span aria-hidden className="size-1.5 rounded-full bg-verificado-borde" /> Registros oficiales de Piura
+        </span>
+        <div className="flex flex-col gap-3">
+          <h1 className="text-[2.25rem] leading-[1.05] font-bold tracking-[-0.035em] sm:text-[3.5rem]">
+            {TEXTO_VERIFICAR.titulo.replace(" o subir", "")}<span className="text-primary"> o subir</span>
+          </h1>
+          <p className="mx-auto max-w-[54ch] text-[1.0625rem] text-muted-foreground sm:text-lg">{TEXTO_HOME.bajada}</p>
+        </div>
+
+        <div className="w-full rounded-3xl border border-border bg-card p-3 text-left shadow-media sm:p-4">
+          <BuscadorVerificar />
+        </div>
+
+        <div className="mt-4 flex w-full flex-col gap-4 text-left">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-[1.375rem] font-bold sm:text-[1.5rem]">{TEXTO_HOME.casos}</h2>
+            <p className="text-muted-foreground">{TEXTO_HOME.casosAyuda}</p>
+          </div>
+          <Accordion type="single" collapsible className="escalonado gap-3">
+            {(Object.keys(CASOS) as Caso[]).map((c) => (
+              <AccordionItem key={c} value={c} className={item}>
+                <AccordionTrigger><Titulo Icono={ICONO_CASO[c]} texto={CASOS[c].titulo} /></AccordionTrigger>
+                <AccordionContent className="flex flex-col gap-4 sm:pl-[3.625rem]">
+                  <Pasos pasos={CASOS[c].pasos} />
+                  {c === "calle" && (
+                    <Alert variant="aviso"><TriangleAlert aria-hidden /><AlertDescription>{CONSEJO.ambulatorio}</AlertDescription></Alert>
+                  )}
+                  <p className="text-[0.875rem] text-muted-foreground">Qué escribir en el buscador: <b className="font-semibold text-foreground">{CASOS[c].placeholder}</b></p>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+            <AccordionItem value="destino" className={item}>
+              <AccordionTrigger><Titulo Icono={MapPin} texto={TEXTO_HOME.destinoCaso} /></AccordionTrigger>
+              <AccordionContent className="flex flex-col gap-4 sm:pl-[3.625rem]">
+                <Pasos pasos={TEXTO_HOME.destinoPasos} />
+                <Link href="/destinos" className={claseBoton("secundario", "self-start")}>{TEXTO_HOME.verDestinos} <ArrowRight aria-hidden /></Link>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </Contenedor>
+    </section>
   );
 }

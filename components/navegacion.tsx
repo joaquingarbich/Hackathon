@@ -2,7 +2,7 @@
 // Cabecera (fija, translúcida: es la capa funcional que flota sobre el contenido) y barra de pestañas del turista (móvil).
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, MapPin, QrCode, ShieldCheck } from "lucide-react";
+import { Building2, CircleHelp, MapPin, ShieldCheck } from "lucide-react";
 import { TEXTO_APP } from "@/config/textos";
 import { cn } from "@/lib/utils";
 
@@ -20,11 +20,11 @@ export function Logo() {
 }
 
 const PESTANAS = [
-  { href: "/", activo: (r: string) => r === "/" || r.startsWith("/caso") || r === "/verificar", texto: "Verificar", Icono: ShieldCheck },
-  { href: "/escanear", activo: (r: string) => r === "/escanear", texto: "Escanear", Icono: QrCode },
+  { href: "/", activo: (r: string) => r === "/", texto: "Verificar", Icono: ShieldCheck },
   { href: "/destinos", activo: (r: string) => r.startsWith("/destinos"), texto: "Destinos", Icono: MapPin },
+  { href: "/faq", activo: (r: string) => r === "/faq", texto: "Preguntas", Icono: CircleHelp },
 ];
-const CON_PESTANAS = ["/", "/verificar", "/escanear", "/destinos"];
+const CON_PESTANAS = ["/", "/destinos", "/faq"];
 
 /** Con la ruta actual (aria-current). Va dentro de <Suspense> en el layout: usePathname es dato de petición. */
 export function Cabecera() {
@@ -90,7 +90,11 @@ export function Pie() {
           <ShieldCheck aria-hidden className="size-4 text-primary" />
           <span>{TEXTO_APP.nombre} · Hackathon Piura Innova 2026 · Reto 16</span>
         </div>
-        <span>Datos de muestra: empresas, personas, placas y números ficticios.</span>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <Link href="/faq" className="inline-flex min-h-11 items-center text-muted-foreground hover:text-foreground">Preguntas frecuentes</Link>
+          <Link href="/reportar" className="inline-flex min-h-11 items-center text-muted-foreground hover:text-foreground">Reportar</Link>
+          <span>Datos de muestra: empresas, personas, placas y números ficticios.</span>
+        </div>
       </div>
     </footer>
   );

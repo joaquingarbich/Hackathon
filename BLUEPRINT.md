@@ -68,7 +68,7 @@ supabase/migrations/  único lugar donde cambia el esquema
 ## 7. Diseño
 
 **Sistema «Claro» v1** (detalle en `docs/DISENO.md`; reemplaza a «Sello» v0.2, cuyos mockups quedan en `docs/disenos/`). Móvil primero; blancos fríos, azul de marca #056CF2 para acciones, paleta propia para los estados (En proceso = violeta). Componentes shadcn/ui adaptados.
-- Portada = verificar (buscador único con chip del tipo detectado, Escanear QR, Verificar con foto, casos de uso); el directorio por destino va al final.
+- Portada = verificar: solo el buscador único (chip del tipo detectado) y los casos de uso desplegables. Búsqueda solo manual (sin escáner ni foto). Directorio en `/destinos`; ayuda en `/faq`.
 - Dictamen: **sello** arriba (color + ícono + palabra + fuente + corte); debajo identidad, canales oficiales, acciones (WhatsApp oficial fijo abajo en móvil, compartir, reportar) y documentos plegados.
 - Sin logos del Estado ni distintivo MINCETUR. Wordmark «CheckTur Piura» con escudo en cuadro azul.
 
