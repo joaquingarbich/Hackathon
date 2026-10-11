@@ -1,4 +1,4 @@
-# Estado y pendientes — actualizado 10/10/2026, noche
+# Estado y pendientes — actualizado 10/10/2026, noche (rediseño «Claro» v1 incluido)
 
 Producción: https://checktur-piura.vercel.app · Supabase `hrycpqowvaixewbjdsbf` · deploy automático por push a `main`.
 **Reenfoque hecho:** el núcleo es VERIFICAR; el directorio por destino es secundario; sin precios ni reseñas en la cara del turista.
