@@ -7,7 +7,7 @@ import { hayCupo } from "@/lib/limite";
 // Supabase Auth responde en inglés: nunca mostrar su texto crudo.
 function errorEnEspanol(m: string) {
   if (/invalid/i.test(m) && /email/i.test(m)) return "Ese correo no es válido. Usa un correo real.";
-  if (/already (been )?registered|already exists/i.test(m)) return "Ya existe una cuenta con ese correo. Usa «Ingresar».";
+  if (/already (been )?registered|already exists/i.test(m)) return "No se pudo crear la cuenta con ese correo. Si ya tienes una, usa «Ingresar».";
   if (/password/i.test(m)) return "La contraseña no cumple los requisitos (mínimo 8 caracteres).";
   if (/rate limit|too many/i.test(m)) return "Demasiados intentos. Espera unos minutos.";
   return "La cuenta no se pudo crear. Intenta de nuevo.";
