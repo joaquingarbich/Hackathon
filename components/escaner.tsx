@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
-import { Camera, Images } from "lucide-react";
-import { claseBoton } from "@/components/ui";
+import { Camera, Images, OctagonAlert, QrCode } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 type Detector = { detect: (s: CanvasImageSource) => Promise<{ rawValue: string }[]> };
 declare global { interface Window { BarcodeDetector?: new (o: { formats: string[] }) => Detector } }
@@ -79,26 +81,39 @@ export function Escaner() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-tarjeta border border-separador bg-relleno">
-        <video ref={video} playsInline muted className={`size-full object-cover ${activo ? "" : "hidden"}`} />
-        {!activo && <p className="absolute inset-0 flex items-center justify-center p-6 text-center text-texto-suave">Apunta la cámara al QR del vehículo, del carné o de la vitrina.</p>}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={() => { setMensaje(null); setActivo(!activo); }} className={claseBoton("primario")}>
-          <Camera aria-hidden className="size-5" /> {activo ? "Detener cámara" : "Abrir cámara"}
-        </button>
-        <input ref={foto} type="file" accept="image/*" className="hidden" onChange={deFoto} aria-hidden tabIndex={-1} />
-        <button type="button" onClick={() => foto.current?.click()} className={claseBoton("secundario")}>
-          <Images aria-hidden className="size-5" /> Foto del QR
-        </button>
-      </div>
-      {mensaje?.tipo === "error" && <p role="alert" className="text-alerta">{mensaje.texto}</p>}
-      {mensaje?.tipo === "ajeno" && (
-        <div role="alert" className="flex flex-col gap-1 rounded-tarjeta border border-alerta-borde bg-alerta-fondo p-4 text-alerta">
-          <b>Este QR no es de CheckTur Piura.</b>
-          <span>No lo abras si te pide pagar o datos personales. Contenido: <span className="break-all font-mono">{mensaje.texto.slice(0, 160)}</span></span>
+    <div className="flex flex-col gap-4">
+      <div className="relative aspect-square w-full max-w-md self-center overflow-hidden rounded-3xl border border-border bg-[linear-gradient(135deg,var(--secondary),var(--muted))] shadow-media sm:self-start">
+        <video ref={video} playsInline muted className={cn("size-full object-cover", !activo && "hidden")} />
+        {/* Visor: cuatro esquinas que encuadran el QR. */}
+        <div aria-hidden className="pointer-events-none absolute inset-[18%]">
+          {["top-0 left-0 border-t-4 border-l-4 rounded-tl-2xl", "top-0 right-0 border-t-4 border-r-4 rounded-tr-2xl", "bottom-0 left-0 border-b-4 border-l-4 rounded-bl-2xl", "bottom-0 right-0 border-b-4 border-r-4 rounded-br-2xl"].map((c) => (
+            <span key={c} className={cn("absolute size-10", activo ? "border-white" : "border-primary", c)} />
+          ))}
         </div>
+        {!activo && (
+          <p className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 p-5 text-center text-[0.9375rem] font-medium text-secondary-foreground">
+            <QrCode aria-hidden className="size-5 shrink-0" /> Apunta al QR del vehículo, del carné o de la vitrina.
+          </p>
+        )}
+      </div>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Button type="button" size="lg" variant={activo ? "outline" : "default"} onClick={() => { setMensaje(null); setActivo(!activo); }}>
+          <Camera aria-hidden /> {activo ? "Detener cámara" : "Abrir cámara"}
+        </Button>
+        <input ref={foto} type="file" accept="image/*" className="hidden" onChange={deFoto} aria-hidden tabIndex={-1} />
+        <Button type="button" size="lg" variant="outline" onClick={() => foto.current?.click()}>
+          <Images aria-hidden /> Foto del QR
+        </Button>
+      </div>
+      {mensaje?.tipo === "error" && (
+        <Alert role="alert" variant="peligro" className="entrada"><OctagonAlert aria-hidden /><AlertDescription>{mensaje.texto}</AlertDescription></Alert>
+      )}
+      {mensaje?.tipo === "ajeno" && (
+        <Alert role="alert" variant="peligro" className="entrada">
+          <OctagonAlert aria-hidden />
+          <AlertTitle>Este QR no es de CheckTur Piura</AlertTitle>
+          <AlertDescription>No lo abras si te pide pagar o datos personales. Contenido: <span className="break-all font-mono">{mensaje.texto.slice(0, 160)}</span></AlertDescription>
+        </Alert>
       )}
     </div>
   );

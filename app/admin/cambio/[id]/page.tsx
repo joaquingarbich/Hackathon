@@ -28,19 +28,19 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/admin/cambio
   const actual: Record<string, unknown> = { ...p, redes: p?.redes };
   return (
     <Pagina>
-      <Link href="/admin" className="flex min-h-11 items-center self-start font-bold">← Panel</Link>
-      <h1 className="text-[1.75rem] font-extrabold">Cambio de perfil · {p?.nombre_comercial ?? p?.razon_social}</h1>
-      <p className="text-texto-suave">RUC <Mono>{p?.ruc}</Mono> · estado {c.estado}{c.motivo && ` · ${c.motivo}`}</p>
+      <Link href="/admin" className="inline-flex min-h-11 items-center gap-1.5 self-start font-medium text-muted-foreground no-underline hover:text-foreground">← Panel</Link>
+      <h1 className="text-[1.75rem] leading-[1.1] font-bold">Cambio de perfil · {p?.nombre_comercial ?? p?.razon_social}</h1>
+      <p className="text-muted-foreground">RUC <Mono>{p?.ruc}</Mono> · estado {c.estado}{c.motivo && ` · ${c.motivo}`}</p>
       <Tarjeta>
-        <p className="mb-3 text-[0.9375rem] text-texto-suave">Revisa sobre todo el <b>celular</b> y las <b>redes</b>: el catálogo los usa para el contacto por WhatsApp. Ante la duda, llama al número que ya figura.</p>
+        <p className="mb-3 text-[0.9375rem] text-muted-foreground">Revisa sobre todo el <b>celular</b> y las <b>redes</b>: el catálogo los usa para el contacto por WhatsApp. Ante la duda, llama al número que ya figura.</p>
         <dl className="flex flex-col gap-3">
           {CAMPOS.map(([k, etiqueta]) => {
             const antes = mostrar(actual[k]), despues = mostrar(nuevo[k]);
             const cambia = antes !== despues;
             return (
-              <div key={k} className={cambia ? "rounded-control bg-observaciones-fondo p-2" : "p-2"}>
+              <div key={k} className={cambia ? "rounded-xl bg-observaciones-fondo p-2" : "p-2"}>
                 <dt className="text-[0.9375rem] font-semibold">{etiqueta}{cambia && " · cambia"}</dt>
-                <dd className="text-[0.9375rem]">{cambia ? <><s className="text-texto-suave">{antes}</s> → <b>{despues}</b></> : despues}</dd>
+                <dd className="text-[0.9375rem]">{cambia ? <><s className="text-muted-foreground">{antes}</s> → <b>{despues}</b></> : despues}</dd>
               </div>
             );
           })}

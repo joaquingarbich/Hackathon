@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CircleCheck, TriangleAlert, ExternalLink } from "lucide-react";
 import { Cargando, Datos } from "@/components/dictamen";
-import { Boton, Mono, Pagina, Tarjeta, claseControl } from "@/components/ui";
+import { Boton, Mono, Pagina, Tarjeta, Textarea, Aviso } from "@/components/ui";
 import { exigirAdmin } from "@/lib/sesion";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { fechaLegible } from "@/lib/dictamen";
@@ -36,9 +36,9 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/admin/resena
 
   return (
     <Pagina>
-      <Link href="/admin" className="flex min-h-11 items-center self-start font-bold">← Panel de validación</Link>
-      <h1 className="text-[2.125rem] leading-[1.05] font-extrabold">Opinión sobre {p?.nombre_comercial ?? p?.razon_social}</h1>
-      <p className="text-texto-suave">Estado: {r.estado}{r.motivo && ` · ${r.motivo}`}</p>
+      <Link href="/admin" className="inline-flex min-h-11 items-center gap-1.5 self-start font-medium text-muted-foreground no-underline hover:text-foreground">← Panel de validación</Link>
+      <h1 className="text-[1.875rem] leading-[1.1] font-bold sm:text-[2.25rem]">Opinión sobre {p?.nombre_comercial ?? p?.razon_social}</h1>
+      <p className="text-muted-foreground">Estado: {r.estado}{r.motivo && ` · ${r.motivo}`}</p>
 
       <Datos titulo="Opinión" filas={[
         ["Estrellas", `${r.estrellas} de 5`], ["Comentario", r.comentario], ["Alias", r.alias ?? "Usuario verificado"],
@@ -46,12 +46,12 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/admin/resena
       ]} />
 
       <Tarjeta className="flex flex-col gap-3">
-        <h2 className="text-[1.375rem] font-bold">Comprobante</h2>
+        <h2 className="text-[1.1875rem] font-semibold tracking-tight">Comprobante</h2>
         {firmada.data?.signedUrl && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element -- URL firmada temporal, no optimizable */}
-            <img src={firmada.data.signedUrl} alt="Comprobante de pago subido" className="max-h-[480px] w-full rounded-control border border-separador object-contain" />
-            <a href={firmada.data.signedUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 font-bold">
+            <img src={firmada.data.signedUrl} alt="Comprobante de pago subido" className="max-h-[480px] w-full rounded-xl border border-border object-contain" />
+            <a href={firmada.data.signedUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 font-semibold">
               Abrir en tamaño completo <ExternalLink aria-hidden className="size-4" />
             </a>
           </>
@@ -64,7 +64,7 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/admin/resena
             </li>
           ))}
         </ul>
-        <p className="text-[0.9375rem] text-texto-suave">Proveedor: RUC <Mono>{p?.ruc}</Mono> · Emisor leído: {v.comprobante?.razon_social_emisor ?? "—"}</p>
+        <p className="text-[0.9375rem] text-muted-foreground">Proveedor: RUC <Mono>{p?.ruc}</Mono> · Emisor leído: {v.comprobante?.razon_social_emisor ?? "—"}</p>
       </Tarjeta>
 
       <Datos titulo="Contacto (privado)" filas={[
@@ -77,9 +77,9 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/admin/resena
         <Tarjeta className="p-5">
           <form action={moderarResena} className="flex flex-col gap-3">
             <input type="hidden" name="id" value={r.id} />
-            <label htmlFor="motivo" className="text-[0.9375rem] font-bold">Motivo (obligatorio para rechazar u ocultar)</label>
-            <textarea id="motivo" name="motivo" maxLength={500} rows={2} className={`${claseControl} py-2.5`} />
-            {errorForm === "motivo" && <p role="alert" className="text-alerta">Indica el motivo.</p>}
+            <label htmlFor="motivo" className="text-[0.9375rem] font-semibold">Motivo (obligatorio para rechazar u ocultar)</label>
+            <Textarea id="motivo" name="motivo" maxLength={500} rows={2} />
+            {errorForm === "motivo" && <Aviso tipo="error">Indica el motivo.</Aviso>}
             {r.estado === "pendiente" && <>
               <Boton name="accion" value="publicar">Publicar</Boton>
               <Boton name="accion" value="rechazar" variante="secundario">Rechazar</Boton>

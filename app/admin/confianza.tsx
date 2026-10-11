@@ -7,9 +7,9 @@ const ESTILO: Record<string, string> = {
 };
 
 export function InsigniaConfianza({ confianza }: { confianza: string | null }) {
-  if (!confianza) return <span className="text-[0.9375rem] text-texto-suave">Confianza: sin calcular</span>;
+  if (!confianza) return <span className="text-[0.9375rem] text-muted-foreground">Confianza: sin calcular</span>;
   return (
-    <span className={`self-start rounded-full border-[1.5px] px-2.5 py-0.5 text-[0.9375rem] font-bold ${ESTILO[confianza]}`}>
+    <span className={`self-start rounded-full border-[1.5px] px-2.5 py-0.5 text-[0.9375rem] font-semibold ${ESTILO[confianza]}`}>
       Confianza {confianza}
     </span>
   );

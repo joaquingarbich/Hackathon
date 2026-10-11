@@ -243,7 +243,7 @@ export const TEXTO_LIMITE = "Hiciste muchas consultas seguidas. Espera unos minu
 // Verificación centrada en el dato (celular, Yape/Plin, cuenta, placa, nombre).
 export const TEXTO_VERIFICAR = {
   titulo: "Verifica antes de pagar o subir",
-  placeholder: "Nombre, RUC, celular/Yape o placa",
+  placeholder: "RUC, celular, placa o nombre",
   chip: { ruc: "Buscando RUC…", celular: "Buscando celular / WhatsApp / Yape / Plin…", banco: "Buscando cuenta bancaria…", placa: "Buscando placa…", nombre: "Buscando nombre de empresa…" } as Record<string, string>,
   canalDe: { celular: "Este número", banco: "Esta cuenta" } as Record<string, string>,
   perteneceA: (que: string, n: number) => `${que} pertenece a ${n === 1 ? "esta empresa registrada" : "estas empresas registradas"}`,

@@ -24,9 +24,9 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/admin/servic
   const itinerario = (s.itinerario ?? []) as { titulo: string; detalle: string }[];
   return (
     <Pagina>
-      <Link href="/admin" className="flex min-h-11 items-center self-start font-bold">← Panel</Link>
-      <h1 className="text-[1.75rem] font-extrabold">{s.nombre}</h1>
-      <p className="text-texto-suave">De <Link href={`/prestador/${p?.id}`}>{p?.nombre_comercial ?? p?.razon_social}</Link> · RUC {p?.ruc} · estado {s.estado}{s.motivo && ` · ${s.motivo}`}</p>
+      <Link href="/admin" className="inline-flex min-h-11 items-center gap-1.5 self-start font-medium text-muted-foreground no-underline hover:text-foreground">← Panel</Link>
+      <h1 className="text-[1.75rem] leading-[1.1] font-bold">{s.nombre}</h1>
+      <p className="text-muted-foreground">De <Link href={`/prestador/${p?.id}`}>{p?.nombre_comercial ?? p?.razon_social}</Link> · RUC {p?.ruc} · estado {s.estado}{s.motivo && ` · ${s.motivo}`}</p>
       <Datos titulo="Ficha" filas={[
         ["Categoría", CATEGORIAS.find((c) => c.id === s.categoria)?.nombre], ["Destino", DESTINOS.find((d) => d.id === s.destino)?.nombre],
         ["Descripción", s.descripcion], ["Duración", s.duracion], ["Horarios", s.salidas], ["Temporada", s.temporada],

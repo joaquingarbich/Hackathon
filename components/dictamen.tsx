@@ -1,9 +1,10 @@
-// Vista del dictamen (C03/C04/C05): sello (estado + fuente + corte) → advertencias → datos → fuentes → consejos.
+// Vista del dictamen: sello (estado + fuente + corte) → advertencias → contenido → consejos → fuentes.
 import type { ReactNode } from "react";
-import { OctagonAlert, TriangleAlert, FlaskConical } from "lucide-react";
-import { Plegable, Sello, Tarjeta } from "@/components/ui";
+import { FlaskConical, Lightbulb, OctagonAlert, TriangleAlert, ImageIcon } from "lucide-react";
+import { Plegable, Sello, Skeleton, Tarjeta } from "@/components/ui";
 import { CONSEJO, TEXTO_ESTADO, type Estado } from "@/config/textos";
 import { fechaLegible, type Advertencia } from "@/lib/dictamen";
+import { cn } from "@/lib/utils";
 
 type Fuente = { id: string; nombre: string; url: string | null; fecha_corte: string };
 
@@ -16,6 +17,11 @@ function siglas(f: Fuente) {
   if (t.includes("validacion")) return "Validación CheckTur";
   if (t.includes("muestra")) return "Datos de muestra";
   return f.nombre;
+}
+
+/** Título de sección dentro de la ficha. */
+export function TituloSeccion({ id, children, className }: { id?: string; children: ReactNode; className?: string }) {
+  return <h2 id={id} className={cn("text-[1.1875rem] font-semibold tracking-tight", className)}>{children}</h2>;
 }
 
 export function VistaDictamen({
@@ -37,37 +43,42 @@ export function VistaDictamen({
       <Sello estado={estado} resumen={resumen} fuentes={nombresFuentes} corte={corte && fechaLegible(corte)} />
 
       {muestra && (
-        <p className="flex items-center gap-2 rounded-control bg-relleno px-3 py-2 text-[0.9375rem] text-texto-suave">
+        <p className="flex items-center gap-2 self-start rounded-full bg-muted px-3 py-1.5 text-[0.8125rem] font-medium text-muted-foreground">
           <FlaskConical aria-hidden className="size-4 shrink-0" />
-          Datos de muestra ficticios, solo para demostración.
+          Datos de muestra ficticios, solo para demostración
         </p>
       )}
 
       {advertencias.length > 0 && (
-        <Tarjeta aria-labelledby="t-adv">
-          <h2 id="t-adv" className="mb-2.5 text-[1.375rem] font-bold">Lo que debes saber</h2>
-          <ul className="flex flex-col gap-2.5">
-            {advertencias.map((a) => (
-              <li key={a.texto} className={`flex gap-2 ${a.nivel === "alerta" ? "text-alerta" : "text-observaciones"}`}>
-                {a.nivel === "alerta"
-                  ? <OctagonAlert aria-label="Alerta" className="mt-0.5 size-5 shrink-0" />
-                  : <TriangleAlert aria-label="Observación" className="mt-0.5 size-5 shrink-0" />}
-                <span>{a.texto}</span>
-              </li>
-            ))}
+        <Tarjeta aria-labelledby="t-adv" className="flex flex-col gap-3">
+          <TituloSeccion id="t-adv">Lo que debes saber</TituloSeccion>
+          <ul className="flex flex-col gap-2">
+            {advertencias.map((a) => {
+              const alerta = a.nivel === "alerta";
+              return (
+                <li key={a.texto} className={cn("flex gap-3 rounded-xl px-3.5 py-3", alerta ? "bg-alerta-fondo text-alerta" : "bg-observaciones-fondo text-observaciones")}>
+                  {alerta
+                    ? <OctagonAlert aria-label="Alerta" className="mt-0.5 size-5 shrink-0" />
+                    : <TriangleAlert aria-label="Observación" className="mt-0.5 size-5 shrink-0" />}
+                  <span className="font-medium">{a.texto}</span>
+                </li>
+              );
+            })}
           </ul>
         </Tarjeta>
       )}
 
       {anuncio.length > 0 && (
-        <Tarjeta aria-labelledby="t-anuncio" className="border-observaciones-borde">
-          <h2 id="t-anuncio" className="text-[1.375rem] font-bold">Sobre el anuncio que consultaste</h2>
-          <p className="mb-2.5 text-[0.9375rem] text-texto-suave">Esto se refiere a la imagen que subiste, no al registro oficial.</p>
-          <ul className="flex flex-col gap-2.5">
+        <Tarjeta aria-labelledby="t-anuncio" className="flex flex-col gap-3 border-observaciones-borde/40">
+          <div className="flex flex-col gap-1">
+            <TituloSeccion id="t-anuncio" className="flex items-center gap-2"><ImageIcon aria-hidden className="size-5 text-muted-foreground" />Sobre el anuncio que consultaste</TituloSeccion>
+            <p className="text-[0.875rem] text-muted-foreground">Se refiere a la imagen que subiste, no al registro oficial.</p>
+          </div>
+          <ul className="flex flex-col gap-2">
             {anuncio.map((t) => (
-              <li key={t} className="flex gap-2 text-observaciones">
+              <li key={t} className="flex gap-3 rounded-xl bg-observaciones-fondo px-3.5 py-3 text-observaciones">
                 <TriangleAlert aria-label="Observación" className="mt-0.5 size-5 shrink-0" />
-                <span>{t}</span>
+                <span className="font-medium">{t}</span>
               </li>
             ))}
           </ul>
@@ -76,19 +87,21 @@ export function VistaDictamen({
 
       {children}
 
-      <Tarjeta aria-labelledby="t-antes">
-        <h2 id="t-antes" className="mb-2 text-[1.375rem] font-bold">Antes de contratar</h2>
-        <ul className="flex list-disc flex-col gap-1.5 pl-5 text-texto-suave">
-          {[...consejos, CONSEJO.ambulatorio].map((c) => <li key={c}>{c}</li>)}
+      <Tarjeta aria-labelledby="t-antes" className="flex flex-col gap-3 bg-secondary/60 shadow-none">
+        <TituloSeccion id="t-antes" className="flex items-center gap-2"><Lightbulb aria-hidden className="size-5 text-primary" />Antes de contratar</TituloSeccion>
+        <ul className="flex flex-col gap-2">
+          {[...consejos, CONSEJO.ambulatorio].map((c) => (
+            <li key={c} className="flex gap-2.5 text-[0.9375rem]"><span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />{c}</li>
+          ))}
         </ul>
       </Tarjeta>
 
       <Plegable titulo="Fuentes y fechas de corte">
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col gap-2">
           {fuentes.map((f) => (
-            <li key={f.id}>
-              {f.url ? <a href={f.url} target="_blank" rel="noreferrer">{f.nombre}</a> : f.nombre}
-              {" · corte "}<span className="font-mono">{fechaLegible(f.fecha_corte)}</span>
+            <li key={f.id} className="flex flex-wrap justify-between gap-x-3">
+              {f.url ? <a href={f.url} target="_blank" rel="noreferrer">{f.nombre}</a> : <span className="text-foreground">{f.nombre}</span>}
+              <span>corte <span className="font-mono tabular-nums">{fechaLegible(f.fecha_corte)}</span></span>
             </li>
           ))}
         </ul>
@@ -97,18 +110,18 @@ export function VistaDictamen({
   );
 }
 
-/** Lista de datos etiqueta → valor (etiqueta encima); omite los vacíos. */
+/** Lista de datos etiqueta → valor; omite los vacíos. */
 export function Datos({ titulo, filas }: { titulo: string; filas: [string, ReactNode][] }) {
   const visibles = filas.filter(([, v]) => v !== null && v !== undefined && v !== "");
   if (!visibles.length) return null;
   return (
     <section className="flex flex-col gap-2.5">
-      <h2 className="text-[1.375rem] font-bold">{titulo}</h2>
-      <dl className="overflow-hidden rounded-tarjeta border border-separador bg-superficie">
+      <TituloSeccion>{titulo}</TituloSeccion>
+      <dl className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-suave">
         {visibles.map(([k, v]) => (
-          <div key={k} className="flex flex-col gap-0.5 border-b border-separador px-4 py-3 last:border-0">
-            <dt className="text-[0.9375rem] text-texto-suave">{k}</dt>
-            <dd className="break-words text-[1.0625rem]">{v}</dd>
+          <div key={k} className="grid gap-0.5 px-4 py-3 sm:grid-cols-[12rem_1fr] sm:gap-4">
+            <dt className="text-[0.875rem] text-muted-foreground">{k}</dt>
+            <dd className="break-words">{v}</dd>
           </div>
         ))}
       </dl>
@@ -117,15 +130,23 @@ export function Datos({ titulo, filas }: { titulo: string; filas: [string, React
 }
 
 /** Cabecera del dictamen: nombre grande + tipo. */
-export function CabeceraDictamen({ titulo, detalle }: { titulo: ReactNode; detalle?: ReactNode }) {
+export function CabeceraDictamen({ titulo, detalle, eyebrow }: { titulo: ReactNode; detalle?: ReactNode; eyebrow?: ReactNode }) {
   return (
-    <div className="flex flex-col gap-1">
-      <h1 className="text-[2.125rem] leading-[1.05] font-extrabold">{titulo}</h1>
-      {detalle && <p className="text-[1.0625rem] text-texto-suave">{detalle}</p>}
-    </div>
+    <header className="flex flex-col gap-1.5">
+      {eyebrow && <span className="text-[0.8125rem] font-semibold tracking-wide text-enlace uppercase">{eyebrow}</span>}
+      <h1 className="text-[1.875rem] leading-[1.1] font-bold break-words sm:text-[2.25rem]">{titulo}</h1>
+      {detalle && <p className="text-[1.0625rem] text-muted-foreground">{detalle}</p>}
+    </header>
   );
 }
 
+/** Esqueleto del resultado: algo aparece al instante mientras se consultan los registros. */
 export const Cargando = () => (
-  <div className="mx-auto w-full max-w-2xl px-4 py-6"><p className="text-texto-suave" role="status">Consultando registros…</p></div>
+  <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-6 sm:px-6 sm:py-10" role="status" aria-live="polite">
+    <span className="sr-only">Consultando registros…</span>
+    <Skeleton className="h-9 w-2/3 rounded-xl" />
+    <Skeleton className="h-5 w-1/3 rounded-lg" />
+    <Skeleton className="h-52 rounded-3xl" />
+    <Skeleton className="h-28 rounded-2xl" />
+  </div>
 );

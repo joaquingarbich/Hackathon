@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
-import { Cargando } from "@/components/dictamen";
-import { ChipProceso, InsigniaEstado, Mono, Pagina, Tarjeta } from "@/components/ui";
+import { Building2, ChevronRight, Eye, FileText, Lightbulb, LogOut, ShieldCheck, Upload } from "lucide-react";
+import { Cargando, TituloSeccion } from "@/components/dictamen";
+import { Alert, AlertDescription, Button, ChipProceso, Encabezado, InsigniaEstado, Mono, Pagina, Tarjeta } from "@/components/ui";
 import { TEXTO_OPERADOR, TIPO_DOCUMENTO, type Estado } from "@/config/textos";
 import { exigirUsuario } from "@/lib/sesion";
 import { cargarPrestador, hoyLima } from "@/lib/consultas";
@@ -13,7 +14,7 @@ import { FormularioSolicitud } from "./formulario";
 import { misProveedores } from "@/lib/agencia";
 import { NOMBRE_TIPO, TEXTO_AGENCIA } from "@/config/textos";
 
-// P05 Inicio del proveedor + P07 Documentos (una sola página: aún no hay Unidades ni Perfil, ver PENDIENTE.md).
+// Inicio de la empresa: lo que ve el turista, sus agencias y los documentos enviados.
 export default function Operador() {
   return (
     <Suspense fallback={<Cargando />}>
@@ -45,63 +46,83 @@ async function Panel() {
 
   return (
     <Pagina>
-      <div className="flex flex-wrap items-center justify-between gap-3 text-[0.9375rem] text-texto-suave">
-        <span className="truncate">{u.email}</span>
-        <div className="flex shrink-0 items-center gap-3">
-          {u.esAdmin && <Link className="font-bold text-texto" href="/admin">Panel de validación</Link>}
-          <form action={salir}><button className="min-h-11 cursor-pointer underline">Salir</button></form>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-2 text-[0.9375rem] shadow-suave">
+        <span className="min-w-0 truncate text-muted-foreground">{u.email}</span>
+        <div className="flex shrink-0 items-center gap-1">
+          {u.esAdmin && <Link className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 font-semibold no-underline hover:bg-muted" href="/admin"><ShieldCheck aria-hidden className="size-4" /> Panel de validación</Link>}
+          <form action={salir}><Button variant="ghost" size="sm"><LogOut aria-hidden /> Salir</Button></form>
         </div>
       </div>
 
+      <Encabezado eyebrow="Para empresas" titulo="Tu panel" bajada={TEXTO_OPERADOR.ayudaPanel} />
+
       {ruc && estado && (
-        <Tarjeta className="flex flex-col gap-2 p-5">
-          <span className="text-[0.9375rem] text-texto-suave">RUC <Mono className="font-semibold text-texto">{ruc}</Mono></span>
-          <h2 className="font-base text-lg font-bold tracking-normal">Lo que ve hoy un turista</h2>
-          <InsigniaEstado estado={estado} />
-          {estado === "no_encontrado" && <p className="text-[0.9375rem] text-texto-suave">Sube tu constancia para pasar a «En proceso de actualización».</p>}
+        <Tarjeta className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <TituloSeccion className="flex items-center gap-2"><Eye aria-hidden className="size-5 text-primary" />Lo que ve hoy un turista</TituloSeccion>
+            <span className="text-[0.875rem] text-muted-foreground">RUC <Mono className="font-semibold text-foreground">{ruc}</Mono></span>
+          </div>
+          <InsigniaEstado estado={estado} className="text-[0.9375rem]" />
+          {estado === "no_encontrado" && <p className="text-[0.9375rem] text-muted-foreground">Sube tu constancia para pasar a «En proceso de actualización».</p>}
         </Tarjeta>
       )}
 
-      <Tarjeta className="flex flex-col gap-2 p-5">
-        <h2 className="text-[1.375rem] font-bold">{TEXTO_AGENCIA.tuAgencia}</h2>
-        {!agencias.length && <p className="text-[0.9375rem] text-texto-suave">{TEXTO_AGENCIA.sinAgencia}</p>}
-        {agencias.map((a) => (
-          <Link key={a.id} href={`/operador/agencia/${a.id}`} className="flex min-h-11 flex-col justify-center font-bold">
-            {a.nombre_comercial ?? a.razon_social} → perfil y servicios
-            <span className="text-[0.9375rem] font-normal text-texto-suave">{NOMBRE_TIPO[a.tipo]} · RUC {a.ruc}</span>
-          </Link>
-        ))}
-      </Tarjeta>
-
-      <div className="flex flex-col gap-2">
-        <h1 className="text-[2.125rem] leading-[1.05] font-extrabold">Documentos</h1>
-        <p className="text-texto-suave">{TEXTO_OPERADOR.ayudaPanel}</p>
-      </div>
-
-      {!!solicitudes?.length && (
-        <section aria-label="Documentos enviados" className="overflow-hidden rounded-tarjeta border border-separador bg-superficie">
-          {solicitudes.map((s) => (
-            <div key={s.id} className="flex flex-col gap-1.5 border-b border-separador p-4 last:border-0">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <b>{TIPO_DOCUMENTO[s.tipo_documento]}</b>
-                <ChipProceso tipo={CHIP[s.estado as keyof typeof CHIP] ?? "revision"} />
-              </div>
-              <p className="text-[0.9375rem] text-texto-suave">RUC <Mono>{s.ruc}</Mono> · enviada el <Mono>{fechaLegible(s.created_at.slice(0, 10))}</Mono></p>
-              {s.estado === "aprobado" && s.vence_el && <p className="text-[0.9375rem]">Visible como «En proceso de actualización» hasta el <Mono>{fechaLegible(s.vence_el)}</Mono>.</p>}
-              {s.estado === "rechazado" && s.motivo && <p className="text-[0.9375rem] text-observaciones">{s.motivo}</p>}
-            </div>
+      <section aria-labelledby="t-agencias" className="flex flex-col gap-3">
+        <TituloSeccion id="t-agencias">{TEXTO_AGENCIA.tuAgencia}</TituloSeccion>
+        {!agencias.length && (
+          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-input/60 bg-card px-6 py-8 text-center">
+            <Building2 aria-hidden className="size-8 text-muted-foreground" />
+            <p className="text-[0.9375rem] text-muted-foreground">{TEXTO_AGENCIA.sinAgencia}</p>
+          </div>
+        )}
+        <ul className="flex flex-col gap-2">
+          {agencias.map((a) => (
+            <li key={a.id}>
+              <Link href={`/operador/agencia/${a.id}`} className="pulsable elevable flex items-center gap-4 rounded-2xl border border-border bg-card p-4 text-foreground no-underline shadow-suave">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground"><Building2 aria-hidden className="size-6" /></span>
+                <span className="flex min-w-0 flex-col">
+                  <b className="font-semibold">{a.nombre_comercial ?? a.razon_social}</b>
+                  <span className="text-[0.875rem] text-muted-foreground">{NOMBRE_TIPO[a.tipo]} · RUC <Mono>{a.ruc}</Mono> · perfil, canales, vehículos y personal</span>
+                </span>
+                <ChevronRight aria-hidden className="ml-auto size-5 shrink-0 text-muted-foreground" />
+              </Link>
+            </li>
           ))}
-        </section>
-      )}
+        </ul>
+      </section>
 
-      <Tarjeta className="flex flex-col gap-3 p-5">
-        <h2 className="text-[1.375rem] font-bold">Subir un documento</h2>
+      <section aria-labelledby="t-docs" className="flex flex-col gap-3">
+        <TituloSeccion id="t-docs">Documentos enviados</TituloSeccion>
+        {!solicitudes?.length && <p className="text-[0.9375rem] text-muted-foreground">Aún no enviaste documentos.</p>}
+        {!!solicitudes?.length && (
+          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-suave">
+            {solicitudes.map((s) => (
+              <li key={s.id} className="flex gap-3 p-4">
+                <FileText aria-hidden className="mt-0.5 size-5 shrink-0 text-muted-foreground" />
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <b className="font-semibold">{TIPO_DOCUMENTO[s.tipo_documento]}</b>
+                    <ChipProceso tipo={CHIP[s.estado as keyof typeof CHIP] ?? "revision"} />
+                  </div>
+                  <p className="text-[0.875rem] text-muted-foreground">RUC <Mono>{s.ruc}</Mono> · enviada el <Mono>{fechaLegible(s.created_at.slice(0, 10))}</Mono></p>
+                  {s.estado === "aprobado" && s.vence_el && <p className="text-[0.9375rem]">Visible como «En proceso de actualización» hasta el <Mono>{fechaLegible(s.vence_el)}</Mono>.</p>}
+                  {s.estado === "rechazado" && s.motivo && <p className="rounded-lg bg-observaciones-fondo px-3 py-2 text-[0.9375rem] text-observaciones">{s.motivo}</p>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <Tarjeta aria-labelledby="t-subir" className="flex flex-col gap-4">
+        <TituloSeccion id="t-subir" className="flex items-center gap-2"><Upload aria-hidden className="size-5 text-primary" />Subir un documento</TituloSeccion>
         <FormularioSolicitud usuarioId={u.id} />
-        <p className="text-[0.9375rem] text-texto-suave">{TEXTO_OPERADOR.privacidad}</p>
+        <p className="text-[0.875rem] text-muted-foreground">{TEXTO_OPERADOR.privacidad}</p>
       </Tarjeta>
-      <Tarjeta className="bg-relleno text-[0.9375rem]">
-        <b>Para que se valide más rápido:</b> mejor el PDF con firma digital. Si es foto: completa, nítida y con el número legible.
-      </Tarjeta>
+      <Alert variant="info">
+        <Lightbulb aria-hidden />
+        <AlertDescription><b>Para que se valide más rápido:</b> mejor el PDF con firma digital. Si es foto: completa, nítida y con el número legible.</AlertDescription>
+      </Alert>
     </Pagina>
   );
 }

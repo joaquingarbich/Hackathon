@@ -41,8 +41,8 @@ lib/vision/           extract(file, tipo) → JSON con certeza por campo. Hoy: g
 lib/checks/           una función por capa de verificación (2–8). Devuelven {capa, ok, detalle}
 lib/dictamen.ts       entidad + ruc_status + vehículos + submissions → {estado, advertencias, fuentes}
 scripts/load-*.ts     un loader por fuente → tablas normalizadas
-app/globals.css       design tokens "Sello" v0.2 (@theme, claro/oscuro). Componentes solo usan tokens semánticos
-components/ui.tsx     Sello, InsigniaEstado, ChipProceso, Boton, Campo, Tarjeta, Plegable, BarraAccion (vitrina en /estilos)
+app/globals.css       design tokens «Claro» v1 (marca #056CF2, claro/oscuro, curvas de animación). Solo tokens semánticos
+components/ui/        primitivas shadcn/ui adaptadas + index.tsx (Sello, InsigniaEstado, Campo, Tarjeta, Plegable, Aviso…; vitrina en /estilos)
 lib/catalogo.ts       lecturas del catálogo + respaldo si falta la tabla services (docs/CATALOGO.md)
 supabase/migrations/  único lugar donde cambia el esquema
 ```
@@ -67,10 +67,10 @@ supabase/migrations/  único lugar donde cambia el esquema
 
 ## 7. Diseño
 
-**Sistema "Sello" v0.2** (mockups de Claude Design en `docs/disenos/`, detalle en `docs/DISENO.md`). Móvil primero; tinta para la interfaz, color solo para el estado.
-- Portada = catálogo (destinos, mejor valorados, buscador). Verificar = pestaña aparte con campo + foto o captura.
-- Dictamen: **sello** arriba (color + ícono + palabra + fuente + corte); debajo datos, autorizaciones, advertencias y fuentes; "Opiniones de usuarios" separado y en neutro.
-- Sin logos del Estado ni distintivo MINCETUR. Wordmark "CheckTur Piura" con check en cuadro de tinta.
+**Sistema «Claro» v1** (detalle en `docs/DISENO.md`; reemplaza a «Sello» v0.2, cuyos mockups quedan en `docs/disenos/`). Móvil primero; blancos fríos, azul de marca #056CF2 para acciones, paleta propia para los estados (En proceso = violeta). Componentes shadcn/ui adaptados.
+- Portada = verificar (buscador único con chip del tipo detectado, Escanear QR, Verificar con foto, casos de uso); el directorio por destino va al final.
+- Dictamen: **sello** arriba (color + ícono + palabra + fuente + corte); debajo identidad, canales oficiales, acciones (WhatsApp oficial fijo abajo en móvil, compartir, reportar) y documentos plegados.
+- Sin logos del Estado ni distintivo MINCETUR. Wordmark «CheckTur Piura» con escudo en cuadro azul.
 
 ## 8. Fases (cada una demostrable)
 

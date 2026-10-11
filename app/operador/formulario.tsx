@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload } from "lucide-react";
-import { Boton, Campo, claseControl } from "@/components/ui";
+import { Aviso, Boton, Campo, Label, NativeSelect } from "@/components/ui";
 import { TIPO_DOCUMENTO } from "@/config/textos";
 import { supabaseNavegador } from "@/lib/supabase/client";
 import { enviarSolicitud } from "./acciones";
@@ -41,22 +41,22 @@ export function FormularioSolicitud({ usuarioId }: { usuarioId: string }) {
   }
 
   return (
-    <form onSubmit={enviar} className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="tipo" className="text-[0.9375rem] font-bold">Documento</label>
-        <select id="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)} className={claseControl}>
+    <form onSubmit={enviar} className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="tipo">Documento</Label>
+        <NativeSelect id="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)}>
           {Object.entries(TIPO_DOCUMENTO).map(([v, t]) => <option key={v} value={v}>{t}</option>)}
-        </select>
+        </NativeSelect>
       </div>
       <Campo id="ruc" name="ruc" etiqueta="RUC de la empresa" inputMode="numeric" maxLength={11} required />
       <Campo id="nombre_comercial" name="nombre_comercial" etiqueta="Nombre comercial" maxLength={120} />
       {tipo === "tuc" && <Campo id="placa" name="placa" etiqueta="Placa de la unidad" ayuda="Ej.: ABC-123" maxLength={7} required />}
       <Campo id="telefono" name="telefono" type="tel" etiqueta="Teléfono de contacto" maxLength={20} />
       <Campo id="archivo" name="archivo" type="file" etiqueta="Archivo (PDF o foto, máx. 10 MB)" accept="application/pdf,image/jpeg,image/png,image/webp" required />
-      {estado.error && <p role="alert" className="text-alerta">{estado.error}</p>}
-      {estado.ok && <p role="status" className="text-verificado">Documento enviado. Un revisor lo validará y verás el resultado aquí.</p>}
+      {estado.error && <Aviso tipo="error">{estado.error}</Aviso>}
+      {estado.ok && <Aviso tipo="ok">Documento enviado. Un revisor lo validará y verás el resultado aquí.</Aviso>}
       <Boton type="submit" disabled={estado.cargando}>
-        <Upload aria-hidden className="size-5" />
+        <Upload aria-hidden className="size-5 accent-primary" />
         {estado.cargando ? "Enviando…" : "Enviar para validación"}
       </Boton>
     </form>

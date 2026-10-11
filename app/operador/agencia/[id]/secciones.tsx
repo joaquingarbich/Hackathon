@@ -1,6 +1,7 @@
 // Panel de la empresa: lo que el turista puede verificar. Altas en revisión hasta que el admin aprueba.
-import { CalendarClock, OctagonAlert } from "lucide-react";
-import { Campo, ChipProceso, Mono, Tarjeta, claseBoton, claseControl } from "@/components/ui";
+import { BusFront, CalendarClock, Check, MapPin, OctagonAlert, UserRound, Wallet } from "lucide-react";
+import { Button, Campo, ChipProceso, Label, Mono, NativeSelect, Tarjeta } from "@/components/ui";
+import { cn } from "@/lib/utils";
 import { DESTINOS, NOMBRE_CANAL, TEXTO_FICHA } from "@/config/textos";
 import { TIPOS_CANAL } from "@/lib/canales";
 import { fechaLegible, vencimientos } from "@/lib/dictamen";
@@ -9,9 +10,9 @@ import { FormularioAlta } from "./formulario-alta";
 
 const CHIP = { pendiente: "revision", aprobado: "aprobado", rechazado: "corregir" } as const;
 const Chip = ({ estado }: { estado: string }) => <ChipProceso tipo={CHIP[estado as keyof typeof CHIP] ?? "revision"} texto={{ pendiente: "En revisión", aprobado: "Aprobado", rechazado: "Por corregir" }[estado]} />;
-const titulo = "text-[1.375rem] font-bold";
-const lista = "overflow-hidden rounded-tarjeta border border-separador bg-superficie";
-const fila = "flex flex-col gap-1 border-b border-separador p-4 last:border-0";
+const titulo = "text-[1.1875rem] font-semibold tracking-tight";
+const lista = "divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-suave";
+const fila = "flex flex-col gap-1.5 p-4";
 
 type Datos = {
   providerId: string; hoy: string; destinos: string[];
@@ -22,7 +23,7 @@ type Datos = {
 };
 
 const Retirar = ({ providerId, que, id }: { providerId: string; que: "canales" | "vehiculos" | "personal"; id: string }) => (
-  <form action={retirar.bind(null, providerId, que, id)}><button className="min-h-11 cursor-pointer text-[0.9375rem] text-texto-suave underline">Retirar</button></form>
+  <form action={retirar.bind(null, providerId, que, id)} className="-ml-3"><Button variant="ghost" size="sm" className="text-muted-foreground">Retirar</Button></form>
 );
 
 export function Vencimientos({ hoy, vehiculos, personal, autorizaciones }: Pick<Datos, "hoy" | "vehiculos" | "personal" | "autorizaciones">) {
@@ -36,14 +37,14 @@ export function Vencimientos({ hoy, vehiculos, personal, autorizaciones }: Pick<
   ], hoy);
   if (!v.length) return null;
   return (
-    <Tarjeta aria-labelledby="t-venc" className="flex flex-col gap-2 border-observaciones-borde p-5">
-      <h2 id="t-venc" className={titulo}>Documentos vencidos o por vencer</h2>
-      <p className="text-[0.9375rem] text-texto-suave">Mientras algo esté vencido, tu ficha muestra «Con observaciones» a los turistas.</p>
-      <ul className="flex flex-col gap-1.5">
+    <Tarjeta aria-labelledby="t-venc" className="flex flex-col gap-3 border-observaciones-borde/40 bg-observaciones-fondo/60">
+      <h2 id="t-venc" className={cn(titulo, "flex items-center gap-2 text-observaciones")}><CalendarClock aria-hidden className="size-5" />Documentos vencidos o por vencer</h2>
+      <p className="text-[0.9375rem] text-foreground/80">Mientras algo esté vencido, tu ficha muestra «Con observaciones» a los turistas.</p>
+      <ul className="flex flex-col gap-2">
         {v.map((x) => (
-          <li key={x.que} className={`flex items-center gap-2 font-semibold ${x.estado === "vencido" ? "text-alerta" : "text-observaciones"}`}>
+          <li key={x.que} className={cn("flex items-center gap-2.5 rounded-xl bg-card px-3.5 py-2.5 font-medium shadow-suave", x.estado === "vencido" ? "text-alerta" : "text-observaciones")}>
             {x.estado === "vencido" ? <OctagonAlert aria-hidden className="size-5 shrink-0" /> : <CalendarClock aria-hidden className="size-5 shrink-0" />}
-            <span>{x.que}: {x.estado === "vencido" ? "venció" : "vence"} el <Mono>{fechaLegible(x.fecha)}</Mono></span>
+            <span className="flex-1">{x.que}</span><span className="text-[0.875rem] font-semibold whitespace-nowrap">{x.estado === "vencido" ? "Venció" : "Vence"} <Mono>{fechaLegible(x.fecha)}</Mono></span>
           </li>
         ))}
       </ul>
@@ -54,39 +55,42 @@ export function Vencimientos({ hoy, vehiculos, personal, autorizaciones }: Pick<
 export function SeccionesVerificables({ providerId, destinos, canales, vehiculos, personal }: Datos) {
   return (
     <>
-      <section id="destinos" className="flex flex-col gap-2">
-        <h2 className={titulo}>{TEXTO_FICHA.destinos}</h2>
-        <form action={guardarDestinos.bind(null, providerId)} className="flex flex-col gap-2">
-          <fieldset className="flex flex-wrap gap-x-5 gap-y-1">
+      <section id="destinos" className="flex flex-col gap-3">
+        <h2 className={cn(titulo, "flex items-center gap-2")}><MapPin aria-hidden className="size-5 text-primary" />{TEXTO_FICHA.destinos}</h2>
+        <form action={guardarDestinos.bind(null, providerId)} className="flex flex-col gap-3">
+          <fieldset className="flex flex-wrap gap-2">
             <legend className="sr-only">Destinos</legend>
             {DESTINOS.map((d) => (
-              <label key={d.id} className="flex min-h-11 items-center gap-2"><input type="checkbox" name="destino" value={d.id} defaultChecked={destinos.includes(d.id)} className="size-5" />{d.nombre}</label>
+              <label key={d.id} className="pulsable group flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-border bg-card px-4 font-medium shadow-suave has-checked:border-primary has-checked:bg-secondary has-checked:text-secondary-foreground has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring">
+                <input type="checkbox" name="destino" value={d.id} defaultChecked={destinos.includes(d.id)} className="peer sr-only" />
+                <Check aria-hidden className="hidden size-4 peer-checked:block" strokeWidth={3} />{d.nombre}
+              </label>
             ))}
           </fieldset>
-          <button className={claseBoton("secundario", "self-start")}>Guardar destinos</button>
+          <Button type="submit" variant="outline" className="self-start">Guardar destinos</Button>
         </form>
       </section>
 
-      <section id="canales" className="flex flex-col gap-2">
-        <h2 className={titulo}>{TEXTO_FICHA.canales}</h2>
-        <p className="text-[0.9375rem] text-texto-suave">WhatsApp, Yape, Plin, cuentas y redes con los que cobras o atiendes. Los turistas podrán comprobar que son tuyos. Las cuentas se guardan sin mostrar el número completo.</p>
+      <section id="canales" className="flex flex-col gap-3">
+        <h2 className={cn(titulo, "flex items-center gap-2")}><Wallet aria-hidden className="size-5 text-primary" />{TEXTO_FICHA.canales}</h2>
+        <p className="text-[0.9375rem] text-muted-foreground">WhatsApp, Yape, Plin, cuentas y redes con los que cobras o atiendes. Los turistas podrán comprobar que son tuyos. Las cuentas se guardan sin mostrar el número completo.</p>
         {!!canales.length && (
           <ul className={lista}>
             {canales.map((c) => (
               <li key={c.id} className={fila}>
                 <div className="flex flex-wrap items-center justify-between gap-2"><b>{NOMBRE_CANAL[c.tipo]} · <Mono>{c.visible}</Mono></b><Chip estado={c.estado} /></div>
-                {c.estado === "rechazado" && c.motivo && <p className="text-[0.9375rem] text-observaciones">{c.motivo}</p>}
+                {c.estado === "rechazado" && c.motivo && <p className="rounded-lg bg-observaciones-fondo px-3 py-2 text-[0.9375rem] text-observaciones">{c.motivo}</p>}
                 <Retirar providerId={providerId} que="canales" id={c.id} />
               </li>
             ))}
           </ul>
         )}
-        <Tarjeta className="p-5">
+        <Tarjeta className="bg-muted/40 shadow-none">
           <FormularioAlta accion={crearCanal.bind(null, providerId)} boton="Agregar canal">
             <div className="grid gap-3 sm:grid-cols-[12rem_1fr_12rem]">
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="c-tipo" className="font-semibold">Tipo</label>
-                <select id="c-tipo" name="tipo" className={claseControl}>{TIPOS_CANAL.map((t) => <option key={t} value={t}>{NOMBRE_CANAL[t]}</option>)}</select>
+                <Label htmlFor="c-tipo">Tipo</Label>
+                <NativeSelect id="c-tipo" name="tipo">{TIPOS_CANAL.map((t) => <option key={t} value={t}>{NOMBRE_CANAL[t]}</option>)}</NativeSelect>
               </div>
               <Campo id="c-valor" name="valor" etiqueta="Número, cuenta, @usuario o web" required maxLength={80} />
               <Campo id="c-etiqueta" name="etiqueta" etiqueta="Banco (si es cuenta)" maxLength={30} />
@@ -95,23 +99,23 @@ export function SeccionesVerificables({ providerId, destinos, canales, vehiculos
         </Tarjeta>
       </section>
 
-      <section id="vehiculos" className="flex flex-col gap-2">
-        <h2 className={titulo}>{TEXTO_FICHA.vehiculos}</h2>
+      <section id="vehiculos" className="flex flex-col gap-3">
+        <h2 className={cn(titulo, "flex items-center gap-2")}><BusFront aria-hidden className="size-5 text-primary" />{TEXTO_FICHA.vehiculos}</h2>
         {!!vehiculos.length && (
           <ul className={lista}>
             {vehiculos.map((v) => (
               <li key={v.id} className={fila}>
-                <div className="flex flex-wrap items-center justify-between gap-2"><Mono className="font-bold">{v.placa.slice(0, 3)}-{v.placa.slice(3)}</Mono><Chip estado={v.aprobacion} /></div>
-                <span className="text-[0.9375rem] text-texto-suave">SOAT <Mono>{v.soat_vencimiento ? fechaLegible(v.soat_vencimiento) : "—"}</Mono> · Rev. técnica <Mono>{v.citv_vencimiento ? fechaLegible(v.citv_vencimiento) : "—"}</Mono></span>
-                {v.aprobacion === "rechazado" && v.motivo && <p className="text-[0.9375rem] text-observaciones">{v.motivo}</p>}
+                <div className="flex flex-wrap items-center justify-between gap-2"><Mono className="rounded-md border border-foreground/70 px-2 py-0.5 font-semibold">{v.placa.slice(0, 3)}-{v.placa.slice(3)}</Mono><Chip estado={v.aprobacion} /></div>
+                <span className="text-[0.9375rem] text-muted-foreground">SOAT <Mono>{v.soat_vencimiento ? fechaLegible(v.soat_vencimiento) : "—"}</Mono> · Rev. técnica <Mono>{v.citv_vencimiento ? fechaLegible(v.citv_vencimiento) : "—"}</Mono></span>
+                {v.aprobacion === "rechazado" && v.motivo && <p className="rounded-lg bg-observaciones-fondo px-3 py-2 text-[0.9375rem] text-observaciones">{v.motivo}</p>}
                 {v.source_id === "checktur_validacion"
                   ? <Retirar providerId={providerId} que="vehiculos" id={v.id} />
-                  : <span className="text-[0.875rem] text-texto-suave">Registrada en el padrón oficial: los cambios se hacen ante la autoridad que la habilitó.</span>}
+                  : <span className="text-[0.875rem] text-muted-foreground">Registrada en el padrón oficial: los cambios se hacen ante la autoridad que la habilitó.</span>}
               </li>
             ))}
           </ul>
         )}
-        <Tarjeta className="p-5">
+        <Tarjeta className="bg-muted/40 shadow-none">
           <FormularioAlta accion={crearVehiculo.bind(null, providerId)} boton="Agregar vehículo">
             <div className="grid gap-3 sm:grid-cols-3">
               <Campo id="v-placa" name="placa" etiqueta="Placa" placeholder="ABC-123" required maxLength={7} />
@@ -126,27 +130,27 @@ export function SeccionesVerificables({ providerId, destinos, canales, vehiculos
         </Tarjeta>
       </section>
 
-      <section id="personal" className="flex flex-col gap-2">
-        <h2 className={titulo}>{TEXTO_FICHA.personal}</h2>
+      <section id="personal" className="flex flex-col gap-3">
+        <h2 className={cn(titulo, "flex items-center gap-2")}><UserRound aria-hidden className="size-5 text-primary" />{TEXTO_FICHA.personal}</h2>
         {!!personal.length && (
           <ul className={lista}>
             {personal.map((x) => (
               <li key={x.id} className={fila}>
                 <div className="flex flex-wrap items-center justify-between gap-2"><b>{x.nombre} · {TEXTO_FICHA.rol[x.rol]}</b><Chip estado={x.estado} /></div>
-                <span className="text-[0.9375rem] text-texto-suave">DNI <Mono>•••••{x.dni_ultimos3}</Mono></span>
-                {x.estado === "rechazado" && x.motivo && <p className="text-[0.9375rem] text-observaciones">{x.motivo}</p>}
+                <span className="text-[0.9375rem] text-muted-foreground">DNI <Mono>•••••{x.dni_ultimos3}</Mono></span>
+                {x.estado === "rechazado" && x.motivo && <p className="rounded-lg bg-observaciones-fondo px-3 py-2 text-[0.9375rem] text-observaciones">{x.motivo}</p>}
                 <Retirar providerId={providerId} que="personal" id={x.id} />
               </li>
             ))}
           </ul>
         )}
-        <Tarjeta className="p-5">
+        <Tarjeta className="bg-muted/40 shadow-none">
           <FormularioAlta accion={crearPersonal.bind(null, providerId)} boton="Agregar persona">
             <div className="grid gap-3 sm:grid-cols-3">
               <Campo id="x-nombre" name="nombre" etiqueta="Nombre completo" required maxLength={80} />
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="x-rol" className="font-semibold">Rol</label>
-                <select id="x-rol" name="rol" className={claseControl}>{Object.entries(TEXTO_FICHA.rol).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
+                <Label htmlFor="x-rol">Rol</Label>
+                <NativeSelect id="x-rol" name="rol">{Object.entries(TEXTO_FICHA.rol).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</NativeSelect>
               </div>
               <Campo id="x-dni" name="dni_ultimos3" inputMode="numeric" etiqueta="DNI: solo los 3 últimos dígitos" required maxLength={3} />
               <Campo id="x-carne" name="carne_numero" etiqueta="Carné de guía (si aplica)" maxLength={30} />

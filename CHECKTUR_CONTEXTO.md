@@ -222,8 +222,8 @@ La extracción multimodal debe devolver JSON estricto y un nivel de certeza por 
 |---|---|---|
 | **Verificado** | Verde | Figura en un padrón oficial vigente y el RUC está activo y habido. En vehículos: placa habilitada para transporte turístico y habilitación no vencida. |
 | **Verificado con observaciones** | Ámbar | Figura, pero hay un hecho objetivo que el turista debe saber (ver advertencias). |
-| **En proceso de actualización** | Azul | No figura aún en el padrón oficial, pero presentó constancia y un administrador la validó (sección 4). |
-| **No encontrado** | Gris | No se halló coincidencia. Texto (voz del sistema "Sello" v0.2, sin "nosotros"): "Sin coincidencias en los registros oficiales con corte al [fecha]. No es una conclusión negativa". Incluir qué hacer: pedirle su RUC o constancia, consultar a iPerú. |
+| **En proceso de actualización** | Violeta (el azul es el color de marca) | No figura aún en el padrón oficial, pero presentó constancia y un administrador la validó (sección 4). |
+| **No encontrado** | Gris | No se halló coincidencia. Texto (voz del sistema de diseño, sin "nosotros"): "Sin coincidencias en los registros oficiales con corte al [fecha]. No es una conclusión negativa". Incluir qué hacer: pedirle su RUC o constancia, consultar a iPerú. |
 | **Alerta** | Rojo | Solo ante hechos objetivos de fuente oficial: RUC de baja, inscripción suspendida, habilitación vehicular vencida o cancelada. |
 
 ### Reglas de redacción (importantes)

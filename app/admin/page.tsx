@@ -54,19 +54,19 @@ async function Cola({ searchParams }: Pick<PageProps<"/admin">, "searchParams">)
   return (
     <Pagina>
       <div className="flex flex-col gap-1">
-        <h1 className="text-[2.125rem] leading-[1.05] font-extrabold">Panel de validación</h1>
-        <p className="text-texto-suave">Documentos, altas de canales, vehículos y personal, reportes de turistas y búsquedas sin resultado.</p>
+        <h1 className="text-[1.875rem] leading-[1.1] font-bold sm:text-[2.25rem]">Panel de validación</h1>
+        <p className="text-muted-foreground">Documentos, altas de canales, vehículos y personal, reportes de turistas y búsquedas sin resultado.</p>
       </div>
-      <h2 className="text-[1.375rem] font-bold">Documentos · pendientes {pendientes?.length ?? 0}</h2>
-      {!pendientes?.length && <p className="text-texto-suave">No hay documentos pendientes.</p>}
-      <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
+      <h2 className="text-[1.1875rem] font-semibold tracking-tight">Documentos · pendientes {pendientes?.length ?? 0}</h2>
+      {!pendientes?.length && <p className="text-muted-foreground">No hay documentos pendientes.</p>}
+      <ul className="overflow-hidden rounded-2xl border border-border bg-card empty:hidden">
         {pendientes?.map((s) => (
-          <li key={s.id} className="border-b border-separador last:border-0">
-            <Link href={`/admin/${s.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-relleno">
+          <li key={s.id} className="border-b border-border last:border-0">
+            <Link href={`/admin/${s.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-muted">
               <span className="flex flex-col gap-1">
                 <b className="text-lg">{(s.datos_declarados as { nombre_comercial?: string }).nombre_comercial ?? "Sin nombre"}</b>
-                <span className="text-[0.9375rem] text-texto-suave">{TIPO_DOCUMENTO[s.tipo_documento]} · RUC <Mono>{s.ruc}</Mono></span>
-                <span className="flex flex-wrap items-center gap-2 text-[0.9375rem] text-texto-suave">
+                <span className="text-[0.9375rem] text-muted-foreground">{TIPO_DOCUMENTO[s.tipo_documento]} · RUC <Mono>{s.ruc}</Mono></span>
+                <span className="flex flex-wrap items-center gap-2 text-[0.9375rem] text-muted-foreground">
                   <InsigniaConfianza confianza={s.confianza} /> <Mono>{fechaLegible(s.created_at.slice(0, 10))}</Mono>
                 </span>
               </span>
@@ -75,63 +75,63 @@ async function Cola({ searchParams }: Pick<PageProps<"/admin">, "searchParams">)
           </li>
         ))}
       </ul>
-      <h2 className="mt-2 text-[1.375rem] font-bold">Opiniones · por revisar {resenas?.length ?? 0}</h2>
-      {!resenas?.length && <p className="text-texto-suave">No hay opiniones pendientes ni reportadas.</p>}
-      <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
+      <h2 className="mt-2 text-[1.1875rem] font-semibold tracking-tight">Opiniones · por revisar {resenas?.length ?? 0}</h2>
+      {!resenas?.length && <p className="text-muted-foreground">No hay opiniones pendientes ni reportadas.</p>}
+      <ul className="overflow-hidden rounded-2xl border border-border bg-card empty:hidden">
         {resenas?.map((r) => (
-          <li key={r.id} className="border-b border-separador last:border-0">
-            <Link href={`/admin/resena/${r.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-relleno">
+          <li key={r.id} className="border-b border-border last:border-0">
+            <Link href={`/admin/resena/${r.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-muted">
               <span className="flex flex-col gap-1">
                 <span className="flex flex-wrap items-center gap-2">
                   <b>{r.estrellas} de 5</b>
                   <ChipProceso tipo={r.estado === "reportada" ? "corregir" : "revision"} texto={r.estado === "reportada" ? "Reportada" : "Pendiente"} />
                 </span>
-                <span className="text-[0.9375rem] text-texto-suave">{r.comentario?.slice(0, 80) ?? "Sin comentario"} · <Mono>{fechaLegible(r.created_at.slice(0, 10))}</Mono></span>
+                <span className="text-[0.9375rem] text-muted-foreground">{r.comentario?.slice(0, 80) ?? "Sin comentario"} · <Mono>{fechaLegible(r.created_at.slice(0, 10))}</Mono></span>
               </span>
               <ChevronRight aria-hidden className="size-5 shrink-0" />
             </Link>
           </li>
         ))}
       </ul>
-      <h2 className="mt-2 text-[1.375rem] font-bold">Servicios · por publicar {servicios?.length ?? 0}</h2>
-      {!servicios?.length && <p className="text-texto-suave">No hay servicios pendientes.</p>}
-      <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
+      <h2 className="mt-2 text-[1.1875rem] font-semibold tracking-tight">Servicios · por publicar {servicios?.length ?? 0}</h2>
+      {!servicios?.length && <p className="text-muted-foreground">No hay servicios pendientes.</p>}
+      <ul className="overflow-hidden rounded-2xl border border-border bg-card empty:hidden">
         {servicios?.map((x) => (
-          <li key={x.id} className="border-b border-separador last:border-0">
-            <Link href={`/admin/servicio/${x.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-relleno">
-              <span className="flex flex-col gap-1"><b>{x.nombre}</b><span className="text-[0.9375rem] text-texto-suave">{nombreDe(x)} · <Mono>{fechaLegible(x.created_at.slice(0, 10))}</Mono></span></span>
+          <li key={x.id} className="border-b border-border last:border-0">
+            <Link href={`/admin/servicio/${x.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-muted">
+              <span className="flex flex-col gap-1"><b>{x.nombre}</b><span className="text-[0.9375rem] text-muted-foreground">{nombreDe(x)} · <Mono>{fechaLegible(x.created_at.slice(0, 10))}</Mono></span></span>
               <ChevronRight aria-hidden className="size-5 shrink-0" />
             </Link>
           </li>
         ))}
       </ul>
-      <h2 className="mt-2 text-[1.375rem] font-bold">Perfiles · cambios por aprobar {cambios?.length ?? 0}</h2>
-      {!cambios?.length && <p className="text-texto-suave">No hay cambios de perfil pendientes.</p>}
-      <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
+      <h2 className="mt-2 text-[1.1875rem] font-semibold tracking-tight">Perfiles · cambios por aprobar {cambios?.length ?? 0}</h2>
+      {!cambios?.length && <p className="text-muted-foreground">No hay cambios de perfil pendientes.</p>}
+      <ul className="overflow-hidden rounded-2xl border border-border bg-card empty:hidden">
         {cambios?.map((x) => (
-          <li key={x.id} className="border-b border-separador last:border-0">
-            <Link href={`/admin/cambio/${x.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-relleno">
-              <span className="flex flex-col gap-1"><b>{nombreDe(x)}</b><span className="text-[0.9375rem] text-texto-suave">Contacto, redes o presentación · <Mono>{fechaLegible(x.created_at.slice(0, 10))}</Mono></span></span>
+          <li key={x.id} className="border-b border-border last:border-0">
+            <Link href={`/admin/cambio/${x.id}`} className="flex items-center justify-between gap-3 p-4 no-underline hover:bg-muted">
+              <span className="flex flex-col gap-1"><b>{nombreDe(x)}</b><span className="text-[0.9375rem] text-muted-foreground">Contacto, redes o presentación · <Mono>{fechaLegible(x.created_at.slice(0, 10))}</Mono></span></span>
               <ChevronRight aria-hidden className="size-5 shrink-0" />
             </Link>
           </li>
         ))}
       </ul>
-      <h2 className="mt-2 text-[1.375rem] font-bold">Consultas · últimos 7 días {consultas?.length ?? 0}</h2>
+      <h2 className="mt-2 text-[1.1875rem] font-semibold tracking-tight">Consultas · últimos 7 días {consultas?.length ?? 0}</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {(["tipo_entrada", "estado_resultado"] as const).map((k) => (
           <Tarjeta key={k} className="p-4">
-            <h3 className="mb-2 font-bold">{k === "tipo_entrada" ? "Por tipo de búsqueda" : "Por resultado"}</h3>
+            <h3 className="mb-2 font-semibold">{k === "tipo_entrada" ? "Por tipo de búsqueda" : "Por resultado"}</h3>
             <ul className="flex flex-col gap-1 text-[0.9375rem]">
               {cuenta(k).map(([n, c]) => <li key={n} className="flex justify-between gap-3"><span>{n.replaceAll("_", " ")}</span><Mono>{c}</Mono></li>)}
-              {!consultas?.length && <li className="text-texto-suave">Sin consultas.</li>}
+              {!consultas?.length && <li className="text-muted-foreground">Sin consultas.</li>}
             </ul>
           </Tarjeta>
         ))}
       </div>
       <Fiscalizacion destino={DESTINOS.some((d) => d.id === sp.d) ? String(sp.d) : undefined} error={typeof sp.error === "string" ? sp.error : undefined} />
-      <p className="text-[0.875rem] text-texto-suave">Datos de muestra · empresas ficticias.</p>
-      <Link href="/operador" className="flex min-h-11 items-center self-start font-bold">← Volver</Link>
+      <p className="text-[0.875rem] text-muted-foreground">Datos de muestra · empresas ficticias.</p>
+      <Link href="/operador" className="inline-flex min-h-11 items-center gap-1.5 self-start font-medium text-muted-foreground no-underline hover:text-foreground">← Volver</Link>
     </Pagina>
   );
 }

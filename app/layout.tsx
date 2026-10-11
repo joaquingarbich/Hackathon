@@ -1,14 +1,13 @@
 import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible, Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { TEXTO_APP } from "@/config/textos";
 import { BarraPestanas, Cabecera, CabeceraBase, Pie } from "@/components/navegacion";
 import "./globals.css";
 
-// Cambiar tipografías aquí; los tokens --font-titulo / --font-base / --font-mono las toman de estas variables.
-const titulo = Bricolage_Grotesque({ variable: "--fuente-titulo", subsets: ["latin"], weight: ["500", "700", "800"] });
-const base = Atkinson_Hyperlegible({ variable: "--fuente-base", subsets: ["latin"], weight: ["400", "700"] });
-const mono = JetBrains_Mono({ variable: "--fuente-mono", subsets: ["latin"], weight: ["400", "600"] });
+// Tipografía: Geist (interfaz y títulos) + Geist Mono (RUC, placas, fechas). Tokens en app/globals.css.
+const sans = Geist({ variable: "--fuente-sans", subsets: ["latin"] });
+const mono = Geist_Mono({ variable: "--fuente-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: TEXTO_APP.nombre,
@@ -17,14 +16,14 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4f6f5" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b141b" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0f1a" },
   ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${titulo.variable} ${base.variable} ${mono.variable} h-full antialiased`}>
+    <html lang="es" className={`${sans.variable} ${mono.variable} h-full font-sans antialiased`}>
       <body className="flex min-h-full flex-col">
         <Suspense fallback={<CabeceraBase />}>
           <Cabecera />

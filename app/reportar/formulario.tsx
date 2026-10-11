@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Boton, Campo, claseControl } from "@/components/ui";
+import { CircleCheck, OctagonAlert, Send } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle, Button, Campo, Label, NativeSelect, NativeSelectOption, RadioGroup, RadioGroupItem, Textarea } from "@/components/ui";
 import { DESTINOS, TEXTO_REPORTE } from "@/config/textos";
 import { reducirImagen } from "@/lib/imagen";
 import { enviarReporte } from "./acciones";
@@ -16,31 +17,42 @@ export function FormularioReporte({ dato, p }: { dato: string; p: string }) {
     const r = await enviarReporte(f);
     setEstado(r.ok ? { cargando: false, ok: true } : { cargando: false, error: r.error });
   }
-  if (estado.ok) return <p role="status" className="rounded-tarjeta border border-verificado-borde bg-verificado-fondo p-4 text-verificado">{TEXTO_REPORTE.enviado}</p>;
+  if (estado.ok)
+    return (
+      <Alert role="status" variant="exito" className="entrada">
+        <CircleCheck aria-hidden />
+        <AlertTitle>Reporte enviado</AlertTitle>
+        <AlertDescription>{TEXTO_REPORTE.enviado}</AlertDescription>
+      </Alert>
+    );
   return (
-    <form onSubmit={enviar} className="flex flex-col gap-4">
+    <form onSubmit={enviar} className="flex flex-col gap-5">
       <input type="hidden" name="p" value={p} />
-      <fieldset className="flex flex-col gap-1">
-        <legend className="mb-1 font-semibold">¿Qué pasó?</legend>
-        {TEXTO_REPORTE.motivos.map((m, i) => (
-          <label key={m} className="flex min-h-11 items-center gap-3"><input type="radio" name="motivo" value={m} required defaultChecked={i === 0} className="size-5" />{m}</label>
-        ))}
+      <fieldset className="flex flex-col gap-2">
+        <legend className="mb-2 text-[0.9375rem] font-semibold">¿Qué pasó?</legend>
+        <RadioGroup name="motivo" required defaultValue={TEXTO_REPORTE.motivos[0]} className="gap-1">
+          {TEXTO_REPORTE.motivos.map((m, i) => (
+            <Label key={m} htmlFor={`motivo-${i}`} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-border px-3.5 font-normal has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-secondary/60">
+              <RadioGroupItem id={`motivo-${i}`} value={m} />{m}
+            </Label>
+          ))}
+        </RadioGroup>
       </fieldset>
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="detalle" className="font-semibold">Detalle (opcional)</label>
-        <textarea id="detalle" name="detalle" rows={3} maxLength={800} className={`${claseControl} py-3`} />
+        <Label htmlFor="detalle">Detalle <span className="font-normal text-muted-foreground">(opcional)</span></Label>
+        <Textarea id="detalle" name="detalle" rows={3} maxLength={800} />
       </div>
       <Campo id="dato" name="dato" etiqueta="Dato reportado (placa, número, nombre…)" defaultValue={dato} maxLength={120} />
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="destino" className="font-semibold">¿Dónde ocurrió? (opcional)</label>
-        <select id="destino" name="destino" defaultValue="" className={claseControl}>
-          <option value="">Sin indicar</option>
-          {DESTINOS.map((d) => <option key={d.id} value={d.id}>{d.nombre}</option>)}
-        </select>
+        <Label htmlFor="destino">¿Dónde ocurrió? <span className="font-normal text-muted-foreground">(opcional)</span></Label>
+        <NativeSelect id="destino" name="destino" defaultValue="">
+          <NativeSelectOption value="">Sin indicar</NativeSelectOption>
+          {DESTINOS.map((d) => <NativeSelectOption key={d.id} value={d.id}>{d.nombre}</NativeSelectOption>)}
+        </NativeSelect>
       </div>
       <Campo id="foto" name="foto" type="file" accept="image/*" etiqueta="Foto (opcional)" ayuda="Captura del anuncio, la van o el comprobante." />
-      {estado.error && <p role="alert" className="text-alerta">{estado.error}</p>}
-      <Boton type="submit" disabled={estado.cargando}>{estado.cargando ? "Enviando…" : "Enviar reporte"}</Boton>
+      {estado.error && <Alert role="alert" variant="peligro"><OctagonAlert aria-hidden /><AlertDescription>{estado.error}</AlertDescription></Alert>}
+      <Button type="submit" size="lg" disabled={estado.cargando}><Send aria-hidden /> {estado.cargando ? "Enviando…" : "Enviar reporte"}</Button>
     </form>
   );
 }

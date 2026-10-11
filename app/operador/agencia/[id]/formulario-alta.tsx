@@ -2,7 +2,8 @@
 // Formulario genérico de alta (canal, vehículo, persona): reduce la foto en el navegador y conserva los campos si hay error.
 import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { Boton } from "@/components/ui";
+import { Plus } from "lucide-react";
+import { Boton, Aviso } from "@/components/ui";
 import { reducirImagen } from "@/lib/imagen";
 import { TEXTO_AGENCIA } from "@/config/textos";
 import type { Resultado } from "./acciones";
@@ -24,11 +25,11 @@ export function FormularioAlta({ accion, children, boton }: { accion: (f: FormDa
     router.refresh();
   }
   return (
-    <form onSubmit={enviar} className="flex flex-col gap-3">
+    <form onSubmit={enviar} className="flex flex-col gap-4">
       {children}
-      {estado.error && <p role="alert" className="text-alerta">{estado.error}</p>}
-      {estado.ok && <p role="status" className="text-verificado">{TEXTO_AGENCIA.enviado}</p>}
-      <Boton type="submit" disabled={estado.cargando} className="self-start">{estado.cargando ? "Enviando…" : boton}</Boton>
+      {estado.error && <Aviso tipo="error">{estado.error}</Aviso>}
+      {estado.ok && <Aviso tipo="ok">{TEXTO_AGENCIA.enviado}</Aviso>}
+      <Boton type="submit" disabled={estado.cargando} className="self-start"><Plus aria-hidden /> {estado.cargando ? "Enviando…" : boton}</Boton>
     </form>
   );
 }

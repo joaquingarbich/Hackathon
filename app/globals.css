@@ -1,142 +1,269 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 /*
- * DESIGN SYSTEM — CheckTur Piura · Sistema "Sello" v0.2 (docs/DISENO.md)
- * Único lugar donde se definen colores, tipografías y radios.
- * Tinta para la interfaz, color solo para el estado del dictamen, y un único elemento con personalidad: el sello.
- * Los componentes usan SOLO estos tokens (bg-superficie, text-verificado…), nunca colores crudos.
- * Claro y oscuro: sigue la apariencia del sistema (sin interruptor propio).
+ * DESIGN SYSTEM — CheckTur Piura · "Claro" v1 (docs/DISENO.md)
+ * Único lugar donde se definen colores, radios, sombras y curvas de animación.
+ * Marca: azul #056CF2 sobre blancos fríos. El color de marca es para acciones; los estados del dictamen
+ * tienen su propia paleta (En proceso = violeta, para no confundirse con la marca).
+ * Componentes: shadcn/ui en components/ui/* (adaptados: 44 px de alto, texto 16 px, foco sólido).
+ * Claro y oscuro: sigue la apariencia del sistema (sin interruptor propio). Contrastes en docs/DISENO.md.
  */
-@theme {
-  /* Tinta: botones primarios y texto fuerte */
-  --color-primario: #0e1b24;
-  --color-primario-hover: #3b4955;
-  --color-sobre-primario: #ffffff;
+@custom-variant dark (@media (prefers-color-scheme: dark));
 
-  /* Neutros por rol */
-  --color-fondo: #f4f6f5;
-  --color-superficie: #ffffff;
-  --color-relleno: #eceef0; /* chips, nota de valoración, bloque de opiniones */
-  --color-texto: #0e1b24; /* 17,5:1 */
-  --color-texto-suave: #46535e; /* 7,9:1 */
-  --color-borde: #6b7782; /* borde de control: 4,6:1 */
-  --color-separador: #dce1e4; /* decorativo */
-  --color-foco: #0e1b24;
+:root {
+  /* shadcn */
+  --background: #f7f9fc;
+  --foreground: #0b1324;
+  --card: #ffffff;
+  --card-foreground: #0b1324;
+  --popover: #ffffff;
+  --popover-foreground: #0b1324;
+  --primary: #056cf2; /* blanco encima: 4,74:1 */
+  --primary-hover: #0458c7;
+  --primary-foreground: #ffffff;
+  --secondary: #ebf3ff; /* tinte de marca */
+  --secondary-foreground: #0550b8;
+  --muted: #f1f4f9;
+  --muted-foreground: #556070; /* 6,4:1 sobre blanco */
+  --accent: #ebf3ff;
+  --accent-foreground: #0b1324;
+  --destructive: #d92d20;
+  --border: #e3e8f0; /* decorativo */
+  --input: #7d889b; /* borde de control: 3,4:1 */
+  --ring: #056cf2;
+  --enlace: #0560da; /* texto de enlace: 5,7:1 */
+  --radius: 0.875rem;
 
-  /* Portada (hero): banda de tinta en ambos modos */
-  --color-portada: #0e1b24;
-  --color-sobre-portada: #ffffff;
-  --color-sobre-portada-suave: #c3cbd1;
+  /* Estados del dictamen: texto / fondo / borde (el borde es también el color sólido del ícono) */
+  --verificado: #067647;
+  --verificado-fondo: #ecfdf3;
+  --verificado-borde: #079455;
+  --observaciones: #93370d;
+  --observaciones-fondo: #fffaeb;
+  --observaciones-borde: #dc6803;
+  --actualizacion: #5925dc;
+  --actualizacion-fondo: #f4f3ff;
+  --actualizacion-borde: #6938ef;
+  --no-encontrado: #475467;
+  --no-encontrado-fondo: #f2f4f7;
+  --no-encontrado-borde: #667085;
+  --alerta: #b42318;
+  --alerta-fondo: #fef3f2;
+  --alerta-borde: #d92d20;
+  --sobre-estado: #ffffff; /* ícono sobre el sólido del estado */
 
-  /* Estados del dictamen: texto / fondo / borde (el borde también es el color sólido del ícono del sello) */
-  --color-verificado: #0d6634;
-  --color-verificado-fondo: #e2f3e7;
-  --color-verificado-borde: #137a43;
-  --color-observaciones: #82500a;
-  --color-observaciones-fondo: #fdf0d5;
-  --color-observaciones-borde: #a86200;
-  --color-actualizacion: #1c4c99;
-  --color-actualizacion-fondo: #e3ecfa;
-  --color-actualizacion-borde: #2559b8;
-  --color-no-encontrado: #47515a;
-  --color-no-encontrado-fondo: #eceef0;
-  --color-no-encontrado-borde: #5a646e;
-  --color-alerta: #a3221b;
-  --color-alerta-fondo: #fbe5e2;
-  --color-alerta-borde: #b92d25;
-  --color-estrella: #a86200;
+  /* Sombras frías y suaves */
+  --sombra-suave: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
+  --sombra-media: 0 2px 4px -2px rgb(16 24 40 / 0.06), 0 8px 24px -4px rgb(16 24 40 / 0.08);
+  --sombra-marca: 0 8px 24px -8px rgb(5 108 242 / 0.35);
 
-  /* Forma */
-  --radius-chip: 0.625rem; /* 10 */
-  --radius-control: 0.75rem; /* 12 */
-  --radius-tarjeta: 1rem; /* 16 */
-  --radius-sello: 1.25rem; /* 20 */
+  /* Curvas (Emil Kowalski): ease-out fuerte para entradas e interacción */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-/* Oscuro: solo se redefinen los valores; los nombres no cambian. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-primario: #e8ecee;
-    --color-primario-hover: #c3cbd1;
-    --color-sobre-primario: #0b141b;
-    --color-fondo: #0b141b;
-    --color-superficie: #15212b;
-    --color-relleno: #26323c;
-    --color-texto: #e8ecee; /* 13,8:1 */
-    --color-texto-suave: #a9b3ba; /* 7,7:1 */
-    --color-borde: #7a8792;
-    --color-separador: #26323c;
-    --color-foco: #e8ecee;
-    --color-portada: #15212b;
-    --color-verificado: #7bd9a3;
-    --color-verificado-fondo: #123224;
-    --color-verificado-borde: #3fb97a;
-    --color-observaciones: #f2c46b;
-    --color-observaciones-fondo: #3a2a0c;
-    --color-observaciones-borde: #d99a2b;
-    --color-actualizacion: #9dbbf5;
-    --color-actualizacion-fondo: #15284a;
-    --color-actualizacion-borde: #6c93e0;
-    --color-no-encontrado: #c3cbd1;
-    --color-no-encontrado-fondo: #26323c;
-    --color-no-encontrado-borde: #8e9ba5;
-    --color-alerta: #f4a39b;
-    --color-alerta-fondo: #3d1714;
-    --color-alerta-borde: #e0645a;
-    --color-estrella: #f2c46b;
+    --background: #0a0f1a;
+    --foreground: #e9eef6;
+    --card: #111827;
+    --card-foreground: #e9eef6;
+    --popover: #111827;
+    --popover-foreground: #e9eef6;
+    --primary: #056cf2;
+    --primary-hover: #0458c7;
+    --primary-foreground: #ffffff;
+    --secondary: #13264a;
+    --secondary-foreground: #a9cbff;
+    --muted: #1a2233;
+    --muted-foreground: #a3adbd;
+    --accent: #13264a;
+    --accent-foreground: #e9eef6;
+    --destructive: #f04438;
+    --border: #222c3f;
+    --input: #64718a;
+    --ring: #6ea8ff;
+    --enlace: #6ea8ff;
+    --verificado: #75e0a7;
+    --verificado-fondo: #0b2a1c;
+    --verificado-borde: #2bb673;
+    --observaciones: #fec84b;
+    --observaciones-fondo: #2e2109;
+    --observaciones-borde: #f79009;
+    --actualizacion: #bdb4fe;
+    --actualizacion-fondo: #1f1a3d;
+    --actualizacion-borde: #8f7bfa;
+    --no-encontrado: #cdd5df;
+    --no-encontrado-fondo: #1d2433;
+    --no-encontrado-borde: #98a2b3;
+    --alerta: #fda29b;
+    --alerta-fondo: #3a1210;
+    --alerta-borde: #f04438;
+    --sobre-estado: #111827;
+    --sombra-suave: 0 1px 2px rgb(0 0 0 / 0.3);
+    --sombra-media: 0 8px 24px -4px rgb(0 0 0 / 0.45);
+    --sombra-marca: 0 8px 24px -8px rgb(5 108 242 / 0.5);
   }
 }
 
-/* Tipografías: vienen de next/font en app/layout.tsx */
 @theme inline {
-  --font-titulo: var(--fuente-titulo);
-  --font-base: var(--fuente-base);
-  --font-mono: var(--fuente-mono);
+  --font-sans: var(--fuente-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--fuente-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--fuente-mono), ui-monospace, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-enlace: var(--enlace);
+
+  --color-verificado: var(--verificado);
+  --color-verificado-fondo: var(--verificado-fondo);
+  --color-verificado-borde: var(--verificado-borde);
+  --color-observaciones: var(--observaciones);
+  --color-observaciones-fondo: var(--observaciones-fondo);
+  --color-observaciones-borde: var(--observaciones-borde);
+  --color-actualizacion: var(--actualizacion);
+  --color-actualizacion-fondo: var(--actualizacion-fondo);
+  --color-actualizacion-borde: var(--actualizacion-borde);
+  --color-no-encontrado: var(--no-encontrado);
+  --color-no-encontrado-fondo: var(--no-encontrado-fondo);
+  --color-no-encontrado-borde: var(--no-encontrado-borde);
+  --color-alerta: var(--alerta);
+  --color-alerta-fondo: var(--alerta-fondo);
+  --color-alerta-borde: var(--alerta-borde);
+  --color-sobre-estado: var(--sobre-estado);
+
+  /* Alias del sistema anterior: mismas clases, nuevos valores */
+  --color-fondo: var(--background);
+  --color-superficie: var(--card);
+  --color-relleno: var(--muted);
+  --color-texto: var(--foreground);
+  --color-texto-suave: var(--muted-foreground);
+  --color-borde: var(--input);
+  --color-separador: var(--border);
+  --color-primario: var(--primary);
+  --color-sobre-primario: var(--primary-foreground);
+
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.25);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 2);
+  --radius-4xl: calc(var(--radius) * 2.5);
+  --radius-chip: calc(var(--radius) * 0.75);
+  --radius-control: var(--radius);
+  --radius-tarjeta: calc(var(--radius) * 1.25);
+  --radius-sello: calc(var(--radius) * 1.5);
+
+  --shadow-suave: var(--sombra-suave);
+  --shadow-media: var(--sombra-media);
+  --shadow-marca: var(--sombra-marca);
+  --ease-out-fuerte: var(--ease-out);
+  --ease-in-out-fuerte: var(--ease-in-out);
 }
 
-html {
-  color-scheme: light dark;
-}
-
-body {
-  background: var(--color-fondo);
-  color: var(--color-texto);
-  font-family: var(--font-base), system-ui, sans-serif;
-  font-size: 1.0625rem; /* 17 en móvil */
-  line-height: 1.5;
-}
-
-@media (min-width: 64rem) {
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    color-scheme: light dark;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
-    font-size: 1rem; /* escritorio: nunca menos de 0,8125rem (13) en notas */
+    @apply bg-background text-foreground;
+    font-size: 1rem;
+    line-height: 1.55;
+    font-feature-settings: "ss01", "cv11";
   }
+  h1, h2, h3 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+  p { text-wrap: pretty; }
+  a {
+    color: var(--enlace);
+    text-underline-offset: 3px;
+  }
+  a:hover { text-decoration-thickness: 2px; }
+  /* Foco sólido y visible en todo (≥ 3:1), sin animar el color del anillo. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+  summary { list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  ::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
 }
 
-h1, h2, h3 {
-  font-family: var(--font-titulo), system-ui, sans-serif;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+/* Pulido de interacción (Emil Kowalski) ------------------------------------------------- */
+
+/* Presionar: respuesta inmediata en todo lo pulsable. */
+.pulsable {
+  transition: transform 160ms var(--ease-out), background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+}
+.pulsable:active:not(:disabled) { transform: scale(0.97); }
+
+/* Hover solo con puntero fino (en táctil el hover queda pegado tras tocar). */
+@media (hover: hover) and (pointer: fine) {
+  .elevable:hover { box-shadow: var(--sombra-media); border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
 }
 
-a:hover {
-  text-decoration-thickness: 2px;
+/* Entrada de contenido importante (el resultado): nada aparece de la nada. */
+.entrada {
+  transition: opacity 320ms var(--ease-out), transform 320ms var(--ease-out);
+  @starting-style { opacity: 0; transform: translateY(8px) scale(0.98); }
+}
+/* Escalonado corto para listas que aparecen juntas (30–60 ms). */
+.escalonado > * {
+  animation: aparecer 360ms var(--ease-out) both;
+}
+.escalonado > *:nth-child(2) { animation-delay: 40ms; }
+.escalonado > *:nth-child(3) { animation-delay: 80ms; }
+.escalonado > *:nth-child(4) { animation-delay: 120ms; }
+.escalonado > *:nth-child(5) { animation-delay: 160ms; }
+.escalonado > *:nth-child(n + 6) { animation-delay: 200ms; }
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(6px); }
+}
+/* Chips que cambian (tipo detectado): de 0,95, nunca de 0. */
+.chip-entrada {
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+  @starting-style { opacity: 0; transform: scale(0.95); }
 }
 
-:focus-visible {
-  outline: 3px solid var(--color-foco);
-  outline-offset: 2px;
-}
-
-summary {
-  list-style: none;
-}
-summary::-webkit-details-marker {
-  display: none;
-}
-
+/* Movimiento reducido: menos y más suave, no cero. Se quitan desplazamientos; quedan los fundidos. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
+  .pulsable:active:not(:disabled) { transform: none; }
+  .entrada { @starting-style { transform: none; } }
+  .escalonado > * { animation-name: fundido; }
+  .chip-entrada { @starting-style { transform: none; } }
+  @keyframes fundido { from { opacity: 0; } }
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}
+
+@media print {
+  body { background: #fff; }
 }

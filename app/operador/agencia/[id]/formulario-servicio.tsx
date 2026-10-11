@@ -1,16 +1,16 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Boton, Campo, claseControl } from "@/components/ui";
+import { Boton, Campo, Textarea, NativeSelect, Aviso } from "@/components/ui";
 import { CATEGORIAS, DESTINOS, IDIOMAS, TEXTO_AGENCIA, UNIDADES_PRECIO } from "@/config/textos";
 import { crearServicio } from "./acciones";
 
 // ids con prefijo "s-": la misma página tiene el formulario de perfil (evita ids duplicados, p. ej. "descripcion").
 const Area = ({ id, etiqueta, ayuda, filas = 3, ...p }: { id: string; etiqueta: string; ayuda?: string; filas?: number } & React.ComponentProps<"textarea">) => (
   <div className="flex flex-col gap-1.5">
-    <label htmlFor={`s-${id}`} className="font-semibold">{etiqueta}</label>
-    <textarea id={`s-${id}`} name={id} rows={filas} className={`${claseControl} py-3`} aria-describedby={ayuda ? `s-${id}-ayuda` : undefined} {...p} />
-    {ayuda && <p id={`s-${id}-ayuda`} className="text-[0.9375rem] text-texto-suave">{ayuda}</p>}
+    <label htmlFor={`s-${id}`} className="text-[0.9375rem] font-semibold">{etiqueta}</label>
+    <Textarea id={`s-${id}`} name={id} rows={filas} aria-describedby={ayuda ? `s-${id}-ayuda` : undefined} {...p}  />
+    {ayuda && <p id={`s-${id}-ayuda`} className="text-[0.9375rem] text-muted-foreground">{ayuda}</p>}
   </div>
 );
 
@@ -30,22 +30,22 @@ export function FormularioServicio({ providerId, tipo }: { providerId: string; t
     router.refresh();
   }
 
-  if (!categorias.length) return <p className="text-texto-suave">Tu tipo de registro aún no admite servicios en el catálogo.</p>;
+  if (!categorias.length) return <p className="text-muted-foreground">Tu tipo de registro aún no admite servicios en el catálogo.</p>;
   return (
     <form onSubmit={enviar} className="flex flex-col gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="s-categoria" className="font-semibold">Categoría</label>
-          <select id="s-categoria" name="categoria" required className={claseControl}>
+          <label htmlFor="s-categoria" className="text-[0.9375rem] font-semibold">Categoría</label>
+          <NativeSelect id="s-categoria" name="categoria" required>
             {categorias.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-          </select>
+          </NativeSelect>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="s-destino" className="font-semibold">Destino</label>
-          <select id="s-destino" name="destino" required defaultValue="" className={claseControl}>
+          <label htmlFor="s-destino" className="text-[0.9375rem] font-semibold">Destino</label>
+          <NativeSelect id="s-destino" name="destino" required defaultValue="">
             <option value="" disabled>Elige</option>
             {DESTINOS.map((d) => <option key={d.id} value={d.id}>{d.nombre}</option>)}
-          </select>
+          </NativeSelect>
         </div>
       </div>
       <Campo id="s-nombre" name="nombre" etiqueta="Nombre del servicio" placeholder="Avistamiento de ballenas" maxLength={120} required />
@@ -58,10 +58,10 @@ export function FormularioServicio({ providerId, tipo }: { providerId: string; t
       <div className="grid gap-4 sm:grid-cols-3">
         <Campo id="s-precio_ref" name="precio_ref" inputMode="decimal" etiqueta="Precio referencial (S/)" maxLength={10} />
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="s-unidad_precio" className="font-semibold">Unidad</label>
-          <select id="s-unidad_precio" name="unidad_precio" className={claseControl}>
+          <label htmlFor="s-unidad_precio" className="text-[0.9375rem] font-semibold">Unidad</label>
+          <NativeSelect id="s-unidad_precio" name="unidad_precio">
             {UNIDADES_PRECIO.map((u) => <option key={u}>{u}</option>)}
-          </select>
+          </NativeSelect>
         </div>
         <Campo id="s-grupo_max" name="grupo_max" inputMode="numeric" etiqueta="Grupo máximo" maxLength={4} />
       </div>
@@ -78,8 +78,8 @@ export function FormularioServicio({ providerId, tipo }: { providerId: string; t
       <Area id="itinerario" etiqueta="Itinerario (opcional)" ayuda="Un paso por línea: «Encuentro en el muelle: charla de seguridad (15 min)»." maxLength={1700} />
       <Campo id="s-punto_encuentro" name="punto_encuentro" etiqueta="Punto de encuentro" maxLength={200} />
       <Area id="condiciones" etiqueta="Condiciones (cancelación, clima…)" maxLength={500} filas={2} />
-      {estado.error && <p role="alert" className="text-alerta">{estado.error}</p>}
-      {estado.ok && <p role="status" className="text-verificado">{TEXTO_AGENCIA.enviado}</p>}
+      {estado.error && <Aviso tipo="error">{estado.error}</Aviso>}
+      {estado.ok && <Aviso tipo="ok">{TEXTO_AGENCIA.enviado}</Aviso>}
       <Boton type="submit" disabled={estado.cargando}>{estado.cargando ? "Enviando…" : "Enviar para revisión"}</Boton>
     </form>
   );

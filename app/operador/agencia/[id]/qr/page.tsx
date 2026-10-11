@@ -34,20 +34,20 @@ async function Contenido({ params }: Pick<PageProps<"/operador/agencia/[id]/qr">
   return (
     <Pagina>
       <div className="flex flex-col gap-2 print:hidden">
-        <Link href={`/operador/agencia/${id}`} className="flex min-h-11 items-center self-start font-bold">← {nombre}</Link>
-        <h1 className="text-[2rem] font-extrabold">Códigos QR para imprimir</h1>
-        <p className="text-texto-suave">Cada QR abre la ficha en vivo: si un documento vence, el turista lo ve al instante. Pega el de cada unidad en la van, el del personal en su carnet y el de la empresa en tu vitrina.</p>
+        <Link href={`/operador/agencia/${id}`} className="inline-flex min-h-11 items-center gap-1.5 self-start font-medium text-muted-foreground no-underline hover:text-foreground">← {nombre}</Link>
+        <h1 className="text-[1.875rem] leading-[1.1] font-bold sm:text-[2.25rem]">Códigos QR para imprimir</h1>
+        <p className="text-muted-foreground">Cada QR abre la ficha en vivo: si un documento vence, el turista lo ve al instante. Pega el de cada unidad en la van, el del personal en su carnet y el de la empresa en tu vitrina.</p>
         <BotonImprimir />
       </div>
       <ul className="grid gap-4 sm:grid-cols-2 print:grid-cols-2 print:gap-3">
         {tarjetas.map((t) => (
-          <li key={t.id} className="flex break-inside-avoid flex-col items-center gap-2 rounded-tarjeta border-2 border-texto bg-superficie p-4 text-center">
-            <span className="text-[0.8125rem] font-bold tracking-wide text-texto-suave uppercase">{t.tipo}</span>
+          <li key={t.id} className="flex break-inside-avoid flex-col items-center gap-2 rounded-2xl border-2 border-foreground bg-card p-4 text-center">
+            <span className="text-[0.8125rem] font-semibold tracking-wide text-muted-foreground uppercase">{t.tipo}</span>
             <b className="text-xl">{t.titulo}</b>
-            <span className="text-[0.9375rem] text-texto-suave">{t.sub}</span>
+            <span className="text-[0.9375rem] text-muted-foreground">{t.sub}</span>
             <div className="w-44" dangerouslySetInnerHTML={{ __html: t.svg }} /> {/* SVG generado por qrcode a partir de nuestra URL */}
             <span className="text-[0.8125rem]">Verifica en vivo en <b>CheckTur Piura</b></span>
-            <Mono className="text-[0.6875rem] break-all text-texto-suave">{t.url}</Mono>
+            <Mono className="text-[0.6875rem] break-all text-muted-foreground">{t.url}</Mono>
           </li>
         ))}
       </ul>

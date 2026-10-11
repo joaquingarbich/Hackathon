@@ -1,13 +1,13 @@
 // Panel del admin / fiscalizador: altas por aprobar, reportes de turistas y búsquedas sin resultado.
 // Lecturas con service role: quien renderiza esto ya pasó exigirAdmin().
 import Link from "next/link";
-import { Boton, Mono, Tarjeta, claseControl } from "@/components/ui";
+import { Boton, Mono, Tarjeta, claseControl, Aviso } from "@/components/ui";
 import { DESTINOS, NOMBRE_CANAL, TEXTO_FICHA, nombreDestino } from "@/config/textos";
 import { fechaLegible } from "@/lib/dictamen";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { marcarReporte, resolverAlta } from "./agencias";
 
-const titulo = "mt-2 text-[1.375rem] font-bold";
+const titulo = "mt-2 text-[1.1875rem] font-semibold tracking-tight";
 const haceDias = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
 
 function Decision({ tipo, id }: { tipo: string; id: string }) {
@@ -49,46 +49,46 @@ export async function Fiscalizacion({ destino, error }: { destino?: string; erro
   return (
     <>
       <h2 id="altas" className={titulo}>Altas por aprobar {nAltas}</h2>
-      {error === "duplicado" && <p role="alert" className="text-alerta">No se aprobó: ese número o cuenta ya está aprobado para otra empresa.</p>}
-      {error === "motivo" && <p role="alert" className="text-alerta">Indica el motivo del rechazo.</p>}
-      {!nAltas && <p className="text-texto-suave">No hay canales, vehículos ni personal pendientes.</p>}
+      {error === "duplicado" && <Aviso tipo="error">No se aprobó: ese número o cuenta ya está aprobado para otra empresa.</Aviso>}
+      {error === "motivo" && <Aviso tipo="error">Indica el motivo del rechazo.</Aviso>}
+      {!nAltas && <p className="text-muted-foreground">No hay canales, vehículos ni personal pendientes.</p>}
       <div className="grid gap-3 sm:grid-cols-2">
         {canales?.map((c) => (
           <Tarjeta key={c.id} className="flex flex-col gap-2 p-4">
             <b>{NOMBRE_CANAL[c.tipo]} · <Mono>{c.visible}</Mono></b>
-            <span className="text-[0.9375rem] text-texto-suave">{empresa(c.provider_id)} · pide registrarlo como canal oficial</span>
-            <p className="text-[0.875rem] text-texto-suave">Confirma con la empresa (por su teléfono ya registrado) que el número o la cuenta es suya.</p>
+            <span className="text-[0.9375rem] text-muted-foreground">{empresa(c.provider_id)} · pide registrarlo como canal oficial</span>
+            <p className="text-[0.875rem] text-muted-foreground">Confirma con la empresa (por su teléfono ya registrado) que el número o la cuenta es suya.</p>
             <Decision tipo="canal" id={c.id} />
           </Tarjeta>
         ))}
         {vehiculos?.map((v) => (
           <Tarjeta key={v.id} className="flex flex-col gap-2 p-4">
             {/* eslint-disable-next-line @next/next/no-img-element -- foto de Storage público */}
-            {v.foto_url && <img src={v.foto_url} alt={`Foto de la unidad ${v.placa}`} className="aspect-[4/3] w-full rounded-control object-cover" />}
+            {v.foto_url && <img src={v.foto_url} alt={`Foto de la unidad ${v.placa}`} className="aspect-[4/3] w-full rounded-xl object-cover" />}
             <b>Vehículo <Mono>{v.placa.slice(0, 3)}-{v.placa.slice(3)}</Mono></b>
-            <span className="text-[0.9375rem] text-texto-suave">{empresa(v.provider_id)} · MTC {v.autorizacion_mtc ?? "—"} · SOAT <Mono>{v.soat_vencimiento ? fechaLegible(v.soat_vencimiento) : "—"}</Mono> · Rev. técnica <Mono>{v.citv_vencimiento ? fechaLegible(v.citv_vencimiento) : "—"}</Mono></span>
-            <p className="text-[0.875rem] text-texto-suave">Contrasta la placa con el registro del MTC y que la foto muestre la placa.</p>
+            <span className="text-[0.9375rem] text-muted-foreground">{empresa(v.provider_id)} · MTC {v.autorizacion_mtc ?? "—"} · SOAT <Mono>{v.soat_vencimiento ? fechaLegible(v.soat_vencimiento) : "—"}</Mono> · Rev. técnica <Mono>{v.citv_vencimiento ? fechaLegible(v.citv_vencimiento) : "—"}</Mono></span>
+            <p className="text-[0.875rem] text-muted-foreground">Contrasta la placa con el registro del MTC y que la foto muestre la placa.</p>
             <Decision tipo="vehiculo" id={v.id} />
           </Tarjeta>
         ))}
         {personal?.map((x) => (
           <Tarjeta key={x.id} className="flex flex-col gap-2 p-4">
             {/* eslint-disable-next-line @next/next/no-img-element -- foto de Storage público */}
-            {x.foto_url && <img src={x.foto_url} alt={`Foto de ${x.nombre}`} className="aspect-[4/3] w-full rounded-control object-cover" />}
+            {x.foto_url && <img src={x.foto_url} alt={`Foto de ${x.nombre}`} className="aspect-[4/3] w-full rounded-xl object-cover" />}
             <b>{x.nombre} · {TEXTO_FICHA.rol[x.rol]}</b>
-            <span className="text-[0.9375rem] text-texto-suave">{empresa(x.provider_id)} · DNI <Mono>•••••{x.dni_ultimos3}</Mono>{x.carne_numero && <> · carné <Mono>{x.carne_numero}</Mono></>}</span>
+            <span className="text-[0.9375rem] text-muted-foreground">{empresa(x.provider_id)} · DNI <Mono>•••••{x.dni_ultimos3}</Mono>{x.carne_numero && <> · carné <Mono>{x.carne_numero}</Mono></>}</span>
             <Decision tipo="persona" id={x.id} />
           </Tarjeta>
         ))}
       </div>
 
       <h2 id="reportes" className={titulo}>Reportes de turistas {reportes?.filter((r) => r.estado === "nuevo").length ?? 0} nuevos</h2>
-      {!reportes?.length && <p className="text-texto-suave">Sin reportes.</p>}
-      <ul className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
+      {!reportes?.length && <p className="text-muted-foreground">Sin reportes.</p>}
+      <ul className="overflow-hidden rounded-2xl border border-border bg-card empty:hidden">
         {reportes?.map((r, i) => (
-          <li key={r.id} className={`flex flex-col gap-1 border-b border-separador p-4 last:border-0 ${r.estado === "revisado" ? "opacity-60" : ""}`}>
+          <li key={r.id} className={`flex flex-col gap-1 border-b border-border p-4 last:border-0 ${r.estado === "revisado" ? "opacity-60" : ""}`}>
             <b>{r.que_paso}</b>
-            <span className="text-[0.9375rem] text-texto-suave">
+            <span className="text-[0.9375rem] text-muted-foreground">
               {r.dato && <>Dato: <Mono>{r.dato}</Mono> · </>}{empresa(r.provider_id) && <>Empresa: {empresa(r.provider_id)} · </>}
               {r.destino && <>{nombreDestino(r.destino)} · </>}<Mono>{fechaLegible(r.created_at.slice(0, 10))}</Mono>
               {fotos[i] && <> · <a href={fotos[i]!} target="_blank" rel="noreferrer">ver foto</a></>}
@@ -99,20 +99,20 @@ export async function Fiscalizacion({ destino, error }: { destino?: string; erro
       </ul>
 
       <h2 id="no-encontrados" className={titulo}>Búsquedas sin resultado · últimos 30 días</h2>
-      <p className="text-[0.9375rem] text-texto-suave">Placas, números y nombres que los turistas buscaron y no existen en el registro: posibles informales o suplantaciones a fiscalizar.</p>
+      <p className="text-[0.9375rem] text-muted-foreground">Placas, números y nombres que los turistas buscaron y no existen en el registro: posibles informales o suplantaciones a fiscalizar.</p>
       <nav aria-label="Filtrar por destino" className="flex flex-wrap gap-2">
-        <Link href="/admin#no-encontrados" className={`inline-flex min-h-11 items-center rounded-full border px-4 text-[0.9375rem] no-underline ${!destino ? "bg-relleno font-bold" : "border-separador"}`}>Todos</Link>
+        <Link href="/admin#no-encontrados" className={`inline-flex min-h-11 items-center rounded-full border px-4 text-[0.9375rem] no-underline ${!destino ? "bg-muted font-semibold" : "border-border"}`}>Todos</Link>
         {DESTINOS.map((d) => (
-          <Link key={d.id} href={`/admin?d=${d.id}#no-encontrados`} className={`inline-flex min-h-11 items-center rounded-full border px-4 text-[0.9375rem] no-underline ${destino === d.id ? "bg-relleno font-bold" : "border-separador"}`}>{d.nombre}</Link>
+          <Link key={d.id} href={`/admin?d=${d.id}#no-encontrados`} className={`inline-flex min-h-11 items-center rounded-full border px-4 text-[0.9375rem] no-underline ${destino === d.id ? "bg-muted font-semibold" : "border-border"}`}>{d.nombre}</Link>
         ))}
       </nav>
-      {!frecuentes.length && <p className="text-texto-suave">Sin búsquedas sin resultado{destino ? ` en ${nombreDestino(destino)}` : ""}.</p>}
-      <ol className="overflow-hidden rounded-tarjeta border border-separador bg-superficie empty:hidden">
+      {!frecuentes.length && <p className="text-muted-foreground">Sin búsquedas sin resultado{destino ? ` en ${nombreDestino(destino)}` : ""}.</p>}
+      <ol className="overflow-hidden rounded-2xl border border-border bg-card empty:hidden">
         {frecuentes.map(([k, n]) => {
           const [tipo, valor] = k.split("|");
           return (
-            <li key={k} className="flex items-center justify-between gap-3 border-b border-separador px-4 py-3 last:border-0">
-              <span><span className="text-[0.9375rem] text-texto-suave">{tipo}</span> · <Mono className="font-semibold">{valor || "—"}</Mono></span>
+            <li key={k} className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 last:border-0">
+              <span><span className="text-[0.9375rem] text-muted-foreground">{tipo}</span> · <Mono className="font-semibold">{valor || "—"}</Mono></span>
               <Mono>{n}×</Mono>
             </li>
           );

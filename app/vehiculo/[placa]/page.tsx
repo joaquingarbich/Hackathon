@@ -5,7 +5,7 @@ import { connection } from "next/server";
 import { CabeceraDictamen, Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { Mono, Pagina } from "@/components/ui";
 import { CONSEJO, TEXTO_ESTADO, TEXTO_FICHA } from "@/config/textos";
-import { AccionesFicha, Foto, urlAbsoluta, whatsappOficial } from "@/components/verificacion";
+import { AccionesFicha, Foto, Placa, urlAbsoluta, whatsappOficial } from "@/components/verificacion";
 import { OtraEmpresa } from "@/components/otra-empresa";
 import { cargarVehiculo, fuentes, hoyLima } from "@/lib/consultas";
 import { dictamenVehiculo, fechaLegible } from "@/lib/dictamen";
@@ -34,12 +34,9 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/vehiculo/[pl
 
   return (
     <Pagina className="gap-5">
-      <div className="flex flex-col gap-3">
-        <span className="flex w-fit flex-col items-center rounded-chip border-2 border-primario bg-superficie px-4 pt-0.5 pb-1">
-          <span className="text-[0.6875rem] font-bold tracking-[0.2em] text-texto-suave">PERÚ</span>
-          <Mono className="text-[1.75rem] leading-none font-semibold">{placaLegible}</Mono>
-        </span>
-        <CabeceraDictamen titulo={`Unidad ${placaLegible}`} detalle={[p.nombre_comercial ?? p.razon_social, v.modalidad === "turistico" ? "turístico" : v.modalidad].filter(Boolean).join(" · ")} />
+      <div className="flex flex-col gap-4">
+        <Placa placa={v.placa} />
+        <CabeceraDictamen eyebrow="Vehículo" titulo={`Unidad ${placaLegible}`} detalle={[p.nombre_comercial ?? p.razon_social, v.modalidad === "turistico" ? "transporte turístico" : v.modalidad].filter(Boolean).join(" · ")} />
       </div>
       <VistaDictamen estado={estado} advertencias={advertencias} fuentes={lista} consejos={[CONSEJO.vehiculo]} muestra={v.es_muestra}>
         <Foto src={v.foto_url} alt={`Foto de la unidad ${placaLegible}`} texto={placaLegible} className="sm:max-w-md" />
@@ -48,10 +45,10 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/vehiculo/[pl
         <Datos
           titulo="Empresa titular"
           filas={[
-            ["Nombre", <Link key="p" className="font-bold" href={`/prestador/${p.id}`}>{p.nombre_comercial ?? p.razon_social}</Link>],
+            ["Nombre", <Link key="p" className="inline-flex min-h-11 items-center font-semibold" href={`/prestador/${p.id}`}>{p.nombre_comercial ?? p.razon_social}</Link>],
             ["Razón social", p.razon_social],
             ["RUC", p.ruc && <Mono key="r">{p.ruc}</Mono>],
-            ["Teléfono", p.telefono],
+            ["Teléfono", p.telefono && <Mono key="t">{p.telefono}</Mono>],
           ]}
         />
         <Datos
@@ -60,15 +57,15 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/vehiculo/[pl
             ["Modalidad", v.modalidad === "turistico" ? "Transporte turístico" : v.modalidad],
             ["Ámbito", v.ambito],
             ["Estado", v.estado],
-            ["TUC", v.tuc_numero],
-            ["Autorización MTC", v.autorizacion_mtc],
-            ["Habilitación vence", f(v.habilitacion_vencimiento)],
-            ["CITV vence", f(v.citv_vencimiento)],
-            ["SOAT vence", f(v.soat_vencimiento)],
+            ["TUC", v.tuc_numero && <Mono key="tuc">{v.tuc_numero}</Mono>],
+            ["Autorización MTC", v.autorizacion_mtc && <Mono key="mtc">{v.autorizacion_mtc}</Mono>],
+            ["Habilitación vence", f(v.habilitacion_vencimiento) && <Mono key="h">{f(v.habilitacion_vencimiento)}</Mono>],
+            ["Revisión técnica vence", f(v.citv_vencimiento) && <Mono key="c">{f(v.citv_vencimiento)}</Mono>],
+            ["SOAT vence", f(v.soat_vencimiento) && <Mono key="s">{f(v.soat_vencimiento)}</Mono>],
           ]}
         />
       </VistaDictamen>
-      <p className="text-[0.9375rem] text-texto-suave">¿El dato parece desactualizado? Consulta la fuente oficial indicada en «Fuentes y fechas de corte».</p>
+      <p className="text-[0.875rem] text-muted-foreground">¿El dato parece desactualizado? Consulta la fuente oficial indicada en «Fuentes y fechas de corte».</p>
     </Pagina>
   );
 }
