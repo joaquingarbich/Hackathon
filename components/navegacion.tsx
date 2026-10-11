@@ -10,7 +10,7 @@ import { RESORTE } from "@/components/movimiento";
 
 // Fondo de la pestaña activa: se desliza a la nueva pestaña (layoutId) en vez de aparecer de golpe.
 const Indicador = ({ id, className }: { id: string; className: string }) => (
-  <motion.span layoutId={id} aria-hidden className={cn("absolute inset-0 -z-10 bg-secondary", className)} transition={{ type: "spring", stiffness: 420, damping: 36 }} />
+  <motion.span layoutId={id} aria-hidden className={cn("absolute inset-0 -z-10 bg-[color-mix(in_srgb,var(--secondary),var(--primary)_16%)]", className)} transition={{ type: "spring", stiffness: 420, damping: 36 }} />
 );
 
 export function Logo() {
