@@ -16,7 +16,7 @@ Reemplaza a «Sello» v0.2. Los mockups de esa versión siguen en `docs/disenos/
 
 | Pieza | Archivo |
 |---|---|
-| Tokens de color, radios, sombras y curvas, en claro y oscuro | `app/globals.css` (`:root` + `@media (prefers-color-scheme: dark)` + `@theme inline`) |
+| Tokens de color, radios, sombras y curvas (solo modo claro) | `app/globals.css` (`:root` + `@theme inline`) |
 | Tipografía (Geist y Geist Mono) | `app/layout.tsx` (`next/font`) |
 | Primitivas shadcn/ui (Button, Input, Card, Badge, Alert, Accordion, NativeSelect, RadioGroup, Checkbox, Skeleton…) | `components/ui/*.tsx`, adaptadas: ver abajo |
 | Componentes de CheckTur (Sello, InsigniaEstado, ChipProceso, Campo, Tarjeta, Plegable, Encabezado, Aviso, BarraAccion…) | `components/ui/index.tsx`. Las páginas importan todo de `@/components/ui` |
@@ -24,7 +24,7 @@ Reemplaza a «Sello» v0.2. Los mockups de esa versión siguen en `docs/disenos/
 | Vista del dictamen (VistaDictamen, Datos, CabeceraDictamen, Cargando) | `components/dictamen.tsx` |
 | Cabecera, barra de pestañas y pie | `components/navegacion.tsx` |
 | Textos visibles | `config/textos.ts` |
-| Vitrina | `/estilos` (revisar en claro y oscuro tras tocar tokens) |
+| Vitrina | `/estilos` (revisar tras tocar tokens) |
 
 Configuración de shadcn: `components.json` (estilo `radix-nova`, base Radix, íconos Lucide). Para agregar un componente: `npx shadcn@latest add <nombre>`. Después hay que adaptarlo igual que los demás: 44 px de alto, 16 px de texto, foco sólido, sin `transition-all` e importar `cn` de `@/lib/utils`.
 

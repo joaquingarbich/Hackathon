@@ -8,9 +8,9 @@
  * Marca: azul #056CF2 sobre blancos fríos. El color de marca es para acciones; los estados del dictamen
  * tienen su propia paleta (En proceso = violeta, para no confundirse con la marca).
  * Componentes: shadcn/ui en components/ui/* (adaptados: 44 px de alto, texto 16 px, foco sólido).
- * Claro y oscuro: sigue la apariencia del sistema (sin interruptor propio). Contrastes en docs/DISENO.md.
+ * Solo modo claro (aunque el sistema esté en oscuro). Contrastes en docs/DISENO.md.
  */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+@custom-variant dark (&:where(.dark, .dark *)); /* sin modo oscuro: la app siempre se ve en claro */
 
 :root {
   /* shadcn */
@@ -62,50 +62,6 @@
   /* Curvas (Emil Kowalski): ease-out fuerte para entradas e interacción */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0f1a;
-    --foreground: #e9eef6;
-    --card: #111827;
-    --card-foreground: #e9eef6;
-    --popover: #111827;
-    --popover-foreground: #e9eef6;
-    --primary: #056cf2;
-    --primary-hover: #0458c7;
-    --primary-foreground: #ffffff;
-    --secondary: #13264a;
-    --secondary-foreground: #a9cbff;
-    --muted: #1a2233;
-    --muted-foreground: #a3adbd;
-    --accent: #13264a;
-    --accent-foreground: #e9eef6;
-    --destructive: #f04438;
-    --border: #222c3f;
-    --input: #64718a;
-    --ring: #6ea8ff;
-    --enlace: #6ea8ff;
-    --verificado: #75e0a7;
-    --verificado-fondo: #0b2a1c;
-    --verificado-borde: #2bb673;
-    --observaciones: #fec84b;
-    --observaciones-fondo: #2e2109;
-    --observaciones-borde: #f79009;
-    --actualizacion: #bdb4fe;
-    --actualizacion-fondo: #1f1a3d;
-    --actualizacion-borde: #8f7bfa;
-    --no-encontrado: #cdd5df;
-    --no-encontrado-fondo: #1d2433;
-    --no-encontrado-borde: #98a2b3;
-    --alerta: #fda29b;
-    --alerta-fondo: #3a1210;
-    --alerta-borde: #f04438;
-    --sobre-estado: #111827;
-    --sombra-suave: 0 1px 2px rgb(0 0 0 / 0.3);
-    --sombra-media: 0 8px 24px -4px rgb(0 0 0 / 0.45);
-    --sombra-marca: 0 8px 24px -8px rgb(5 108 242 / 0.5);
-  }
 }
 
 @theme inline {
@@ -186,7 +142,7 @@
     @apply border-border;
   }
   html {
-    color-scheme: light dark;
+    color-scheme: light;
     -webkit-tap-highlight-color: transparent;
   }
   body {
