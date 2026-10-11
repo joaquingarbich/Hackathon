@@ -11,7 +11,7 @@ test("prestador", () => {
   assert.equal(dictamenPrestador(agencia, [], OK, HOY).estado, "verificado");
   assert.equal(dictamenPrestador({ ...agencia, clases: ["mayorista"] }, [], OK, HOY).estado, "observaciones");
   assert.equal(dictamenPrestador(agencia, [], { estado: "BAJA DE OFICIO", condicion: "HABIDO" }, HOY).estado, "alerta");
-  assert.equal(dictamenPrestador(agencia, [], null, HOY).estado, "observaciones"); // sin dato SUNAT no es verde
+  assert.equal(dictamenPrestador(agencia, [], null, HOY).estado, "verificado"); // sin dato SUNAT: manda el padrón MINCETUR/MTC
   assert.equal(dictamenPrestador({ ...agencia, estado_inscripcion: "suspendida" }, [], OK, HOY).estado, "alerta");
   const aventura = { ...agencia, actividades: ["aventura"] };
   assert.equal(dictamenPrestador(aventura, [], OK, HOY).estado, "observaciones");

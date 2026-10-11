@@ -93,7 +93,7 @@ export function Pie() {
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <Link href="/faq" className="inline-flex min-h-11 items-center text-muted-foreground hover:text-foreground">Preguntas frecuentes</Link>
           <Link href="/reportar" className="inline-flex min-h-11 items-center text-muted-foreground hover:text-foreground">Reportar</Link>
-          <span>Datos de muestra: empresas, personas, placas y números ficticios.</span>
+          <span>Prototipo con extractos oficiales de Piura: Directorio MINCETUR y resoluciones de transporte turístico (MTC, GORE Piura, Municipalidad).</span>
         </div>
       </div>
     </footer>

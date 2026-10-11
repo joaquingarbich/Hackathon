@@ -5,12 +5,11 @@ import { Cargando, TituloSeccion } from "@/components/dictamen";
 import { BuscadorVerificar } from "@/components/buscador-verificar";
 import { Alert, AlertDescription, AlertTitle, Encabezado, InsigniaEstado, Skeleton, Tarjeta, claseBoton } from "@/components/ui";
 import { DESTINOS, NOMBRE_TIPO, TEXTO_DESTINOS, TEXTO_HOME, nombreDestino } from "@/config/textos";
-import { conteoPorDestino, empresasDeLaZona, empresasPorDestino, type EmpresaDirectorio } from "@/lib/consultas";
+import { conteoPorDestino, empresasPorDestino, type EmpresaDirectorio } from "@/lib/consultas";
 import { cn } from "@/lib/utils";
 
 // Directorio (secundario): empresas registradas por destino, para contactarlas por su canal oficial.
-// Sin precios, sin reseñas, sin rankings. Primero las que DECLARARON el destino; después las de la zona
-// que aún no declararon destinos (p. ej. agencias del Directorio MINCETUR), con el aviso de que pueden atenderlo.
+// Sin precios, sin reseñas, sin rankings. Solo empresas REGISTRADAS en CheckTur que declararon el destino (extra del verificador)
 const TIPOS = ["agencia", "transporte_terrestre", "hospedaje", "restaurante", "guia"];
 
 export default function Destinos({ searchParams }: PageProps<"/destinos">) {
@@ -38,7 +37,7 @@ async function Directorio({ searchParams }: Pick<PageProps<"/destinos">, "search
 
   if (!d) return <Selector />;
 
-  const [declaradas, zona] = await Promise.all([empresasPorDestino(d.id, t), empresasDeLaZona(d.id, t)]);
+  const declaradas = await empresasPorDestino(d.id, t);
   return (
     <>
       <Link href="/destinos" className="inline-flex min-h-11 items-center gap-1.5 self-start font-medium text-muted-foreground no-underline hover:text-foreground">
@@ -72,15 +71,6 @@ async function Directorio({ searchParams }: Pick<PageProps<"/destinos">, "search
         )}
       </section>
 
-      {zona.length > 0 && (
-        <section aria-labelledby="t-zona" className="flex flex-col gap-3">
-          <div className="flex flex-col gap-0.5">
-            <TituloSeccion id="t-zona">{TEXTO_DESTINOS.zona} <span className="font-normal text-muted-foreground">· {zona.length}</span></TituloSeccion>
-            <p className="text-[0.875rem] text-muted-foreground">{TEXTO_DESTINOS.zonaAyuda(`la zona de ${d.nombre}`)}</p>
-          </div>
-          <ListaEmpresas empresas={zona} sinDeclarar />
-        </section>
-      )}
 
       <Tarjeta aria-labelledby="t-ofrecieron" className="flex flex-col gap-3 bg-secondary/50 shadow-none">
         <h2 id="t-ofrecieron" className="text-[1.0625rem] font-semibold">{TEXTO_DESTINOS.buscarOtra(nombreDestino(d.id))}</h2>
@@ -114,7 +104,7 @@ async function GrillaDestinos() {
         <li key={x.id}>
           <Link href={`/destinos?d=${x.id}`} className="pulsable elevable flex h-full min-h-24 flex-col justify-between gap-3 rounded-2xl border border-border bg-card p-4 text-foreground no-underline shadow-suave">
             <span className="flex items-start gap-2 font-semibold leading-snug"><MapPin aria-hidden className="mt-0.5 size-4.5 shrink-0 text-primary" />{x.nombre}</span>
-            <span className="text-[0.8125rem] text-muted-foreground">{conteo[x.id] ? `${TEXTO_HOME.empresas(conteo[x.id])} lo declararon` : "Ver empresas de la zona"}</span>
+            <span className="text-[0.8125rem] text-muted-foreground">{conteo[x.id] ? `${TEXTO_HOME.empresas(conteo[x.id])} lo declararon` : "Aún sin empresas registradas"}</span>
           </Link>
         </li>
       ))}

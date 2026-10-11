@@ -128,6 +128,7 @@ async function Contenido({ params }: Pick<PageProps<"/prestador/[id]">, "params"
                           {a.fecha_emision && <> · emitida <Mono>{fechaLegible(a.fecha_emision)}</Mono></>}
                           {a.fecha_vencimiento ? <> · vence <Mono>{fechaLegible(a.fecha_vencimiento)}</Mono></> : " · vigencia indeterminada"}
                         </span>
+                        {a.url_fuente && <a href={a.url_fuente} target="_blank" rel="noreferrer" className="self-start font-medium">Ver documento oficial</a>}
                       </li>
                     );
                   })}

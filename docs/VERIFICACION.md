@@ -1,6 +1,10 @@
 # Modelo de verificación
 
-El núcleo es **verificar un dato** (placa, celular/Yape/Plin, cuenta, RUC o nombre) y decir a qué empresa pertenece y en qué estado está. El directorio por destino es secundario.
+El núcleo es **verificar un dato** (placa, celular/Yape/Plin, cuenta, RUC o nombre) contra los **registros oficiales** y decir a qué empresa pertenece y en qué estado está.
+
+**Fuentes (deciden el estado):** Directorio MINCETUR (agencias, constancias, teléfonos → `canales.fuente = 'mincetur'`) y resoluciones de transporte turístico del MTC, GORE Piura (DRTC) y Municipalidad (placas, con `authorizations.url_fuente` al PDF). Se cargan con `npm run load:padrones` (idempotente). SUNAT solo suma advertencias si hay dato.
+
+**Declarado por la empresa (no decide el estado):** canales, vehículos y personal que la empresa registra en CheckTur se muestran asociados a ella. En vehículos manda el MTC: una placa solo declarada sale «Con observaciones». Un número que no está en MINCETUR ni declarado: «no descarta que sea de una empresa formal; toma precauciones». Una empresa que aún no figura en MINCETUR puede registrarse y sale «En proceso de actualización». `/destinos` lista solo empresas registradas en CheckTur.
 
 ## Lo que una empresa registra (y el turista puede verificar)
 
@@ -28,6 +32,6 @@ Los 5 estados de siempre. Además, `dictamenPrestador(…, { vehiculos, personal
 
 `/v/[id]` abre en vivo la ficha de la empresa, el vehículo o la persona (`resolverQr`). La empresa imprime sus QR en `/operador/agencia/[id]/qr` (stickers, carnet, vitrina; PDF con la impresión del navegador). No hay lector dentro de la app: la cámara del teléfono abre el QR impreso directamente.
 
-## Datos de muestra
+## Datos
 
-`supabase/seed.sql` → `seed_catalogo.sql` → `seed_verificacion.sql` (en ese orden; todos ficticios). Fotos de muestra en `public/muestras/`.
+Sin semilla: solo los extractos oficiales (`mincetur_agencias_piura_*.csv`, `placas_turismo_piura_*.csv`) cargados con `scripts/load-padrones.mts`.

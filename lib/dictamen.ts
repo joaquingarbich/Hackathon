@@ -20,8 +20,9 @@ export const fechaLegible = (iso: string) => iso.split("-").reverse().join("/");
 const diasHasta = (iso: string, hoy: string) => (Date.parse(iso) - Date.parse(hoy)) / 86_400_000;
 
 function advertenciasRuc(rucNumero: string | null, ruc: Ruc): Advertencia[] {
-  if (!rucNumero) return [{ nivel: "observacion", texto: ADVERTENCIA.sinRuc }];
-  if (!ruc) return [{ nivel: "observacion", texto: ADVERTENCIA.rucSinDato }];
+  // Decisión del equipo: el estado sale de MINCETUR/MTC. SUNAT solo suma advertencias cuando hay dato
+  // (RUC de baja o no habido); sin RUC o sin dato de SUNAT no se penaliza.
+  if (!rucNumero || !ruc) return [];
   const a: Advertencia[] = [];
   if (ruc.estado !== "ACTIVO") a.push({ nivel: "alerta", texto: ADVERTENCIA.rucNoActivo(ruc.estado) });
   if (ruc.condicion !== "HABIDO") a.push({ nivel: "observacion", texto: ADVERTENCIA.rucNoHabido(ruc.condicion) });

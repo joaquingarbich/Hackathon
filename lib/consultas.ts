@@ -3,7 +3,7 @@ import { supabasePublico } from "@/lib/supabase/publico";
 import { REGLAS } from "@/config/reglas";
 import type { Entrada } from "@/lib/normalizacion";
 import { coincidenciaClara, dictamenPrestador } from "@/lib/dictamen";
-import { DESTINOS, type Estado } from "@/config/textos";
+import type { Estado } from "@/config/textos";
 import type { Tables } from "@/lib/database.types";
 import { createHash } from "node:crypto";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -33,7 +33,7 @@ export async function cargarPrestador(id: string) {
   if (!prestador) return null;
   // Todo lo verificable de la empresa (solo lo aprobado: RLS).
   const [autorizaciones, ruc, vehiculos, personal, canales, destinos, servicios] = await Promise.all([
-    db().from("authorizations").select("tipo, entidad_emisora, numero, fecha_emision, fecha_vencimiento").eq("provider_id", id).then(lista),
+    db().from("authorizations").select("tipo, entidad_emisora, numero, fecha_emision, fecha_vencimiento, url_fuente").eq("provider_id", id).then(lista),
     rucStatus(prestador.ruc),
     db().from("vehicles").select("id, placa, foto_url, modalidad, estado, soat_vencimiento, citv_vencimiento, habilitacion_vencimiento").eq("provider_id", id).order("placa").then(lista),
     db().from("personal").select("id, nombre, rol, dni_ultimos3, foto_url, carne_numero, carne_vence").eq("provider_id", id).order("nombre").then(lista),
@@ -44,7 +44,7 @@ export async function cargarPrestador(id: string) {
   return { prestador, autorizaciones, ruc, vehiculos, personal, canales, destinos: destinos.map((d) => d.destino), servicios };
 }
 
-export type EmpresaCanal = { id: string; nombre: string; tipo: string; canales: string[] };
+export type EmpresaCanal = { id: string; nombre: string; tipo: string; canales: string[] }; // canales: "tipo:fuente"
 
 /** ¿A qué empresa pertenece este celular (WhatsApp/Yape/Plin/teléfono) o cuenta bancaria?
  *  Con service role: canales.valor no es legible por la API. Solo devuelve datos públicos. */
@@ -52,14 +52,10 @@ async function empresasPorCanal(entrada: { tipo: "celular" | "banco"; valor: str
   const admin = supabaseAdmin();
   const valor = entrada.tipo === "banco" ? createHash("sha256").update(entrada.valor).digest("hex") : entrada.valor;
   const tipos = entrada.tipo === "banco" ? ["banco"] : CANALES_CELULAR;
-  const { data: cs } = await admin.from("canales").select("provider_id, tipo").eq("estado", "aprobado").eq("valor", valor).in("tipo", tipos);
+  // Incluye los celulares del Directorio MINCETUR (fuente 'mincetur', oficial) y los declarados por la empresa ('empresa').
+  const { data: cs } = await admin.from("canales").select("provider_id, tipo, fuente").eq("estado", "aprobado").eq("valor", valor).in("tipo", tipos);
   const porEmpresa = new Map<string, Set<string>>();
-  for (const c of cs ?? []) porEmpresa.set(c.provider_id, (porEmpresa.get(c.provider_id) ?? new Set()).add(c.tipo));
-  if (entrada.tipo === "celular") {
-    // Teléfono registrado en el padrón (proveedores anteriores a la tabla de canales)
-    const { data: legado } = await db().rpc("buscar_por_contacto", { usuario: "", telefono: entrada.valor });
-    for (const l of legado ?? []) porEmpresa.set(l.id, (porEmpresa.get(l.id) ?? new Set()).add("telefono"));
-  }
+  for (const c of cs ?? []) porEmpresa.set(c.provider_id, (porEmpresa.get(c.provider_id) ?? new Set()).add(`${c.tipo}:${c.fuente}`));
   if (!porEmpresa.size) return [];
   const { data: ps } = await db().from("providers").select("id, nombre_comercial, razon_social, tipo").in("id", [...porEmpresa.keys()]);
   return (ps ?? []).map((p) => ({ id: p.id, nombre: p.nombre_comercial ?? p.razon_social ?? "Empresa", tipo: p.tipo, canales: [...porEmpresa.get(p.id)!] }));
@@ -153,39 +149,29 @@ export async function cargarPersona(id: string) {
 export type EmpresaDirectorio = { id: string; nombre: string; tipo: string; lugar: string | null; estado: Estado; servicios: string[]; whatsapp: string | null };
 
 /** Directorio por destino: empresas que DECLARARON atenderlo, con estado publicable (no "alerta" ni validación caducada). */
+/** Empresas con cuenta en CheckTur (registraron sus servicios con nosotros). Solo ids: dato no sensible. */
+async function registradas(): Promise<Set<string>> {
+  const { data } = await supabaseAdmin().from("proveedor_cuentas").select("provider_id");
+  return new Set((data ?? []).map((c) => c.provider_id));
+}
+
+/** Directorio (extra del verificador): solo empresas REGISTRADAS en CheckTur que declararon atender el destino. */
 export async function empresasPorDestino(destino: string, tipo?: string): Promise<EmpresaDirectorio[]> {
-  const ids = lista(await db().from("empresa_destinos").select("provider_id").eq("destino", destino)).map((d) => d.provider_id);
+  const conCuenta = await registradas();
+  const ids = lista(await db().from("empresa_destinos").select("provider_id").eq("destino", destino)).map((d) => d.provider_id).filter((id) => conCuenta.has(id));
   if (!ids.length) return [];
   let q = db().from("providers").select("*").in("id", ids);
   if (tipo) q = q.eq("tipo", tipo);
   return armarDirectorio(lista(await q));
 }
 
-const sinTildes = (t: string | null) => (t ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 /** "LOS ORGANOS" (padrón en mayúsculas) → "Los Organos"; lo demás queda igual. */
 const legible = (t: string | null) => (t && t === t.toUpperCase() ? t.toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase()) : t);
-const PROVINCIAS = ["piura", "sullana", "talara", "paita", "sechura", "morropon", "ayabaca", "huancabamba"];
 
 /**
  * Empresas registradas con local en los distritos del destino que NO declararon destinos en CheckTur
  * (p. ej. las cargadas del Directorio MINCETUR). Pueden atenderlo aunque no lo hayan declarado.
  */
-export async function empresasDeLaZona(destino: string, tipo?: string): Promise<EmpresaDirectorio[]> {
-  const d = DESTINOS.find((x) => x.id === destino);
-  if (!d) return [];
-  const zona: readonly string[] = d.distritos;
-  const conDestinos = new Set(lista(await db().from("empresa_destinos").select("provider_id")).map((x) => x.provider_id));
-  let q = db().from("providers").select("id, distrito, provincia").limit(2000);
-  if (tipo) q = q.eq("tipo", tipo);
-  const candidatos = lista(await q).filter((p) => {
-    if (conDestinos.has(p.id)) return false;
-    const prov = sinTildes(p.provincia);
-    // La provincia solo cuenta si no es una provincia (filas del padrón con columnas corridas, p. ej. "MANCORA").
-    return zona.includes(sinTildes(p.distrito)) || (!PROVINCIAS.includes(prov) && zona.includes(prov));
-  });
-  if (!candidatos.length) return [];
-  return armarDirectorio(lista(await db().from("providers").select("*").in("id", candidatos.map((p) => p.id))));
-}
 
 /** Estado (reusa dictamenPrestador), servicios y WhatsApp oficial de cada empresa; solo las publicables. */
 async function armarDirectorio(ps: Tables<"providers">[]): Promise<EmpresaDirectorio[]> {
@@ -218,6 +204,7 @@ async function armarDirectorio(ps: Tables<"providers">[]): Promise<EmpresaDirect
 
 /** Cuántas empresas declararon cada destino (para el selector del directorio). */
 export async function conteoPorDestino(): Promise<Record<string, number>> {
-  const filas = lista(await db().from("empresa_destinos").select("destino"));
+  const conCuenta = await registradas();
+  const filas = lista(await db().from("empresa_destinos").select("destino, provider_id")).filter((d) => conCuenta.has(d.provider_id));
   return filas.reduce<Record<string, number>>((m, d) => ({ ...m, [d.destino]: (m[d.destino] ?? 0) + 1 }), {});
 }

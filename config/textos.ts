@@ -57,6 +57,7 @@ export const ADVERTENCIA = {
     `Esta unidad está habilitada para la modalidad "${modalidad}", no para transporte turístico.`,
   citvVencido: (fecha: string) => `La inspección técnica vehicular (CITV) venció el ${fecha}.`,
   soatVencido: (fecha: string) => `El SOAT venció el ${fecha}.`,
+  vehiculoDeclarado: (corte: string) => `Esta unidad la declaró la empresa en CheckTur: no figura en las resoluciones de transporte turístico (MTC, GORE Piura, Municipalidad) con corte al ${corte}.`,
   flotaVencida: (placa: string, doc: string, fecha: string) => `La unidad ${placa} tiene ${doc} vencido desde el ${fecha}.`,
   flotaPorVencer: (placa: string, doc: string, fecha: string) => `A la unidad ${placa} se le vence ${doc} el ${fecha}.`,
   carneVencido: (nombre: string, fecha: string) => `El carné de guía de ${nombre} venció el ${fecha}.`,
@@ -249,8 +250,9 @@ export const TEXTO_VERIFICAR = {
   chip: { ruc: "Buscando RUC…", celular: "Buscando celular / WhatsApp / Yape / Plin…", banco: "Buscando cuenta bancaria…", placa: "Buscando placa…", nombre: "Buscando nombre de empresa…" } as Record<string, string>,
   canalDe: { celular: "Este número", banco: "Esta cuenta" } as Record<string, string>,
   perteneceA: (que: string, n: number) => `${que} pertenece a ${n === 1 ? "esta empresa registrada" : "estas empresas registradas"}`,
-  noRegistrado: (que: string) => `${que} NO está registrado por ninguna empresa en CheckTur.`,
-  noPagues: "No pagues ni envíes dinero a este número o cuenta hasta confirmar con la empresa por su canal oficial registrado.",
+  noRegistrado: (que: string) => `${que} no figura en el Directorio MINCETUR ni lo registró ninguna empresa en CheckTur.`,
+  noPagues: "Esto no descarta que sea de una empresa formal: muchas no registran todos sus números. Toma precauciones y confirma con la empresa por su teléfono del Directorio MINCETUR o en su local antes de pagar.",
+  fuenteCanal: { mincetur: "en el Directorio MINCETUR", empresa: "declarado por la empresa en CheckTur" } as Record<string, string>,
   quizas: "¿Quizás buscabas…?",
   suplantacion: "Ojo: si te dieron un nombre parecido pero no igual, podría ser una suplantación. Contacta solo por el canal oficial de la empresa registrada.",
   empresaDicha: "¿Qué empresa te dijeron?",
@@ -348,15 +350,12 @@ export const TEXTO_DESTINOS = {
   elegir: "¿A dónde vas?",
   cambiar: "Cambiar destino",
   declararon: (destino: string) => `Declararon atender ${destino}`,
-  declararonAyuda: "Estas empresas registradas indicaron en CheckTur que ofrecen servicios en este destino.",
+  declararonAyuda: "Empresas que se registraron en CheckTur e indicaron que ofrecen servicios en este destino. Es un extra del verificador: la formalidad la da su ficha (MINCETUR y MTC).",
   sinDeclarar: (destino: string) => `Aún no hay empresas que hayan declarado atender ${destino}.`,
-  zona: "Otras empresas registradas en la zona",
-  zonaAyuda: (distritos: string) =>
-    `Figuran en los registros oficiales con local en ${distritos}, pero todavía no declararon en CheckTur a qué destinos llevan. Puede que sí ofrezcan servicios aquí: consúltales por su canal oficial.`,
   aviso: "No ver a una empresa en esta lista no significa que no atienda este destino.",
-  avisoCorto: "Aquí aparecen los destinos que cada empresa declaró en CheckTur; muchas agencias registradas aún no lo han hecho. Si te ofrecen un servicio, búscala por su nombre o RUC.",
+  avisoCorto: "Aquí solo aparecen las empresas que se registraron en CheckTur y declararon sus destinos. Si te ofrecen un servicio de otra, búscala por su nombre, RUC o placa: el verificador consulta los registros oficiales.",
   avisoDetalle:
-    "Aquí aparecen los destinos que cada empresa declaró en CheckTur. Las agencias del Directorio MINCETUR figuran como registradas aunque todavía no hayan declarado sus destinos. Si te ofrecen un servicio, busca la empresa por su nombre o RUC.",
+    "Aquí solo aparecen las empresas que se registraron en CheckTur y declararon a qué destinos llevan. Que una empresa no esté en esta lista no significa que sea informal: búscala por su nombre, RUC o placa en el verificador, que consulta el Directorio MINCETUR y los registros de transporte.",
   verDetalle: "Ver ficha completa",
   buscarOtra: (destino: string) => `¿Te ofrecieron algo en ${destino} que no está aquí?`,
 } as const;
@@ -375,7 +374,7 @@ export const TEXTO_FAQ = {
     },
     {
       p: "¿De dónde salen los datos?",
-      r: "Del Directorio de Prestadores de Servicios Turísticos de MINCETUR y DIRCETUR Piura, del padrón de SUNAT (estado del RUC), de los registros de transporte (MTC y municipalidades) y de los canales, vehículos y personal que cada empresa registró y que un revisor aprobó. Cada resultado muestra su fuente y la fecha de corte.",
+      r: "Del Directorio de Prestadores de Servicios Turísticos de MINCETUR (agencias y sus teléfonos) y de las resoluciones de transporte turístico del MTC, el GORE Piura y la Municipalidad (placas), con el enlace a cada documento oficial. Si hay dato de SUNAT, se suma el estado del RUC. Lo que una empresa declara en CheckTur (WhatsApp, Yape, vehículos) se muestra asociado a ella e indicado como declarado, nunca como registro oficial. Cada resultado muestra su fuente y la fecha de corte.",
     },
     {
       p: "¿Qué significa cada resultado?",
@@ -387,7 +386,7 @@ export const TEXTO_FAQ = {
     },
     {
       p: "¿Por qué una empresa no aparece en un destino?",
-      r: "Porque en «Destinos» se muestran los lugares que cada empresa declaró en CheckTur. Muchas agencias del Directorio MINCETUR figuran como registradas, pero aún no han declarado a qué destinos llevan. Por eso también ves «Otras empresas registradas en la zona». Si te ofrecen un servicio, búscala por su nombre o RUC.",
+      r: "Porque «Destinos» es un extra del verificador: solo muestra las empresas que se registraron en CheckTur y declararon a qué destinos llevan. Muchas empresas formales todavía no lo han hecho. Si te ofrecen un servicio, búscala por su nombre, RUC, placa o celular: el verificador consulta el Directorio MINCETUR y los registros de transporte.",
     },
     {
       p: "Me pidieron pagar por Yape o Plin, ¿cómo lo compruebo?",

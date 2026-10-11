@@ -14,9 +14,9 @@ export type Database = {
   public: {
     Tables: {
       canales: {
-        Row: { created_at: string; estado: string; id: string; motivo: string | null; provider_id: string; revisado_at: string | null; revisor: string | null; tipo: string; valor: string; visible: string }
-        Insert: { created_at?: string; estado?: string; id?: string; motivo?: string | null; provider_id: string; revisado_at?: string | null; revisor?: string | null; tipo: string; valor: string; visible: string }
-        Update: { created_at?: string; estado?: string; id?: string; motivo?: string | null; provider_id?: string; revisado_at?: string | null; revisor?: string | null; tipo?: string; valor?: string; visible?: string }
+        Row: { created_at: string; estado: string; fuente: string; id: string; motivo: string | null; provider_id: string; revisado_at: string | null; revisor: string | null; tipo: string; valor: string; visible: string }
+        Insert: { created_at?: string; estado?: string; fuente?: string; id?: string; motivo?: string | null; provider_id: string; revisado_at?: string | null; revisor?: string | null; tipo: string; valor: string; visible: string }
+        Update: { created_at?: string; estado?: string; fuente?: string; id?: string; motivo?: string | null; provider_id?: string; revisado_at?: string | null; revisor?: string | null; tipo?: string; valor?: string; visible?: string }
         Relationships: []
       }
       empresa_destinos: {
@@ -35,6 +35,7 @@ export type Database = {
           provider_id: string
           source_id: string
           tipo: string
+          url_fuente: string | null
         }
         Insert: {
           entidad_emisora: string
@@ -45,6 +46,7 @@ export type Database = {
           provider_id: string
           source_id: string
           tipo: string
+          url_fuente?: string | null
         }
         Update: {
           entidad_emisora?: string
@@ -55,6 +57,7 @@ export type Database = {
           provider_id?: string
           source_id?: string
           tipo?: string
+          url_fuente?: string | null
         }
         Relationships: [
           {

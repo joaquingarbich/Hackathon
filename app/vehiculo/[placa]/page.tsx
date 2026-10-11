@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { CabeceraDictamen, Cargando, Datos, VistaDictamen } from "@/components/dictamen";
 import { Mono, Pagina } from "@/components/ui";
-import { CONSEJO, TEXTO_ESTADO, TEXTO_FICHA } from "@/config/textos";
+import { ADVERTENCIA, CONSEJO, TEXTO_ESTADO, TEXTO_FICHA } from "@/config/textos";
 import { AccionesFicha, Foto, Placa, urlAbsoluta, whatsappOficial } from "@/components/verificacion";
 import { OtraEmpresa } from "@/components/otra-empresa";
 import { cargarVehiculo, fuentes, hoyLima } from "@/lib/consultas";
@@ -27,7 +27,12 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/vehiculo/[pl
   const [datos, lista] = await Promise.all([cargarVehiculo(placa.toUpperCase()), fuentes()]);
   if (!datos) notFound();
   const { vehiculo: v, prestador: p, ruc, canales } = datos;
-  const { estado, advertencias } = dictamenVehiculo(v, p.ruc, ruc, hoyLima(), p.validacion_vence);
+  const base = dictamenVehiculo(v, p.ruc, ruc, hoyLima(), p.validacion_vence);
+  // En vehículos manda el MTC: una unidad que solo declaró la empresa sale asociada a ella, pero con observación.
+  const corteMtc = lista.find((f) => f.id === "mtc_resoluciones")?.fecha_corte;
+  const declarada = v.source_id === "checktur_validacion";
+  const advertencias = declarada ? [...base.advertencias, { nivel: "observacion" as const, texto: ADVERTENCIA.vehiculoDeclarado(corteMtc ? fechaLegible(corteMtc) : "la última actualización") }] : base.advertencias;
+  const estado = declarada && base.estado === "verificado" ? "observaciones" : base.estado;
   const placaLegible = `${v.placa.slice(0, 3)}-${v.placa.slice(3)}`;
   const empresa = p.nombre_comercial ?? p.razon_social ?? "Empresa";
   const url = await urlAbsoluta(`/v/${v.id}`);

@@ -53,7 +53,7 @@ async function Resultado({ searchParams }: Pick<PageProps<"/consulta">, "searchP
       return (
         <Pagina className="gap-5">
           <CabeceraDictamen eyebrow={tipoDato} titulo={<Mono>{visible}</Mono>} />
-          <VistaDictamen estado="no_encontrado" anuncio={anuncio} advertencias={[{ nivel: "alerta", texto: TEXTO_VERIFICAR.noRegistrado(que) }, { nivel: "alerta", texto: TEXTO_VERIFICAR.noPagues }]} fuentes={await fuentes()} consejos={CONSEJO.noEncontrado} />
+          <VistaDictamen estado="no_encontrado" anuncio={anuncio} advertencias={[{ nivel: "observacion", texto: TEXTO_VERIFICAR.noRegistrado(que) }, { nivel: "observacion", texto: TEXTO_VERIFICAR.noPagues }]} fuentes={await fuentes()} consejos={CONSEJO.noEncontrado} />
           <Acciones dato={visible} reportar="Reportar este número o cuenta" />
         </Pagina>
       );
@@ -68,7 +68,7 @@ async function Resultado({ searchParams }: Pick<PageProps<"/consulta">, "searchP
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-verificado-fondo text-verificado"><Building2 aria-hidden className="size-5" /></span>
                   <span>
                     <b className="block text-[1.0625rem] font-semibold">{e.nombre}</b>
-                    <span className="block text-[0.875rem] text-muted-foreground">{NOMBRE_TIPO[e.tipo] ?? e.tipo} · registrado como {e.canales.map((c) => NOMBRE_CANAL[c] ?? c).join(", ")}</span>
+                    <span className="block text-[0.875rem] text-muted-foreground">{NOMBRE_TIPO[e.tipo] ?? e.tipo} · {e.canales.map((c) => { const [tipo, fuente] = c.split(":"); return `${NOMBRE_CANAL[tipo] ?? tipo} ${TEXTO_VERIFICAR.fuenteCanal[fuente] ?? ""}`; }).join(" · ")}</span>
                   </span>
                 </span>
                 <ChevronRight aria-hidden className="size-5 shrink-0 text-muted-foreground" />
