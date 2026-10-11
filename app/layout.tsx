@@ -26,14 +26,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className={`${sans.variable} ${mono.variable} h-full font-sans antialiased`}>
       <body className="flex min-h-full flex-col">
-        <Suspense fallback={<CabeceraBase />}>
-          <Cabecera />
-        </Suspense>
-        <main className="flex flex-1 flex-col"><MovimientoGlobal>{children}</MovimientoGlobal></main>
-        <Pie />
-        <Suspense>
-          <BarraPestanas />
-        </Suspense>
+        <MovimientoGlobal>
+          <Suspense fallback={<CabeceraBase />}>
+            <Cabecera />
+          </Suspense>
+          <main className="flex flex-1 flex-col">{children}</main>
+          <Pie />
+          <Suspense>
+            <BarraPestanas />
+          </Suspense>
+        </MovimientoGlobal>
       </body>
     </html>
   );

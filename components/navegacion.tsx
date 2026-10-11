@@ -2,14 +2,21 @@
 // Cabecera (fija, translúcida: es la capa funcional que flota sobre el contenido) y barra de pestañas del turista (móvil).
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "motion/react";
 import { Building2, CircleHelp, MapPin, ShieldCheck } from "lucide-react";
 import { TEXTO_APP } from "@/config/textos";
 import { cn } from "@/lib/utils";
+import { RESORTE } from "@/components/movimiento";
+
+// Fondo de la pestaña activa: se desliza a la nueva pestaña (layoutId) en vez de aparecer de golpe.
+const Indicador = ({ id, className }: { id: string; className: string }) => (
+  <motion.span layoutId={id} aria-hidden className={cn("absolute inset-0 -z-10 bg-secondary", className)} transition={{ type: "spring", stiffness: 420, damping: 36 }} />
+);
 
 export function Logo() {
   return (
     <Link href="/" className="pulsable flex min-h-11 items-center gap-2.5 rounded-xl text-foreground no-underline" aria-label={`${TEXTO_APP.nombre}, inicio`}>
-      <span className="flex size-9 items-center justify-center rounded-[0.7rem] bg-primary text-primary-foreground shadow-marca">
+      <span className="flex size-9 items-center justify-center rounded-[0.7rem] bg-primary text-primary-foreground">
         <ShieldCheck aria-hidden className="size-5" strokeWidth={2.4} />
       </span>
       <span className="text-[1.1875rem] font-bold tracking-tight">
@@ -38,12 +45,16 @@ export function CabeceraBase({ ruta = "" }: { ruta?: string }) {
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6 lg:px-8">
         <Logo />
         <nav aria-label="Secciones" className="ml-auto hidden items-center gap-1 md:flex">
-          {PESTANAS.map(({ href, activo, texto, Icono }) => (
-            <Link key={href} href={href} aria-current={activo(ruta) ? "page" : undefined}
-              className="pulsable flex h-10 items-center gap-2 rounded-full px-4 text-[0.9375rem] font-medium text-muted-foreground no-underline hover:bg-muted hover:text-foreground aria-[current=page]:bg-secondary aria-[current=page]:text-secondary-foreground">
-              <Icono aria-hidden className="size-4.5" /> {texto}
-            </Link>
-          ))}
+          {PESTANAS.map(({ href, activo, texto, Icono }) => {
+            const a = activo(ruta);
+            return (
+              <Link key={href} href={href} aria-current={a ? "page" : undefined}
+                className="pulsable relative isolate flex h-10 items-center gap-2 rounded-full px-4 text-[0.9375rem] font-medium text-muted-foreground no-underline hover:text-foreground aria-[current=page]:text-secondary-foreground [&:not([aria-current])]:hover:bg-muted">
+                {a && <Indicador id="pestana-escritorio" className="rounded-full" />}
+                <Icono aria-hidden className="size-4.5" /> {texto}
+              </Link>
+            );
+          })}
           <span aria-hidden className="mx-2 h-5 w-px bg-border" />
           <Link href="/operador" className="pulsable flex h-10 items-center gap-2 rounded-full border border-border bg-card px-4 text-[0.9375rem] font-medium text-foreground no-underline shadow-suave hover:bg-muted">
             <Building2 aria-hidden className="size-4.5" /> Para empresas
@@ -68,10 +79,13 @@ export function BarraPestanas() {
             <li key={href}>
               <Link href={href} aria-current={a ? "page" : undefined}
                 className={cn(
-                  "pulsable flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[0.8125rem] font-medium no-underline",
-                  a ? "bg-secondary text-secondary-foreground" : "text-muted-foreground",
+                  "pulsable relative isolate flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[0.8125rem] font-medium no-underline",
+                  a ? "text-secondary-foreground" : "text-muted-foreground",
                 )}>
-                <Icono aria-hidden className="size-6" strokeWidth={a ? 2.4 : 1.9} />
+                {a && <Indicador id="pestana-movil" className="rounded-2xl" />}
+                <motion.span animate={{ y: a ? -1 : 0, scale: a ? 1.08 : 1 }} transition={RESORTE} className="flex">
+                  <Icono aria-hidden className="size-6" strokeWidth={a ? 2.4 : 1.9} />
+                </motion.span>
                 {texto}
               </Link>
             </li>
