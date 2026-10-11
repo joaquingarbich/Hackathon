@@ -23,6 +23,7 @@ export const REGLAS = {
     resena: { maximo: 5, ventanaSeg: 3600 },
     documento: { maximo: 10, ventanaSeg: 3600 },
     reporte: { maximo: 5, ventanaSeg: 3600 },
+    alta: { maximo: 20, ventanaSeg: 3600 }, // canales, vehículos y personal por cuenta (evita inundar la cola del admin)
   },
   dominiosOficialesQR: [".gob.pe"],
 } as const;

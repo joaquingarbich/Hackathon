@@ -7,6 +7,8 @@ import { createHash } from "node:crypto";
 import { DESTINOS } from "@/config/textos";
 import { normalizarCanal, TIPOS_CANAL, type TipoCanal } from "@/lib/canales";
 import { normalizarPlaca } from "@/lib/normalizacion";
+import { hayCupo } from "@/lib/limite";
+import { TEXTO_LIMITE } from "@/config/textos";
 
 const campos = (f: FormData): Campos => {
   const c: Campos = {};
@@ -58,7 +60,8 @@ const MAX_FOTO = 1.5 * 1024 * 1024;
 async function subirFoto(db: Awaited<ReturnType<typeof exigirDueno>>["db"], providerId: string, f: FormData): Promise<string | null | "error"> {
   const foto = f.get("foto");
   if (!(foto instanceof File) || !foto.size) return null;
-  if (!foto.type.startsWith("image/") || foto.size > MAX_FOTO) return "error";
+  // Solo rasterizadas: un SVG puede llevar script y el bucket es público (XSS almacenado).
+  if (!["image/jpeg", "image/png", "image/webp"].includes(foto.type) || foto.size > MAX_FOTO) return "error";
   const ruta = `${providerId}/${crypto.randomUUID()}.jpg`;
   const up = await db.storage.from("fotos").upload(ruta, new Uint8Array(await foto.arrayBuffer()), { contentType: foto.type });
   return up.error ? "error" : db.storage.from("fotos").getPublicUrl(ruta).data.publicUrl;
@@ -75,7 +78,8 @@ export async function guardarDestinos(providerId: string, f: FormData) {
 }
 
 export async function crearCanal(providerId: string, f: FormData): Promise<Resultado> {
-  const { db } = await exigirDueno(providerId);
+  const { db, u } = await exigirDueno(providerId);
+  if (!(await hayCupo("alta", u.id))) return fallo(TEXTO_LIMITE);
   const tipo = String(f.get("tipo") ?? "") as TipoCanal;
   if (!TIPOS_CANAL.includes(tipo)) return fallo("Elige el tipo de canal.");
   const n = normalizarCanal(tipo, String(f.get("valor") ?? ""), (s) => createHash("sha256").update(s).digest("hex"), String(f.get("etiqueta") ?? ""));
@@ -88,9 +92,14 @@ export async function crearCanal(providerId: string, f: FormData): Promise<Resul
 }
 
 export async function crearVehiculo(providerId: string, f: FormData): Promise<Resultado> {
-  const { db, proveedor } = await exigirDueno(providerId);
+  const { db, proveedor, u } = await exigirDueno(providerId);
+  if (!(await hayCupo("alta", u.id))) return fallo(TEXTO_LIMITE);
   const placa = normalizarPlaca(String(f.get("placa") ?? ""));
   if (!placa) return fallo("Placa no válida (formato ABC-123).");
+  // La placa es única solo entre APROBADAS: un pendiente de otra cuenta no bloquea al dueño real; el admin decide.
+  const { data: previas } = await db.from("vehicles").select("provider_id, aprobacion").eq("placa", placa);
+  if (previas?.some((v) => v.aprobacion === "aprobado")) return fallo("Esa placa ya está registrada. Si la unidad es tuya, escribe al revisor.");
+  if (previas?.some((v) => v.provider_id === providerId && v.aprobacion === "pendiente")) return fallo("Ya enviaste esa placa: está en revisión.");
   const soat = fecha(f, "soat_vencimiento"), citv = fecha(f, "citv_vencimiento"), hab = fecha(f, "habilitacion_vencimiento");
   if (!soat || !citv) return fallo("Indica las fechas de vencimiento del SOAT y de la revisión técnica.");
   const foto = await subirFoto(db, providerId, f);
@@ -102,12 +111,12 @@ export async function crearVehiculo(providerId: string, f: FormData): Promise<Re
     soat_vencimiento: soat, citv_vencimiento: citv, habilitacion_vencimiento: hab,
     foto_url: foto, es_muestra: proveedor.es_muestra, source_id: "checktur_validacion",
   });
-  if (error?.code === "23505") return fallo("Esa placa ya está registrada. Si la unidad es tuya, escribe al revisor.");
   return error ? fallo("No se pudo guardar. Intenta de nuevo.") : { ok: true };
 }
 
 export async function crearPersonal(providerId: string, f: FormData): Promise<Resultado> {
-  const { db } = await exigirDueno(providerId);
+  const { db, u } = await exigirDueno(providerId);
+  if (!(await hayCupo("alta", u.id))) return fallo(TEXTO_LIMITE);
   const nombre = String(f.get("nombre") ?? "").trim().slice(0, 80);
   const rol = String(f.get("rol") ?? "");
   const dni3 = String(f.get("dni_ultimos3") ?? "").replace(/\D/g, "");
@@ -127,6 +136,10 @@ const TABLAS_RETIRABLES = { canales: "canales", vehiculos: "vehicles", personal:
 
 export async function retirar(providerId: string, que: keyof typeof TABLAS_RETIRABLES, id: string) {
   const { db } = await exigirDueno(providerId);
-  await db.from(TABLAS_RETIRABLES[que]).delete().eq("id", id).eq("provider_id", providerId);
+  if (que === "vehiculos")
+    // Solo las unidades que registró la empresa: las del padrón oficial (MTC/municipio) no se pueden borrar
+    // desde aquí (si no, una empresa limpiaría su dictamen borrando una unidad con el SOAT vencido).
+    await db.from("vehicles").delete().eq("id", id).eq("provider_id", providerId).eq("source_id", "checktur_validacion");
+  else await db.from(TABLAS_RETIRABLES[que]).delete().eq("id", id).eq("provider_id", providerId);
   redirect(`/operador/agencia/${providerId}#${que}`);
 }

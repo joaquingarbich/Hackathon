@@ -26,7 +26,7 @@ async function Contenido({ params, searchParams }: Pick<PageProps<"/operador/age
   const { proveedor: p, db } = await exigirDueno(id);
   const [{ data: canalesTodos }, { data: vehiculosTodos }, { data: personalTodo }, { data: destinosSel }, { data: auts }] = await Promise.all([
     db.from("canales").select("id, tipo, visible, estado, motivo").eq("provider_id", id).order("created_at"),
-    db.from("vehicles").select("id, placa, aprobacion, motivo, soat_vencimiento, citv_vencimiento, habilitacion_vencimiento").eq("provider_id", id).order("placa"),
+    db.from("vehicles").select("id, placa, aprobacion, motivo, source_id, soat_vencimiento, citv_vencimiento, habilitacion_vencimiento").eq("provider_id", id).order("placa"),
     db.from("personal").select("id, nombre, rol, dni_ultimos3, estado, motivo, carne_vence").eq("provider_id", id).order("nombre"),
     db.from("empresa_destinos").select("destino").eq("provider_id", id),
     db.from("authorizations").select("tipo, fecha_vencimiento").eq("provider_id", id),

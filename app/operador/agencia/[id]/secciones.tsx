@@ -16,7 +16,7 @@ const fila = "flex flex-col gap-1 border-b border-separador p-4 last:border-0";
 type Datos = {
   providerId: string; hoy: string; destinos: string[];
   canales: { id: string; tipo: string; visible: string; estado: string; motivo: string | null }[];
-  vehiculos: { id: string; placa: string; aprobacion: string; motivo: string | null; soat_vencimiento: string | null; citv_vencimiento: string | null; habilitacion_vencimiento: string | null }[];
+  vehiculos: { id: string; placa: string; aprobacion: string; motivo: string | null; source_id: string; soat_vencimiento: string | null; citv_vencimiento: string | null; habilitacion_vencimiento: string | null }[];
   personal: { id: string; nombre: string; rol: string; dni_ultimos3: string; estado: string; motivo: string | null; carne_vence: string | null }[];
   autorizaciones: { tipo: string; fecha_vencimiento: string | null }[];
 };
@@ -104,7 +104,9 @@ export function SeccionesVerificables({ providerId, destinos, canales, vehiculos
                 <div className="flex flex-wrap items-center justify-between gap-2"><Mono className="font-bold">{v.placa.slice(0, 3)}-{v.placa.slice(3)}</Mono><Chip estado={v.aprobacion} /></div>
                 <span className="text-[0.9375rem] text-texto-suave">SOAT <Mono>{v.soat_vencimiento ? fechaLegible(v.soat_vencimiento) : "—"}</Mono> · Rev. técnica <Mono>{v.citv_vencimiento ? fechaLegible(v.citv_vencimiento) : "—"}</Mono></span>
                 {v.aprobacion === "rechazado" && v.motivo && <p className="text-[0.9375rem] text-observaciones">{v.motivo}</p>}
-                <Retirar providerId={providerId} que="vehiculos" id={v.id} />
+                {v.source_id === "checktur_validacion"
+                  ? <Retirar providerId={providerId} que="vehiculos" id={v.id} />
+                  : <span className="text-[0.875rem] text-texto-suave">Registrada en el padrón oficial: los cambios se hacen ante la autoridad que la habilitó.</span>}
               </li>
             ))}
           </ul>

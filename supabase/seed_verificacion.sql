@@ -32,7 +32,7 @@ insert into public.authorizations (provider_id, tipo, entidad_emisora, numero, f
 update public.vehicles set foto_url = '/muestras/van-' || lower(placa) || '.svg', autorizacion_mtc = 'R.D. 000-2024-MUESTRA' where es_muestra and placa like 'MUE%';
 insert into public.vehicles (provider_id, placa, modalidad, ambito, estado, tuc_numero, habilitacion_vencimiento, citv_vencimiento, soat_vencimiento, es_muestra, source_id, foto_url, autorizacion_mtc) values
   ('00000000-0000-4000-a000-000000000021', 'MUE006', 'turistico', 'regional', 'habilitado', 'TUC-MUE-006', '2033-06-30', '2027-05-20', '2027-04-15', true, 'muestra', '/muestras/van-mue006.svg', 'R.D.R. 021-2024-MUESTRA')
-on conflict (placa) do nothing;
+on conflict do nothing;
 
 -- ---------- personal (DNI: solo últimos 3) ----------
 insert into public.personal (id, provider_id, nombre, rol, dni_ultimos3, foto_url, carne_numero, carne_vence, estado) values

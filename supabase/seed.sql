@@ -43,4 +43,4 @@ insert into public.vehicles (provider_id, placa, modalidad, ambito, estado, tuc_
   ('00000000-0000-4000-a000-000000000002', 'MUE004', 'turistico',    'provincial', 'cancelado',  'TUC-MUE-004', '2030-05-10', '2026-12-01', '2026-11-20', true, 'muestra'),
   -- ámbar: SOAT vencido
   ('00000000-0000-4000-a000-000000000002', 'MUE005', 'turistico',    'provincial', 'habilitado', 'TUC-MUE-005', '2030-05-10', '2027-02-01', '2026-08-31', true, 'muestra')
-on conflict (placa) do nothing;
+on conflict do nothing;

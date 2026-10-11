@@ -103,19 +103,18 @@ export async function publicarValidacion(id: string) {
     });
   } else {
     const placa = normalizarPlaca(d.placa ?? ext?.campos?.placa ?? ""); // la placa declarada ya se cruzó con el documento (capa 3)
-    if (placa)
-      await db.from("vehicles").upsert(
-        {
-          provider_id: proveedorId,
-          placa,
-          modalidad: "turistico",
-          tuc_numero: ext?.campos?.numero_tuc ?? null,
-          habilitacion_vencimiento: ext?.campos?.habilitacion_vencimiento ?? null,
-          es_muestra: esMuestra,
-          source_id: "checktur_validacion",
-        },
-        { onConflict: "placa", ignoreDuplicates: true },
-      );
+    // La placa es única solo entre aprobadas: si ya hay una aprobada (de cualquiera), no se duplica.
+    const { data: yaAprobada } = placa ? await db.from("vehicles").select("id").eq("placa", placa).eq("aprobacion", "aprobado").maybeSingle() : { data: null };
+    if (placa && !yaAprobada)
+      await db.from("vehicles").insert({
+        provider_id: proveedorId,
+        placa,
+        modalidad: "turistico",
+        tuc_numero: ext?.campos?.numero_tuc ?? null,
+        habilitacion_vencimiento: ext?.campos?.habilitacion_vencimiento ?? null,
+        es_muestra: esMuestra,
+        source_id: "checktur_validacion",
+      });
   }
   await db.from("sources").update({ fecha_corte: hoy() }).eq("id", "checktur_validacion");
   await vincularCuenta(proveedorId!, s.user_id);
